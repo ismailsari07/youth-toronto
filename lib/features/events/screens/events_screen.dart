@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models.dart';
 import '../../../core/theme.dart';
@@ -269,7 +271,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen>
     if (events.isEmpty) {
       return Center(
         child: Text(
-          'No events found.',
+          'No upcoming events',
           style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
         ),
       );
@@ -357,7 +359,12 @@ class _EventsScreenState extends ConsumerState<EventsScreen>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text('REGISTER →', style: AppTextStyles.goldAccent),
+                          Text(
+                            event.registrationUri != null
+                                ? 'REGISTER →'
+                                : 'DETAILS →',
+                            style: AppTextStyles.goldAccent,
+                          ),
                         ],
                       ),
                     ],
@@ -711,18 +718,22 @@ class EventDetailScreen extends StatelessWidget {
                   ],
                   const SizedBox(height: 24),
                   _buildInfoCard(),
-                  const SizedBox(height: 24),
-                  _buildRegisterButton(),
-                  const SizedBox(height: 12),
-                  Center(
-                    child: Text(
-                      '${event.attendingCount} attending',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.textMuted,
-                        fontSize: 13,
+                  if (event.registrationUri != null) ...[
+                    const SizedBox(height: 24),
+                    _buildRegisterButton(context),
+                  ],
+                  if (event.attendingCount > 0) ...[
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Text(
+                        '${event.attendingCount} attending',
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.textMuted,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -733,20 +744,20 @@ class EventDetailScreen extends StatelessWidget {
   }
 
   Widget _buildImageArea(BuildContext context) {
+    final imageUrl = event.imageUrl;
     return SizedBox(
       height: 240,
       child: Stack(
         children: [
-          Positioned.fill(child: CustomPaint(painter: _HatchPainter())),
-          const Center(
-            child: Text(
-              'EVENT IMAGE',
-              style: TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 10,
-                letterSpacing: 2,
-              ),
-            ),
+          Positioned.fill(
+            child: imageUrl != null
+                ? Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    // Missing/broken image (e.g. no storage bucket) → gradient.
+                    errorBuilder: (_, _, _) => _buildImageFallback(),
+                  )
+                : _buildImageFallback(),
           ),
           SafeArea(
             child: Padding(
@@ -758,7 +769,10 @@ class EventDetailScreen extends StatelessWidget {
                     icon: Icons.close,
                     onTap: () => Navigator.pop(context),
                   ),
-                  _buildOverlayButton(icon: Icons.ios_share_outlined),
+                  _buildOverlayButton(
+                    icon: Icons.ios_share_outlined,
+                    onTap: () => _share(context),
+                  ),
                 ],
               ),
             ),
@@ -766,6 +780,51 @@ class EventDetailScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildImageFallback() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.surfaceElevated, AppColors.surface],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _share(BuildContext context) async {
+    final lines = <String>[
+      event.title,
+      _fmtDetailDate(event.dateTime),
+      if (event.location != null && event.location!.trim().isNotEmpty)
+        event.location!.trim(),
+      if (event.registrationUri != null) 'Register: ${event.registrationUri}',
+    ];
+    try {
+      await SharePlus.instance.share(
+        ShareParams(text: lines.join('\n'), subject: event.title),
+      );
+    } catch (e) {
+      debugPrint('Sharing event failed: $e');
+    }
+  }
+
+  Future<void> _openRegistration(BuildContext context) async {
+    final uri = event.registrationUri;
+    if (uri == null) return;
+    var opened = false;
+    try {
+      opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Opening registration link failed: $e');
+    }
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Couldn't open the registration link")),
+      );
+    }
   }
 
   Widget _buildOverlayButton({required IconData icon, VoidCallback? onTap}) {
@@ -862,50 +921,27 @@ class EventDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRegisterButton() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: AppColors.gold,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Center(
-        child: Text(
-          'Register',
-          style: GoogleFonts.dmSans(
-            color: AppColors.background,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+  Widget _buildRegisterButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _openRegistration(context),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.gold,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Text(
+            'Register',
+            style: GoogleFonts.dmSans(
+              color: AppColors.background,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
     );
   }
-}
-
-// ─── Hatch Painter ────────────────────────────────────────────────────────────
-
-class _HatchPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()..color = AppColors.surface,
-    );
-    final linePaint = Paint()
-      ..color = AppColors.cardBorder
-      ..strokeWidth = 1;
-    const spacing = 18.0;
-    for (double d = -size.height; d <= size.width; d += spacing) {
-      canvas.drawLine(
-        Offset(d, 0),
-        Offset(d + size.height, size.height),
-        linePaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
 }

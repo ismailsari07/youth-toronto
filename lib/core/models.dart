@@ -130,6 +130,20 @@ class YouthEvent {
     required this.isPublished,
   });
 
+  /// registration_link as a launchable web URL, or null if blank or unsafe.
+  /// Admins may omit the scheme ("forms.gle/abc"), so https:// is assumed.
+  Uri? get registrationUri {
+    final raw = registrationLink?.trim() ?? '';
+    if (raw.isEmpty || raw.contains(RegExp(r'\s'))) return null;
+    final withScheme = raw.contains('://') ? raw : 'https://$raw';
+    final uri = Uri.tryParse(withScheme);
+    if (uri == null) return null;
+    if (uri.scheme != 'http' && uri.scheme != 'https') return null;
+    // Reject user:pass@ tricks (e.g. "mailto:a@b.com") and dotless hosts.
+    if (uri.userInfo.isNotEmpty || !uri.host.contains('.')) return null;
+    return uri;
+  }
+
   factory YouthEvent.fromJson(Map<String, dynamic> json) => YouthEvent(
         id: json['id'] as String,
         title: json['title'] as String,

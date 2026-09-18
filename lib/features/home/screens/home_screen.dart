@@ -236,11 +236,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (async.isLoading && !async.hasValue) {
       return [const SizedBox(height: 28), _sectionSpinner(height: 130)];
     }
-    final now = DateTime.now();
-    final upcoming = (async.valueOrNull ?? const <YouthEvent>[])
-        .where((e) => e.dateTime.isAfter(now))
-        .take(3)
-        .toList();
+    // eventsProvider already returns upcoming events only.
+    final upcoming =
+        (async.valueOrNull ?? const <YouthEvent>[]).take(3).toList();
     if (upcoming.isEmpty) return const [];
     return [
       const SizedBox(height: 28),

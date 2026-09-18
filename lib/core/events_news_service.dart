@@ -3,16 +3,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'models.dart';
 
 class EventsNewsService {
+  /// Events from the start of today (local) onward, soonest first. Today's
+  /// events stay listed all day since there's no end time. Errors propagate.
   static Future<List<YouthEvent>> fetchEvents() async {
-    try {
-      final rows = await Supabase.instance.client
-          .from('youth_events')
-          .select()
-          .order('date_time');
-      return rows.map((row) => YouthEvent.fromJson(row)).toList();
-    } catch (_) {
-      return [];
-    }
+    final rows = await Supabase.instance.client
+        .from('youth_events')
+        .select()
+        .gte('date_time', startOfToday().toUtc().toIso8601String())
+        .order('date_time');
+    return rows.map((row) => YouthEvent.fromJson(row)).toList();
+  }
+
+  static DateTime startOfToday() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
   }
 
   /// Published, unexpired announcements, newest first. Errors propagate so the

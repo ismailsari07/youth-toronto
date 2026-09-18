@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/models.dart';
+import '../../../core/mosque_time.dart';
 import '../../../core/prayer_utils.dart';
 import '../../../core/theme.dart';
 import '../../../shared/formatters.dart';
@@ -115,18 +116,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  static int _calcSecondsFromNow(String timeStr) {
-    final now = DateTime.now();
-    final parts = timeStr.split(':');
-    var target = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      int.parse(parts[0]),
-      int.parse(parts[1]),
-    );
+  // Countdown and progress run on the mosque's clock (see mosque_time.dart),
+  // so they're right for any device time zone and for 12-hour stored times.
+
+  static int _calcSecondsFromNow(NextPrayer nextPrayer) {
+    final now = mosqueNow();
+    final today = DateTime(now.year, now.month, now.day);
+    var target = prayerMoment(today, nextPrayer.name, nextPrayer.time);
+    if (target == null) return 0;
     if (!target.isAfter(now)) {
-      target = target.add(const Duration(days: 1));
+      final tomorrow = DateTime(today.year, today.month, today.day + 1);
+      target = prayerMoment(tomorrow, nextPrayer.name, nextPrayer.time)!;
     }
     return target.difference(now).inSeconds;
   }
@@ -139,25 +139,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final nextIdx = filtered.indexWhere((p) => p.name == nextPrayer.name);
     if (nextIdx <= 0) return 0.0;
 
-    final now = DateTime.now();
-    final prevParts = filtered[nextIdx - 1].time.split(':');
-    final nextParts = nextPrayer.time.split(':');
-
-    var prevTime = DateTime(
-      now.year, now.month, now.day,
-      int.parse(prevParts[0]), int.parse(prevParts[1]),
-    );
-    var nextTime = DateTime(
-      now.year, now.month, now.day,
-      int.parse(nextParts[0]), int.parse(nextParts[1]),
-    );
-
-    if (!nextTime.isAfter(prevTime)) {
-      nextTime = nextTime.add(const Duration(days: 1));
-    }
-    if (prevTime.isAfter(now)) {
-      prevTime = prevTime.subtract(const Duration(days: 1));
-    }
+    final now = mosqueNow();
+    final today = DateTime(now.year, now.month, now.day);
+    final prev = filtered[nextIdx - 1];
+    final prevTime = prayerMoment(today, prev.name, prev.time);
+    final nextTime = prayerMoment(today, nextPrayer.name, nextPrayer.time);
+    if (prevTime == null || nextTime == null) return 0.0;
 
     final total = nextTime.difference(prevTime).inSeconds;
     if (total <= 0) return 0.0;
@@ -223,7 +210,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ];
     }
     final nextPrayer = getNextPrayer(payload.dailyPrayerTimes);
-    final secondsLeft = _calcSecondsFromNow(nextPrayer.time);
+    final secondsLeft = _calcSecondsFromNow(nextPrayer);
     final progress = _calcProgress(payload.dailyPrayerTimes, nextPrayer);
     return [
       _animate(3, _buildNextPrayerCard(nextPrayer, secondsLeft, progress)),

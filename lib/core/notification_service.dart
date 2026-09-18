@@ -1,27 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'models.dart';
+import 'mosque_time.dart';
 
 const _channelId = 'prayer_reminders';
 const _channelName = 'Prayer Reminders';
+
+/// One reminder to schedule. [at] is an absolute instant (a Toronto
+/// TZDateTime), so it fires at the right moment wherever the device is.
+typedef Reminder = ({int id, String title, String body, tz.TZDateTime at});
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize() async {
-    tz.initializeTimeZones();
-    try {
-      final tzInfo = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(tzInfo.identifier));
-    } catch (e) {
-      // Unknown device timezone — keep the package default so plugin init
-      // below still runs.
-      debugPrint('NotificationService: timezone setup failed: $e');
-    }
+    initMosqueTime();
 
     // Permissions are requested later via requestPermissions(), not here:
     // this runs before runApp(), and a permission dialog would block the
@@ -55,7 +49,8 @@ class NotificationService {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       if (android != null) {
-        return await android.requestNotificationsPermission() ?? false;
+        // null below Android 13, where no runtime permission exists.
+        return await android.requestNotificationsPermission() ?? true;
       }
       return false;
     } catch (e) {
@@ -64,9 +59,9 @@ class NotificationService {
     }
   }
 
-  static Future<void> schedulePrayerNotifications(
-    List<DailyPrayerItem> prayers,
-  ) async {
+  /// Replaces every pending reminder with [reminders]. All date/time logic
+  /// lives in ReminderSync; this only talks to the plugin.
+  static Future<void> scheduleReminders(List<Reminder> reminders) async {
     await cancelAll();
 
     const details = NotificationDetails(
@@ -79,36 +74,12 @@ class NotificationService {
       iOS: DarwinNotificationDetails(),
     );
 
-    final now = tz.TZDateTime.now(tz.local);
-    var id = 0;
-
-    for (final prayer in prayers) {
-      if (prayer.name == 'Sunrise') continue;
-      final iqamah = prayer.iqamah;
-      if (iqamah == null) continue;
-
-      final parts = iqamah.split(':');
-      if (parts.length != 2) continue;
-      final hour = int.tryParse(parts[0]);
-      final minute = int.tryParse(parts[1]);
-      if (hour == null || minute == null) continue;
-
-      final fireTime = tz.TZDateTime(
-        tz.local,
-        now.year,
-        now.month,
-        now.day,
-        hour,
-        minute,
-      ).subtract(const Duration(minutes: 5));
-
-      if (fireTime.isBefore(now)) continue;
-
+    for (final r in reminders) {
       await _plugin.zonedSchedule(
-        id: id++,
-        title: prayer.name,
-        body: 'Iqamah in 5 minutes',
-        scheduledDate: fireTime,
+        id: r.id,
+        title: r.title,
+        body: r.body,
+        scheduledDate: r.at,
         notificationDetails: details,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );

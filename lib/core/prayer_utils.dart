@@ -1,37 +1,34 @@
 import 'models.dart';
+import 'mosque_time.dart';
 
-DateTime _parseTime(String timeStr, DateTime date) {
-  final parts = timeStr.split(':');
-  final hour = int.parse(parts[0]);
-  final minute = int.parse(parts[1]);
-  return DateTime(date.year, date.month, date.day, hour, minute);
-}
-
+/// The next prayer (Sunrise excluded) on the mosque's clock. After Isha it
+/// wraps to tomorrow's Fajr, using today's time as the estimate.
 NextPrayer getNextPrayer(List<DailyPrayerItem> prayers) {
-  final now = DateTime.now();
+  final now = mosqueNow();
   final today = DateTime(now.year, now.month, now.day);
 
   final filtered = prayers.where((p) => p.name != 'Sunrise').toList();
 
   for (final prayer in filtered) {
-    final prayerTime = _parseTime(prayer.time, today);
-    if (prayerTime.isAfter(now)) {
+    final moment = prayerMoment(today, prayer.name, prayer.time);
+    if (moment != null && moment.isAfter(now)) {
       return NextPrayer(
         name: prayer.name,
         time: prayer.time,
         iqamah: prayer.iqamah,
-        minutesUntil: prayerTime.difference(now).inMinutes,
+        minutesUntil: moment.difference(now).inMinutes,
       );
     }
   }
 
   // All prayers have passed — wrap to Fajr tomorrow
   final fajr = filtered.firstWhere((p) => p.name == 'Fajr');
-  final fajrTomorrow = _parseTime(fajr.time, today.add(const Duration(days: 1)));
+  final tomorrow = DateTime(today.year, today.month, today.day + 1);
+  final fajrTomorrow = prayerMoment(tomorrow, fajr.name, fajr.time);
   return NextPrayer(
     name: fajr.name,
     time: fajr.time,
     iqamah: fajr.iqamah,
-    minutesUntil: fajrTomorrow.difference(now).inMinutes,
+    minutesUntil: fajrTomorrow?.difference(now).inMinutes ?? 0,
   );
 }

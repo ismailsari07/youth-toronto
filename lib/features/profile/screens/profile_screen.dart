@@ -7,6 +7,8 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/auth_service.dart';
+import '../../../core/notification_service.dart';
+import '../../../core/reminder_sync.dart';
 import '../../../core/theme.dart';
 import '../../../shared/providers/auth_provider.dart';
 import 'auth_screen.dart';
@@ -48,9 +50,10 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen>
     with SingleTickerProviderStateMixin {
-  // Value the user just picked, shown until the refreshed profile arrives.
-  bool? _pendingNotifications;
-  bool _savingNotifications = false;
+  // Device-level reminder setting (the only one scheduling reads); null
+  // until loaded from shared_preferences.
+  bool? _remindersOn;
+  bool _savingReminders = false;
   String _language = 'EN';
   late final AnimationController _controller;
   late final List<Animation<double>> _opacityAnims;
@@ -59,6 +62,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
   @override
   void initState() {
     super.initState();
+    ReminderSync.isEnabled().then((on) {
+      if (mounted) setState(() => _remindersOn = on);
+    });
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: _kTotalMs),
@@ -136,15 +142,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Restart animation and reset local state whenever the signed-in user changes.
+    // Restart the entrance animation whenever the signed-in user changes.
     ref.listen(currentUserProvider, (prev, next) {
       if (prev?.id != next?.id) {
         _controller.reset();
         _controller.forward();
-        setState(() {
-          _pendingNotifications = null;
-          _savingNotifications = false;
-        });
       }
     });
 
@@ -274,6 +276,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             child: _buildWelcomeCard(),
           ),
         ),
+        const SizedBox(height: 20),
+        _animate(
+          2,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.cardBorder, width: 1),
+              ),
+              child: _buildRemindersRow(),
+            ),
+          ),
+        ),
         const SizedBox(height: 36),
         _animate(2, _buildOrnamentFooter('MYT · est. 2024')),
       ],
@@ -396,12 +413,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 const SizedBox(height: 28),
                 _animate(3, Text('SETTINGS', style: AppTextStyles.label)),
                 const SizedBox(height: 12),
-                _animate(
-                  3,
-                  _buildSettingsCard(
-                    profileData?['notifications_enabled'] as bool?,
-                  ),
-                ),
+                _animate(3, _buildSettingsCard()),
                 const SizedBox(height: 20),
                 _animate(4, _buildLogOutButton()),
                 const SizedBox(height: 36),
@@ -611,16 +623,62 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     );
   }
 
-  Future<void> _setNotificationsEnabled(bool value) async {
+  Future<void> _setRemindersEnabled(bool value) async {
+    final previous = _remindersOn;
+    setState(() {
+      _remindersOn = value;
+      _savingReminders = true;
+    });
+    try {
+      await ReminderSync.setEnabled(value);
+    } catch (e) {
+      debugPrint('Saving reminder setting failed: $e');
+      if (!mounted) return;
+      setState(() {
+        _remindersOn = previous;
+        _savingReminders = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Couldn't save setting")),
+      );
+      return;
+    }
+
+    if (value) {
+      final granted = await NotificationService.requestPermissions();
+      if (!granted && mounted) {
+        // iOS won't ask twice; the user has to allow it in Settings.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Turn on notifications for Pape Mosque in Settings',
+            ),
+          ),
+        );
+      }
+    } else {
+      try {
+        await NotificationService.cancelAll();
+      } catch (e) {
+        debugPrint('Cancelling reminders failed: $e');
+      }
+    }
+    ReminderSync.sync(); // not awaited; never throws
+
+    if (ref.read(currentUserProvider) != null) {
+      await _mirrorRemindersToServer(value);
+    }
+    if (mounted) setState(() => _savingReminders = false);
+  }
+
+  /// Keeps user_profiles.notifications_enabled in step for signed-in users.
+  /// Informational only (scheduling reads the device setting), so a failure
+  /// is logged rather than undoing the user's choice.
+  Future<void> _mirrorRemindersToServer(bool value) async {
     final userId = ref.read(currentUserProvider)?.id;
     if (userId == null) return;
-    // Captured up front: the refresh must still happen if the user leaves the
-    // tab mid-save, when `ref` is no longer usable.
+    // Captured up front: `ref` is unusable if the tab closes mid-save.
     final container = ProviderScope.containerOf(context, listen: false);
-    setState(() {
-      _pendingNotifications = value;
-      _savingNotifications = true;
-    });
     try {
       // .select() so an update blocked by RLS (0 rows, no error) is caught.
       final rows = await Supabase.instance.client
@@ -634,17 +692,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       container.invalidate(userProfileProvider);
     } catch (e) {
       debugPrint('Saving notifications_enabled failed: $e');
-      if (!mounted) return;
-      setState(() => _pendingNotifications = null);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Couldn't save setting")),
-      );
-    } finally {
-      if (mounted) setState(() => _savingNotifications = false);
     }
   }
 
-  Widget _buildSettingsCard(bool? storedNotifications) {
+  Widget _buildRemindersRow() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.notifications_outlined,
+            color: AppColors.textMuted,
+            size: 18,
+          ),
+          const SizedBox(width: 12),
+          Text('Prayer reminders', style: AppTextStyles.body),
+          const Spacer(),
+          Switch(
+            value: _remindersOn ?? true,
+            onChanged: (_remindersOn == null || _savingReminders)
+                ? null
+                : _setRemindersEnabled,
+            activeThumbColor: AppColors.gold,
+            activeTrackColor: const Color(0x40C8A96B),
+            inactiveThumbColor: AppColors.textMuted,
+            inactiveTrackColor: AppColors.surfaceHighlight,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsCard() {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -653,30 +732,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       ),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.notifications_outlined,
-                  color: AppColors.textMuted,
-                  size: 18,
-                ),
-                const SizedBox(width: 12),
-                Text('Notifications', style: AppTextStyles.body),
-                const Spacer(),
-                Switch(
-                  value: _pendingNotifications ?? storedNotifications ?? true,
-                  onChanged:
-                      _savingNotifications ? null : _setNotificationsEnabled,
-                  activeThumbColor: AppColors.gold,
-                  activeTrackColor: const Color(0x40C8A96B),
-                  inactiveThumbColor: AppColors.textMuted,
-                  inactiveTrackColor: AppColors.surfaceHighlight,
-                ),
-              ],
-            ),
-          ),
+          _buildRemindersRow(),
           const Divider(
             height: 1,
             thickness: 0.5,

@@ -48,8 +48,9 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen>
     with SingleTickerProviderStateMixin {
-  bool _notificationsOn = true;
-  bool _notificationsInitialized = false;
+  // Value the user just picked, shown until the refreshed profile arrives.
+  bool? _pendingNotifications;
+  bool _savingNotifications = false;
   String _language = 'EN';
   late final AnimationController _controller;
   late final List<Animation<double>> _opacityAnims;
@@ -141,23 +142,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         _controller.reset();
         _controller.forward();
         setState(() {
-          _notificationsOn = true;
-          _notificationsInitialized = false;
+          _pendingNotifications = null;
+          _savingNotifications = false;
         });
       }
-    });
-
-    // Initialise notifications toggle from Supabase once per login session.
-    ref.listen(userProfileProvider, (_, next) {
-      next.whenData((profile) {
-        if (!_notificationsInitialized && profile != null && mounted) {
-          setState(() {
-            _notificationsOn =
-                profile['notifications_enabled'] as bool? ?? true;
-            _notificationsInitialized = true;
-          });
-        }
-      });
     });
 
     final authAsync = ref.watch(authStateProvider);
@@ -408,7 +396,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 const SizedBox(height: 28),
                 _animate(3, Text('SETTINGS', style: AppTextStyles.label)),
                 const SizedBox(height: 12),
-                _animate(3, _buildSettingsCard()),
+                _animate(
+                  3,
+                  _buildSettingsCard(
+                    profileData?['notifications_enabled'] as bool?,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 _animate(4, _buildLogOutButton()),
                 const SizedBox(height: 36),
@@ -618,7 +611,40 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     );
   }
 
-  Widget _buildSettingsCard() {
+  Future<void> _setNotificationsEnabled(bool value) async {
+    final userId = ref.read(currentUserProvider)?.id;
+    if (userId == null) return;
+    // Captured up front: the refresh must still happen if the user leaves the
+    // tab mid-save, when `ref` is no longer usable.
+    final container = ProviderScope.containerOf(context, listen: false);
+    setState(() {
+      _pendingNotifications = value;
+      _savingNotifications = true;
+    });
+    try {
+      // .select() so an update blocked by RLS (0 rows, no error) is caught.
+      final rows = await Supabase.instance.client
+          .from('user_profiles')
+          .update({'notifications_enabled': value})
+          .eq('id', userId)
+          .select('id');
+      if (rows.length != 1) {
+        throw StateError('expected 1 updated row, got ${rows.length}');
+      }
+      container.invalidate(userProfileProvider);
+    } catch (e) {
+      debugPrint('Saving notifications_enabled failed: $e');
+      if (!mounted) return;
+      setState(() => _pendingNotifications = null);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Couldn't save setting")),
+      );
+    } finally {
+      if (mounted) setState(() => _savingNotifications = false);
+    }
+  }
+
+  Widget _buildSettingsCard(bool? storedNotifications) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -640,17 +666,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 Text('Notifications', style: AppTextStyles.body),
                 const Spacer(),
                 Switch(
-                  value: _notificationsOn,
-                  onChanged: (v) {
-                    setState(() => _notificationsOn = v);
-                    final userId = ref.read(currentUserProvider)?.id;
-                    if (userId != null) {
-                      Supabase.instance.client
-                          .from('user_profiles')
-                          .update({'notifications_enabled': v})
-                          .eq('user_id', userId);
-                    }
-                  },
+                  value: _pendingNotifications ?? storedNotifications ?? true,
+                  onChanged:
+                      _savingNotifications ? null : _setNotificationsEnabled,
                   activeThumbColor: AppColors.gold,
                   activeTrackColor: const Color(0x40C8A96B),
                   inactiveThumbColor: AppColors.textMuted,

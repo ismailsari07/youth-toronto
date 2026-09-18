@@ -194,7 +194,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
         ),
         const SizedBox(width: 8),
         _buildPill(
-          borderColor: const Color(0x665A5F52),
+          borderColor: AppColors.cardBorder,
           child: Text(
             _formatHijriDate(payload.hijriDate),
             style: AppTextStyles.body.copyWith(fontSize: 13),
@@ -238,8 +238,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: isActive
           ? BoxDecoration(
+              color: AppColors.activeGlow,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.gold, width: 1),
+              border: Border.all(color: AppColors.gold, width: 0.8),
             )
           : null,
       child: Center(
@@ -323,7 +324,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      color: isHighlighted ? AppColors.surfaceHighlight : AppColors.surface,
+      color: isHighlighted
+          ? Color.alphaBlend(AppColors.activeGlow, AppColors.surfaceElevated)
+          : AppColors.surface,
       child: Row(
         children: [
           Column(
@@ -424,7 +427,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
             Expanded(
               child: Divider(
                 thickness: 0.5,
-                color: Color(0x335A5F52),
+                color: AppColors.divider,
               ),
             ),
             Padding(
@@ -437,7 +440,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
             Expanded(
               child: Divider(
                 thickness: 0.5,
-                color: Color(0x335A5F52),
+                color: AppColors.divider,
               ),
             ),
           ],

@@ -121,7 +121,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
                       separatorBuilder: (_, index) => const Divider(
                         height: 1,
                         thickness: 0.5,
-                        color: Color(0x335A5F52),
+                        color: AppColors.divider,
                       ),
                       itemBuilder: (context, i) =>
                           _buildNewsItem(context, items[i]),
@@ -363,7 +363,7 @@ class _NewsDetailScreen extends StatelessWidget {
     return Row(
       children: [
         const Expanded(
-          child: Divider(thickness: 0.5, color: Color(0x335A5F52)),
+          child: Divider(thickness: 0.5, color: AppColors.divider),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -378,7 +378,7 @@ class _NewsDetailScreen extends StatelessWidget {
           ),
         ),
         const Expanded(
-          child: Divider(thickness: 0.5, color: Color(0x335A5F52)),
+          child: Divider(thickness: 0.5, color: AppColors.divider),
         ),
       ],
     );

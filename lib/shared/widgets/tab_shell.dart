@@ -49,7 +49,7 @@ class TabShell extends StatelessWidget {
         decoration: const BoxDecoration(
           color: AppColors.surface,
           border: Border(
-            top: BorderSide(color: AppColors.textMuted, width: 0.3),
+            top: BorderSide(color: AppColors.cardBorder, width: 0.5),
           ),
         ),
         child: SafeArea(
@@ -62,22 +62,39 @@ class TabShell extends StatelessWidget {
                     onTap: () => _onTap(context, i),
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            i == current ? _activeIcons[i] : _icons[i],
-                            color: i == current
-                                ? AppColors.gold
-                                : AppColors.textMuted,
-                            size: i == current ? 26 : 22,
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: i == current
+                                  ? AppColors.activeGlow
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: Icon(
+                              i == current ? _activeIcons[i] : _icons[i],
+                              color: i == current
+                                  ? AppColors.gold
+                                  : AppColors.textMuted,
+                              size: 22,
+                            ),
                           ),
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 2),
                           Text(
                             _labels[i],
                             style: GoogleFonts.dmSans(
-                              fontSize: 11,
+                              fontSize: 10,
+                              fontWeight: i == current
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
                               color: i == current
                                   ? AppColors.gold
                                   : AppColors.textMuted,

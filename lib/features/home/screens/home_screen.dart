@@ -302,7 +302,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Row(
       children: [
         const Expanded(
-          child: Divider(thickness: 0.5, color: Color(0x335A5F52)),
+          child: Divider(thickness: 0.5, color: AppColors.divider),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -312,7 +312,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         ),
         const Expanded(
-          child: Divider(thickness: 0.5, color: Color(0x335A5F52)),
+          child: Divider(thickness: 0.5, color: AppColors.divider),
         ),
       ],
     );
@@ -385,7 +385,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const Divider(
                   height: 1,
                   thickness: 0.5,
-                  color: Color(0x335A5F52),
+                  color: AppColors.cardBorder,
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -396,9 +396,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       _formatCountdown(secondsLeft),
                       style: GoogleFonts.dmSans(
                         color: AppColors.gold,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 1.0,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1.5,
                       ),
                     ),
                   ],
@@ -410,14 +410,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             builder: (_, constraints) => Stack(
               children: [
                 Container(
-                  height: 2,
+                  height: 3,
                   width: double.infinity,
-                  color: AppColors.surfaceHighlight,
+                  color: AppColors.surfaceElevated,
                 ),
                 Container(
-                  height: 2,
+                  height: 3,
                   width: constraints.maxWidth * progress,
-                  color: AppColors.gold,
+                  decoration: BoxDecoration(
+                    color: AppColors.gold,
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(2),
+                      bottomRight: Radius.circular(2),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -470,14 +476,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       children: [
         Text(abbrev, style: AppTextStyles.label.copyWith(fontSize: 10)),
         const SizedBox(height: 4),
-        Text(
-          prayer.time,
-          style: GoogleFonts.dmSans(
-            color: isActive ? AppColors.textPrimary : AppColors.textMuted,
-            fontSize: isActive ? 18.0 : 14.0,
-            fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
-          ),
-        ),
+        isActive
+            ? Text(
+                prayer.time,
+                style: GoogleFonts.cormorantGaramond(
+                  color: AppColors.textPrimary,
+                  fontSize: 19,
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.italic,
+                ),
+              )
+            : Text(
+                prayer.time,
+                style: GoogleFonts.dmSans(
+                  color: AppColors.textMuted,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
         const SizedBox(height: 4),
         Container(
           width: 4,
@@ -485,6 +501,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           decoration: BoxDecoration(
             color: isActive ? AppColors.gold : Colors.transparent,
             shape: BoxShape.circle,
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: AppColors.gold.withValues(alpha: 0.5),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
           ),
         ),
       ],
@@ -563,7 +588,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               fit: StackFit.expand,
               children: [
                 Container(
-                  color: AppColors.surfaceHighlight,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.surfaceElevated, AppColors.surface],
+                    ),
+                  ),
                   child: Center(
                     child: Text('EVENT IMAGE', style: AppTextStyles.label),
                   ),

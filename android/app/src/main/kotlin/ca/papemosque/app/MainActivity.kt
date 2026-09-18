@@ -1,4 +1,4 @@
-package com.example.myt_flutter
+package ca.papemosque.app
 
 import io.flutter.embedding.android.FlutterActivity
 

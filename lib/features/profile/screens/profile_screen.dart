@@ -32,6 +32,9 @@ const _registeredEvents = <_RegisteredEvent>[
   _RegisteredEvent(date: 'May 23', title: 'Weekend Retreat', attended: false),
 ];
 
+// Destructive-action red; local on purpose (not a theme colour).
+const _dangerRed = Color(0xFFE57373);
+
 // ─── Stagger constants ────────────────────────────────────────────────────────
 
 const _kItemCount = 5;
@@ -416,7 +419,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 _animate(3, _buildSettingsCard()),
                 const SizedBox(height: 20),
                 _animate(4, _buildLogOutButton()),
-                const SizedBox(height: 36),
+                const SizedBox(height: 12),
+                _animate(4, _buildDeleteAccountButton()),
+                const SizedBox(height: 28),
                 _animate(4, _buildOrnamentFooter('MYT · TORONTO · 2026')),
               ],
             ),
@@ -813,6 +818,175 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         ),
       ),
     );
+  }
+
+  Widget _buildDeleteAccountButton() {
+    return Center(
+      child: GestureDetector(
+        onTap: _confirmDeleteAccount,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Text(
+            'Delete account',
+            style: AppTextStyles.body.copyWith(
+              color: _dangerRed,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Two-step, fully in-app deletion (App Store 5.1.1(v)): the button only
+  /// enables once the user types DELETE exactly.
+  Future<void> _confirmDeleteAccount() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmController = TextEditingController();
+    var running = false;
+    String? error;
+
+    final deleted = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          final confirmed = confirmController.text == 'DELETE';
+
+          Future<void> runDelete() async {
+            setDialogState(() {
+              running = true;
+              error = null;
+            });
+            final result = await AuthService.deleteAccount();
+            if (!dialogContext.mounted) return;
+            if (result == null) {
+              Navigator.of(dialogContext).pop(true);
+            } else {
+              setDialogState(() {
+                running = false;
+                error = result;
+              });
+            }
+          }
+
+          return PopScope(
+            canPop: !running,
+            child: AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: AppColors.cardBorder),
+              ),
+              title: Text(
+                'Delete account?',
+                style: GoogleFonts.cormorantGaramond(
+                  color: AppColors.textPrimary,
+                  fontSize: 26,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'This permanently deletes your account and profile '
+                    '(name, email, phone, date of birth). '
+                    "This can't be undone.",
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Type DELETE to confirm', style: AppTextStyles.label),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: confirmController,
+                    enabled: !running,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    textCapitalization: TextCapitalization.characters,
+                    style: AppTextStyles.body,
+                    cursorColor: AppColors.gold,
+                    onChanged: (_) => setDialogState(() {}),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: 'DELETE',
+                      hintStyle: AppTextStyles.body.copyWith(
+                        color: AppColors.textMuted,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: AppColors.cardBorder,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: _dangerRed),
+                      ),
+                    ),
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      error!,
+                      style: AppTextStyles.body.copyWith(
+                        color: _dangerRed,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: running
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(false),
+                  child: Text(
+                    'Cancel',
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: (confirmed && !running) ? runDelete : null,
+                  child: running
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: _dangerRed,
+                          ),
+                        )
+                      : Text(
+                          'Delete account',
+                          style: AppTextStyles.body.copyWith(
+                            color: confirmed
+                                ? _dangerRed
+                                : _dangerRed.withValues(alpha: 0.35),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    confirmController.dispose();
+    if (deleted == true) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Your account has been deleted.')),
+      );
+    }
   }
 }
 

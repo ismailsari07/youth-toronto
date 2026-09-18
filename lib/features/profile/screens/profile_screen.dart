@@ -1,9 +1,15 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart' show DateFormat;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/auth_service.dart';
 import '../../../core/theme.dart';
+import '../../../shared/providers/auth_provider.dart';
+import 'auth_screen.dart';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -29,22 +35,21 @@ const _registeredEvents = <_RegisteredEvent>[
 const _kItemCount = 5;
 const _kDelayMs = 25;
 const _kDurationMs = 150;
-// Total = (itemCount - 1) * delay + duration = 4*60 + 300 = 540ms
 const _kTotalMs = (_kItemCount - 1) * _kDelayMs + _kDurationMs;
 
 // ─── Profile Screen ───────────────────────────────────────────────────────────
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
+class _ProfileScreenState extends ConsumerState<ProfileScreen>
     with SingleTickerProviderStateMixin {
-  bool _isLoggedIn = false;
   bool _notificationsOn = true;
+  bool _notificationsInitialized = false;
   String _language = 'EN';
   late final AnimationController _controller;
   late final List<Animation<double>> _opacityAnims;
@@ -108,21 +113,68 @@ class _ProfileScreenState extends State<ProfileScreen>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => _AuthSheet(
-        onAuth: () {
-          Navigator.pop(context);
-          setState(() => _isLoggedIn = true);
-        },
+      builder: (_) => AuthScreen(
+        onSuccess: () => Navigator.pop(context),
       ),
     );
   }
 
+  String _initials(String fullName) {
+    final parts = fullName.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
+    return fullName.isNotEmpty ? fullName[0].toUpperCase() : '?';
+  }
+
+  String _memberYear(String? createdAt) {
+    if (createdAt == null) return DateTime.now().year.toString();
+    return (DateTime.tryParse(createdAt)?.year ?? DateTime.now().year)
+        .toString();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Restart animation and reset local state whenever the signed-in user changes.
+    ref.listen(currentUserProvider, (prev, next) {
+      if (prev?.id != next?.id) {
+        _controller.reset();
+        _controller.forward();
+        setState(() {
+          _notificationsOn = true;
+          _notificationsInitialized = false;
+        });
+      }
+    });
+
+    // Initialise notifications toggle from Supabase once per login session.
+    ref.listen(userProfileProvider, (_, next) {
+      next.whenData((profile) {
+        if (!_notificationsInitialized && profile != null && mounted) {
+          setState(() {
+            _notificationsOn =
+                profile['notifications_enabled'] as bool? ?? true;
+            _notificationsInitialized = true;
+          });
+        }
+      });
+    });
+
+    final authAsync = ref.watch(authStateProvider);
+    final profileData = ref.watch(userProfileProvider).valueOrNull;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: _isLoggedIn ? _buildLoggedIn() : _buildLoggedOut(),
+        child: authAsync.when(
+          loading: () => _buildLoggedOut(),
+          error: (_, _) => _buildLoggedOut(),
+          data: (authState) {
+            final user = authState.session?.user;
+            if (user == null) return _buildLoggedOut();
+            return _buildLoggedIn(user, profileData);
+          },
+        ),
       ),
     );
   }
@@ -198,7 +250,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Row(
       children: [
         const Expanded(
-          child: Divider(thickness: 0.5, color: Color(0x335A5F52)),
+          child: Divider(thickness: 0.5, color: AppColors.divider),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -213,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
         ),
         const Expanded(
-          child: Divider(thickness: 0.5, color: Color(0x335A5F52)),
+          child: Divider(thickness: 0.5, color: AppColors.divider),
         ),
       ],
     );
@@ -321,7 +373,22 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   // ── Logged-in ─────────────────────────────────────────────────────────────
 
-  Widget _buildLoggedIn() {
+  String? _formatDob(String? rawDob) {
+    if (rawDob == null || rawDob.isEmpty) return null;
+    final date = DateTime.tryParse(rawDob);
+    if (date == null) return null;
+    return DateFormat('dd MMM yyyy').format(date);
+  }
+
+  Widget _buildLoggedIn(User user, Map<String, dynamic>? profileData) {
+    final fullName = profileData?['full_name'] as String? ??
+        user.email?.split('@').first ??
+        'Member';
+    final email = user.email ?? '';
+    final memberYear = _memberYear(profileData?['created_at'] as String?);
+    final phone = profileData?['phone'] as String?;
+    final dob = _formatDob(profileData?['date_of_birth'] as String?);
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +400,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _animate(1, _buildUserCard()),
+                _animate(1, _buildUserCard(fullName, email, memberYear, phone: phone, dob: dob)),
                 const SizedBox(height: 28),
                 _animate(2, _buildSectionLabel('MY EVENTS', 'Registered')),
                 const SizedBox(height: 12),
@@ -354,7 +421,13 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget _buildUserCard() {
+  Widget _buildUserCard(
+    String fullName,
+    String email,
+    String memberYear, {
+    String? phone,
+    String? dob,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -374,7 +447,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
             child: Center(
               child: Text(
-                'YK',
+                _initials(fullName),
                 style: GoogleFonts.cormorantGaramond(
                   color: AppColors.textPrimary,
                   fontSize: 20,
@@ -384,40 +457,84 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ),
           const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Yusuf Kaya',
-                style: AppTextStyles.body.copyWith(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fullName,
+                  style: AppTextStyles.body.copyWith(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                'yusuf.kaya@example.com',
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.textMuted,
-                  fontSize: 13,
+                const SizedBox(height: 3),
+                Text(
+                  email,
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textMuted,
+                    fontSize: 13,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 3,
+                if (phone != null && phone.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.phone_outlined,
+                        color: AppColors.textMuted,
+                        size: 12,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        phone,
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.textMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (dob != null && dob.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.cake_outlined,
+                        color: AppColors.textMuted,
+                        size: 12,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        dob,
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.textMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.cardBorder, width: 1),
+                  ),
+                  child: Text(
+                    'MEMBER · $memberYear',
+                    style: AppTextStyles.label.copyWith(fontSize: 9),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.cardBorder, width: 1),
-                ),
-                child: Text(
-                  'MEMBER · 2024',
-                  style: AppTextStyles.label.copyWith(fontSize: 9),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -524,9 +641,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                 const Spacer(),
                 Switch(
                   value: _notificationsOn,
-                  onChanged: (v) => setState(() => _notificationsOn = v),
+                  onChanged: (v) {
+                    setState(() => _notificationsOn = v);
+                    final userId = ref.read(currentUserProvider)?.id;
+                    if (userId != null) {
+                      Supabase.instance.client
+                          .from('user_profiles')
+                          .update({'notifications_enabled': v})
+                          .eq('user_id', userId);
+                    }
+                  },
                   activeThumbColor: AppColors.gold,
-                  activeTrackColor: const Color(0x40C9A97A),
+                  activeTrackColor: const Color(0x40C8A96B),
                   inactiveThumbColor: AppColors.textMuted,
                   inactiveTrackColor: AppColors.surfaceHighlight,
                 ),
@@ -591,7 +717,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildLogOutButton() {
     return GestureDetector(
-      onTap: () => setState(() => _isLoggedIn = false),
+      onTap: () => AuthService.signOut(),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -608,136 +734,6 @@ class _ProfileScreenState extends State<ProfileScreen>
             Text(
               'Log Out',
               style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Auth Sheet ───────────────────────────────────────────────────────────────
-
-class _AuthSheet extends StatelessWidget {
-  const _AuthSheet({required this.onAuth});
-  final VoidCallback onAuth;
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.fromLTRB(24, 16, 24, 32 + bottomInset),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.textMuted,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 28),
-          Text(
-            'MYT',
-            style: GoogleFonts.cormorantGaramond(
-              color: AppColors.gold,
-              fontSize: 14,
-              fontStyle: FontStyle.italic,
-              letterSpacing: 3,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Welcome',
-            style: GoogleFonts.cormorantGaramond(
-              color: AppColors.textPrimary,
-              fontSize: 36,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Hoş geldin',
-            style: GoogleFonts.cormorantGaramond(
-              color: AppColors.textMuted,
-              fontSize: 16,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          const SizedBox(height: 28),
-          _buildAuthButton(
-            icon: Icons.apple,
-            label: 'Continue with Apple',
-            bgColor: const Color(0xFF111111),
-            textColor: Colors.white,
-          ),
-          const SizedBox(height: 10),
-          _buildAuthButton(
-            icon: Icons.language,
-            label: 'Continue with Google',
-            bgColor: AppColors.background,
-            textColor: AppColors.textPrimary,
-            border: true,
-          ),
-          const SizedBox(height: 10),
-          _buildAuthButton(
-            icon: Icons.phone_outlined,
-            label: 'Phone number',
-            bgColor: AppColors.background,
-            textColor: AppColors.textPrimary,
-            border: true,
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Signing in lets you register for events with one tap.',
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 12,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAuthButton({
-    required IconData icon,
-    required String label,
-    required Color bgColor,
-    required Color textColor,
-    bool border = false,
-  }) {
-    return GestureDetector(
-      onTap: onAuth,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-          border: border
-              ? Border.all(color: AppColors.cardBorder, width: 1)
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: textColor, size: 18),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: GoogleFonts.dmSans(
-                color: textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
             ),
           ],
         ),

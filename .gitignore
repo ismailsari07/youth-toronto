@@ -43,3 +43,17 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Signing material (iOS + Android) — never commit
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+*.jks
+*.keystore
+key.properties

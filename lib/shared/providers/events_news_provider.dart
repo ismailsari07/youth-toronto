@@ -7,6 +7,6 @@ final eventsProvider = FutureProvider<List<YouthEvent>>((ref) async {
   return EventsNewsService.fetchEvents();
 });
 
-final newsProvider = FutureProvider<List<NewsItem>>((ref) async {
-  return EventsNewsService.fetchNews();
+final newsProvider = FutureProvider<List<Announcement>>((ref) async {
+  return EventsNewsService.fetchAnnouncements();
 });

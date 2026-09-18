@@ -147,35 +147,39 @@ class YouthEvent {
       );
 }
 
-class NewsItem {
+class Announcement {
   final String id;
   final String title;
-  final String teaser;
-  final String body;
+  final String description;
   final String? imageUrl;
-  final bool isNew;
-  final bool isPublished;
+  final String? imageAltText;
+  final DateTime? publishedAt;
   final DateTime createdAt;
 
-  const NewsItem({
+  const Announcement({
     required this.id,
     required this.title,
-    required this.teaser,
-    required this.body,
+    required this.description,
     this.imageUrl,
-    required this.isNew,
-    required this.isPublished,
+    this.imageAltText,
+    this.publishedAt,
     required this.createdAt,
   });
 
-  factory NewsItem.fromJson(Map<String, dynamic> json) => NewsItem(
+  /// Date shown to users: when it was published, else when it was created.
+  DateTime get date => publishedAt ?? createdAt;
+
+  bool get isNew => DateTime.now().difference(date).inDays < 7;
+
+  factory Announcement.fromJson(Map<String, dynamic> json) => Announcement(
         id: json['id'] as String,
         title: json['title'] as String,
-        teaser: json['teaser'] as String,
-        body: json['body'] as String,
+        description: json['description'] as String,
         imageUrl: json['image_url'] as String?,
-        isNew: json['is_new'] as bool? ?? false,
-        isPublished: json['is_published'] as bool? ?? false,
+        imageAltText: json['image_alt_text'] as String?,
+        publishedAt: json['published_at'] != null
+            ? DateTime.parse(json['published_at'] as String)
+            : null,
         createdAt: DateTime.parse(json['created_at'] as String),
       );
 }

@@ -15,15 +15,18 @@ class EventsNewsService {
     }
   }
 
-  static Future<List<NewsItem>> fetchNews() async {
-    try {
-      final rows = await Supabase.instance.client
-          .from('news')
-          .select()
-          .order('created_at', ascending: false);
-      return rows.map((row) => NewsItem.fromJson(row)).toList();
-    } catch (_) {
-      return [];
-    }
+  /// Published, unexpired announcements, newest first. Errors propagate so the
+  /// screen can show its error state instead of a misleading empty list.
+  static Future<List<Announcement>> fetchAnnouncements() async {
+    final now = DateTime.now().toUtc().toIso8601String();
+    final rows = await Supabase.instance.client
+        .from('announcements')
+        .select(
+          'id, title, description, image_url, image_alt_text, published_at, created_at',
+        )
+        .eq('status', 'published')
+        .gt('expires_at', now)
+        .order('published_at', ascending: false, nullsFirst: false);
+    return rows.map((row) => Announcement.fromJson(row)).toList();
   }
 }

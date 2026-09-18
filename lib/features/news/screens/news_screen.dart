@@ -107,13 +107,23 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
               child: _animate(
                 1,
                 newsAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (err, stack) =>
-                      const Center(child: Text('Failed to load news')),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(color: AppColors.gold),
+                  ),
+                  error: (err, stack) => Center(
+                    child: Text(
+                      "Couldn't load announcements",
+                      style: AppTextStyles.body,
+                    ),
+                  ),
                   data: (items) {
                     if (items.isEmpty) {
-                      return const Center(child: Text('No announcements'));
+                      return Center(
+                        child: Text(
+                          'No announcements right now',
+                          style: AppTextStyles.body,
+                        ),
+                      );
                     }
                     return ListView.separated(
                       padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
@@ -157,7 +167,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
     );
   }
 
-  Widget _buildNewsItem(BuildContext context, NewsItem item) {
+  Widget _buildNewsItem(BuildContext context, Announcement item) {
     return GestureDetector(
       onTap: () => Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute<void>(
@@ -176,7 +186,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
                 _buildBadge(item.isNew),
                 const Spacer(),
                 Text(
-                  _fmtTimestamp(item.createdAt),
+                  _fmtTimestamp(item.date),
                   style: AppTextStyles.label.copyWith(
                     fontSize: 10,
                     letterSpacing: 0.5,
@@ -195,7 +205,9 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              item.teaser,
+              item.description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: AppTextStyles.body.copyWith(
                 color: AppColors.textMuted,
                 fontSize: 14,
@@ -242,7 +254,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
 
 class _NewsDetailScreen extends StatelessWidget {
   const _NewsDetailScreen({required this.item});
-  final NewsItem item;
+  final Announcement item;
 
   @override
   Widget build(BuildContext context) {
@@ -271,17 +283,19 @@ class _NewsDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _fmtTimestamp(item.createdAt),
+                      _fmtTimestamp(item.date),
                       style: AppTextStyles.body.copyWith(
                         color: AppColors.textMuted,
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    _buildCoverImage(),
+                    if (item.imageUrl != null) ...[
+                      const SizedBox(height: 20),
+                      _buildCoverImage(item.imageUrl!),
+                    ],
                     const SizedBox(height: 24),
                     Text(
-                      item.body,
+                      item.description,
                       style: AppTextStyles.body.copyWith(
                         fontSize: 15,
                         height: 1.7,
@@ -303,13 +317,11 @@ class _NewsDetailScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildIconButton(
             icon: Icons.close,
             onTap: () => Navigator.pop(context),
           ),
-          _buildIconButton(icon: Icons.ios_share_outlined),
         ],
       ),
     );
@@ -331,30 +343,17 @@ class _NewsDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCoverImage() {
-    final url = item.imageUrl;
+  Widget _buildCoverImage(String url) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: SizedBox(
+      child: Image.network(
+        url,
         height: 180,
-        child: url != null
-            ? Image.network(url, fit: BoxFit.cover, width: double.infinity)
-            : Stack(
-                fit: StackFit.expand,
-                children: [
-                  CustomPaint(painter: _HatchPainter()),
-                  const Center(
-                    child: Text(
-                      'COVER IMAGE',
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 10,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        width: double.infinity,
+        fit: BoxFit.cover,
+        semanticLabel: item.imageAltText,
+        // Broken/missing image (e.g. storage bucket absent) → no cover at all.
+        errorBuilder: (_, _, _) => const SizedBox.shrink(),
       ),
     );
   }
@@ -383,30 +382,4 @@ class _NewsDetailScreen extends StatelessWidget {
       ],
     );
   }
-}
-
-// ─── Hatch Painter ────────────────────────────────────────────────────────────
-
-class _HatchPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()..color = AppColors.surface,
-    );
-    final linePaint = Paint()
-      ..color = AppColors.cardBorder
-      ..strokeWidth = 1;
-    const spacing = 18.0;
-    for (double d = -size.height; d <= size.width; d += spacing) {
-      canvas.drawLine(
-        Offset(d, 0),
-        Offset(d + size.height, size.height),
-        linePaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
 }

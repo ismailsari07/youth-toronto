@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -13,19 +14,54 @@ class NotificationService {
 
   static Future<void> initialize() async {
     tz.initializeTimeZones();
-    final tzInfo = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(tzInfo.identifier));
+    try {
+      final tzInfo = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(tzInfo.identifier));
+    } catch (e) {
+      // Unknown device timezone — keep the package default so plugin init
+      // below still runs.
+      debugPrint('NotificationService: timezone setup failed: $e');
+    }
 
+    // Permissions are requested later via requestPermissions(), not here:
+    // this runs before runApp(), and a permission dialog would block the
+    // first frame.
     await _plugin.initialize(
       settings: const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestSoundPermission: false,
+          requestBadgePermission: false,
+        ),
       ),
     );
+  }
 
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+  /// Asks for notification permission on first use. The OS shows its dialog
+  /// only once; later calls return the stored answer without prompting.
+  static Future<bool> requestPermissions() async {
+    try {
+      final ios = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        return await ios.requestPermissions(
+              alert: true,
+              sound: true,
+              badge: true,
+            ) ??
+            false;
+      }
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) {
+        return await android.requestNotificationsPermission() ?? false;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('NotificationService: permission request failed: $e');
+      return false;
+    }
   }
 
   static Future<void> schedulePrayerNotifications(
@@ -40,6 +76,7 @@ class NotificationService {
         importance: Importance.high,
         priority: Priority.high,
       ),
+      iOS: DarwinNotificationDetails(),
     );
 
     final now = tz.TZDateTime.now(tz.local);

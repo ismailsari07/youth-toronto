@@ -10,10 +10,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await PrayerService.initialize();
-  } catch (_) {
-    // Supabase credentials are placeholders — skip until configured
+  } catch (e) {
+    // Supabase init failed — start anyway; data screens show their error state.
+    debugPrint('Supabase init failed: $e');
   }
-  await NotificationService.initialize();
+  try {
+    await NotificationService.initialize();
+  } catch (e) {
+    // Reminders are optional — never let them stop the app from opening.
+    debugPrint('Notification init failed: $e');
+  }
   runApp(const ProviderScope(child: MytApp()));
 }
 

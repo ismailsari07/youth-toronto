@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/models.dart';
 import '../../../core/theme.dart';
+import '../../../shared/formatters.dart';
 import '../../../shared/providers/events_news_provider.dart';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -11,11 +12,6 @@ import '../../../shared/providers/events_news_provider.dart';
 enum _ViewMode { list, calendar }
 
 enum _Filter { all, free, paid }
-
-const _months3 = <String>[
-  '', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
-];
 
 const _monthsFull = <String>[
   '', 'January', 'February', 'March', 'April', 'May', 'June',
@@ -27,18 +23,8 @@ const _months3Short = <String>[
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ];
 
-String _fmtTime(DateTime dt) {
-  final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
-  final m = dt.minute.toString().padLeft(2, '0');
-  final ampm = dt.hour >= 12 ? 'PM' : 'AM';
-  return '$h:$m $ampm';
-}
-
-String _fmtCardDate(DateTime dt) =>
-    '${_months3[dt.month]} ${dt.day} · ${_fmtTime(dt)}';
-
 String _fmtDetailDate(DateTime dt) =>
-    '${_months3Short[dt.month]} ${dt.day}, ${dt.year} · ${_fmtTime(dt)}';
+    '${_months3Short[dt.month]} ${dt.day}, ${dt.year} · ${eventTime(dt)}';
 
 // ─── Stagger constants ────────────────────────────────────────────────────────
 
@@ -300,7 +286,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen>
     return GestureDetector(
       onTap: () => Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute<void>(
-          builder: (_) => _EventDetailScreen(event: event),
+          builder: (_) => EventDetailScreen(event: event),
         ),
       ),
       child: Container(
@@ -325,7 +311,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _fmtCardDate(event.dateTime),
+                            eventCardDate(event.dateTime),
                             style: AppTextStyles.label,
                           ),
                           const Spacer(),
@@ -670,7 +656,7 @@ class _CalendarViewState extends State<_CalendarView> {
             ],
           ),
           Text(
-            _fmtTime(event.dateTime),
+            eventTime(event.dateTime),
             style: AppTextStyles.body.copyWith(
               color: AppColors.textMuted,
               fontSize: 13,
@@ -684,8 +670,8 @@ class _CalendarViewState extends State<_CalendarView> {
 
 // ─── Detail Screen ────────────────────────────────────────────────────────────
 
-class _EventDetailScreen extends StatelessWidget {
-  const _EventDetailScreen({required this.event});
+class EventDetailScreen extends StatelessWidget {
+  const EventDetailScreen({super.key, required this.event});
   final YouthEvent event;
 
   @override

@@ -135,7 +135,7 @@ class YouthEvent {
         title: json['title'] as String,
         description: json['description'] as String?,
         location: json['location'] as String?,
-        dateTime: DateTime.parse(json['date_time'] as String),
+        dateTime: DateTime.parse(json['date_time'] as String).toLocal(),
         isFree: json['is_free'] as bool? ?? false,
         price: json['price'] as String?,
         attendingCount: (json['attending_count'] as num?)?.toInt() ?? 0,

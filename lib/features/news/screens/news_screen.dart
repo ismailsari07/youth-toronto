@@ -4,18 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/models.dart';
 import '../../../core/theme.dart';
+import '../../../shared/formatters.dart';
 import '../../../shared/providers/events_news_provider.dart';
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
-String _fmtTimestamp(DateTime dt) {
-  final diff = DateTime.now().difference(dt);
-  if (diff.inMinutes < 60) return '${diff.inMinutes} minutes ago';
-  if (diff.inHours < 24) return '${diff.inHours} hours ago';
-  if (diff.inDays < 7) return '${diff.inDays} days ago';
-  if (diff.inDays < 28) return '${(diff.inDays / 7).floor()} weeks ago';
-  return '${(diff.inDays / 30).floor()} months ago';
-}
 
 // ─── Stagger constants ────────────────────────────────────────────────────────
 
@@ -171,7 +161,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
     return GestureDetector(
       onTap: () => Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute<void>(
-          builder: (_) => _NewsDetailScreen(item: item),
+          builder: (_) => NewsDetailScreen(item: item),
         ),
       ),
       behavior: HitTestBehavior.opaque,
@@ -186,7 +176,7 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
                 _buildBadge(item.isNew),
                 const Spacer(),
                 Text(
-                  _fmtTimestamp(item.date),
+                  timeAgo(item.date),
                   style: AppTextStyles.label.copyWith(
                     fontSize: 10,
                     letterSpacing: 0.5,
@@ -252,8 +242,8 @@ class _NewsScreenState extends ConsumerState<NewsScreen>
 
 // ─── Detail Screen ────────────────────────────────────────────────────────────
 
-class _NewsDetailScreen extends StatelessWidget {
-  const _NewsDetailScreen({required this.item});
+class NewsDetailScreen extends StatelessWidget {
+  const NewsDetailScreen({super.key, required this.item});
   final Announcement item;
 
   @override
@@ -283,7 +273,7 @@ class _NewsDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _fmtTimestamp(item.date),
+                      timeAgo(item.date),
                       style: AppTextStyles.body.copyWith(
                         color: AppColors.textMuted,
                         fontSize: 13,

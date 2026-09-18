@@ -2,12 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/models.dart';
 import '../../../core/prayer_utils.dart';
 import '../../../core/theme.dart';
+import '../../../shared/formatters.dart';
+import '../../../shared/providers/events_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
+import '../../events/screens/events_screen.dart';
+import '../../news/screens/news_screen.dart';
 
 const _stripAbbrev = <String, String>{
   'Fajr': 'FAJR',
@@ -171,103 +176,151 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Sections load independently: missing prayer data must not blank Home.
     final prayerAsync = ref.watch(prayerProvider);
+    final eventsAsync = ref.watch(eventsProvider);
+    final newsAsync = ref.watch(newsProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: prayerAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.gold),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              _animate(0, _buildHeader()),
+              const SizedBox(height: 24),
+              _animate(1, _buildGreeting()),
+              const SizedBox(height: 20),
+              _animate(2, _buildOrnamentDivider()),
+              const SizedBox(height: 20),
+              ..._buildPrayerSection(prayerAsync),
+              ..._buildEventsSection(eventsAsync),
+              ..._buildAnnouncementSection(newsAsync),
+              const SizedBox(height: 32),
+              _animate(6, _buildOrnamentDivider()),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
-        error: (e, _) => Center(
-          child: Text('Failed to load', style: AppTextStyles.body),
-        ),
-        data: (payload) {
-          if (payload == null) {
-            return Center(
-              child: Text('No data available', style: AppTextStyles.body),
-            );
-          }
-          final nextPrayer = getNextPrayer(payload.dailyPrayerTimes);
-          final secondsLeft = _calcSecondsFromNow(nextPrayer.time);
-          final progress = _calcProgress(payload.dailyPrayerTimes, nextPrayer);
-          return _buildBody(payload, nextPrayer, secondsLeft, progress);
-        },
       ),
     );
   }
 
-  Widget _buildBody(
-    PrayerCachePayload payload,
-    NextPrayer nextPrayer,
-    int secondsLeft,
-    double progress,
-  ) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            _animate(0, _buildHeader()),
-            const SizedBox(height: 24),
-            _animate(1, _buildGreeting()),
-            const SizedBox(height: 20),
-            _animate(2, _buildOrnamentDivider()),
-            const SizedBox(height: 20),
-            _animate(3, _buildNextPrayerCard(nextPrayer, secondsLeft, progress)),
-            const SizedBox(height: 12),
-            _animate(4, _buildPrayerStrip(payload.dailyPrayerTimes, nextPrayer)),
-            const SizedBox(height: 28),
-            _animate(5, _buildSectionHeader('UPCOMING', 'Events')),
-            const SizedBox(height: 12),
-            _animate(5, _buildEventsRow()),
-            const SizedBox(height: 28),
-            _animate(6, _buildSectionHeader('LATEST', 'Announcement')),
-            const SizedBox(height: 12),
-            _animate(6, _buildAnnouncementCard()),
-            const SizedBox(height: 32),
-            _animate(6, _buildOrnamentDivider()),
-            const SizedBox(height: 16),
-          ],
+  List<Widget> _buildPrayerSection(AsyncValue<PrayerCachePayload?> async) {
+    final payload = async.valueOrNull;
+    if (async.isLoading && payload == null) {
+      return [_sectionSpinner(height: 180)];
+    }
+    if (payload == null) {
+      return [
+        _animate(
+          3,
+          _buildMessageCard('Prayer times unavailable right now'),
         ),
+      ];
+    }
+    final nextPrayer = getNextPrayer(payload.dailyPrayerTimes);
+    final secondsLeft = _calcSecondsFromNow(nextPrayer.time);
+    final progress = _calcProgress(payload.dailyPrayerTimes, nextPrayer);
+    return [
+      _animate(3, _buildNextPrayerCard(nextPrayer, secondsLeft, progress)),
+      const SizedBox(height: 12),
+      _animate(4, _buildPrayerStrip(payload.dailyPrayerTimes, nextPrayer)),
+    ];
+  }
+
+  List<Widget> _buildEventsSection(AsyncValue<List<YouthEvent>> async) {
+    if (async.isLoading && !async.hasValue) {
+      return [const SizedBox(height: 28), _sectionSpinner(height: 130)];
+    }
+    final now = DateTime.now();
+    final upcoming = (async.valueOrNull ?? const <YouthEvent>[])
+        .where((e) => e.dateTime.isAfter(now))
+        .take(3)
+        .toList();
+    if (upcoming.isEmpty) return const [];
+    return [
+      const SizedBox(height: 28),
+      _animate(
+        5,
+        _buildSectionHeader(
+          'UPCOMING',
+          'Events',
+          onSeeAll: () => context.go('/events'),
+        ),
+      ),
+      const SizedBox(height: 12),
+      _animate(5, _buildEventsRow(upcoming)),
+    ];
+  }
+
+  List<Widget> _buildAnnouncementSection(
+    AsyncValue<List<Announcement>> async,
+  ) {
+    if (async.isLoading && !async.hasValue) {
+      return [const SizedBox(height: 28), _sectionSpinner(height: 130)];
+    }
+    final items = async.valueOrNull ?? const <Announcement>[];
+    if (items.isEmpty) return const [];
+    return [
+      const SizedBox(height: 28),
+      _animate(
+        6,
+        _buildSectionHeader(
+          'LATEST',
+          'Announcement',
+          onSeeAll: () => context.go('/news'),
+        ),
+      ),
+      const SizedBox(height: 12),
+      _animate(6, _buildAnnouncementCard(items.first)),
+    ];
+  }
+
+  Widget _sectionSpinner({required double height}) {
+    return SizedBox(
+      height: height,
+      child: const Center(
+        child: CircularProgressIndicator(color: AppColors.gold),
+      ),
+    );
+  }
+
+  Widget _buildMessageCard(String message) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder, width: 1),
+      ),
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
       ),
     );
   }
 
   Widget _buildHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Text(
-              '◈',
-              style: TextStyle(color: AppColors.gold, fontSize: 14),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'M Y T',
-              style: GoogleFonts.dmSans(
-                color: AppColors.gold,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 4,
-              ),
-            ),
-          ],
+        Text(
+          '◈',
+          style: TextStyle(color: AppColors.gold, fontSize: 14),
         ),
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.textMuted, width: 0.8),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(
-            Icons.notifications_outlined,
-            color: AppColors.textMuted,
-            size: 18,
+        const SizedBox(width: 8),
+        Text(
+          'PAPE MOSQUE',
+          style: GoogleFonts.dmSans(
+            color: AppColors.gold,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 4,
           ),
         ),
       ],
@@ -520,7 +573,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         : col;
   }
 
-  Widget _buildSectionHeader(String label, String title) {
+  Widget _buildSectionHeader(
+    String label,
+    String title, {
+    required VoidCallback onSeeAll,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -528,7 +585,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: AppTextStyles.label),
-            Text('See all →', style: AppTextStyles.goldAccent),
+            GestureDetector(
+              onTap: onSeeAll,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 6, 0, 6),
+                child: Text('See all →', style: AppTextStyles.goldAccent),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 2),
@@ -544,68 +608,73 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildEventsRow() {
+  void _openRoute(Widget screen) {
+    Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute<void>(builder: (_) => screen),
+    );
+  }
+
+  Widget _buildEventsRow(List<YouthEvent> events) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildEventCard(
-            title: 'Youth Iftar',
-            date: 'Apr 15 · 8:15 PM',
-            isFree: true,
-          ),
-          const SizedBox(width: 12),
-          _buildEventCard(
-            title: 'Tafsir Circle',
-            date: 'May 8 · 7:30 PM',
-            isFree: false,
-          ),
+          for (int i = 0; i < events.length; i++) ...[
+            if (i > 0) const SizedBox(width: 12),
+            _buildEventCard(events[i]),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildEventCard({
-    required String title,
-    required String date,
-    required bool isFree,
-  }) {
+  Widget _buildEventImageFallback() {
     return Container(
-      width: 220,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.cardBorder, width: 1),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.surfaceElevated, AppColors.surface],
+        ),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 130,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppColors.surfaceElevated, AppColors.surface],
-                    ),
+    );
+  }
+
+  Widget _buildEventCard(YouthEvent event) {
+    final imageUrl = event.imageUrl;
+    return GestureDetector(
+      onTap: () => _openRoute(EventDetailScreen(event: event)),
+      child: Container(
+        width: 220,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.cardBorder, width: 1),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 130,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (imageUrl != null)
+                    Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => _buildEventImageFallback(),
+                    )
+                  else
+                    _buildEventImageFallback(),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(width: 3, color: AppColors.gold),
                   ),
-                  child: Center(
-                    child: Text('EVENT IMAGE', style: AppTextStyles.label),
-                  ),
-                ),
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(width: 3, color: AppColors.gold),
-                ),
-                if (isFree)
                   Positioned(
                     top: 10,
                     right: 10,
@@ -623,30 +692,77 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       ),
                       child: Text(
-                        'FREE',
+                        event.isFree ? 'FREE' : (event.price ?? 'PAID'),
                         style: AppTextStyles.label.copyWith(fontSize: 10),
                       ),
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.cormorantGaramond(
-                    color: AppColors.textPrimary,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w400,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cormorantGaramond(
+                      color: AppColors.textPrimary,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
+                  const SizedBox(height: 4),
+                  Text(
+                    eventCardDate(event.dateTime),
+                    style: AppTextStyles.body.copyWith(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnnouncementCard(Announcement item) {
+    return GestureDetector(
+      onTap: () => _openRoute(NewsDetailScreen(item: item)),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.cardBorder, width: 1),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (item.isNew)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.gold, width: 0.8),
+                    ),
+                    child: Text('NEW', style: AppTextStyles.goldAccent),
+                  ),
+                const Spacer(),
                 Text(
-                  date,
+                  timeAgo(item.date),
                   style: AppTextStyles.body.copyWith(
                     fontSize: 12,
                     color: AppColors.textMuted,
@@ -654,70 +770,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAnnouncementCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.cardBorder, width: 1),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.gold, width: 0.8),
-                ),
-                child: Text('NEW', style: AppTextStyles.goldAccent),
+            const SizedBox(height: 10),
+            Text(
+              item.title,
+              style: GoogleFonts.cormorantGaramond(
+                color: AppColors.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w400,
               ),
-              Text(
-                '2 days ago',
-                style: AppTextStyles.body.copyWith(
-                  fontSize: 12,
-                  color: AppColors.textMuted,
-                ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              item.description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.body.copyWith(
+                fontSize: 14,
+                color: AppColors.textMuted,
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'New Prayer Hall Opens',
-            style: GoogleFonts.cormorantGaramond(
-              color: AppColors.textPrimary,
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "Our new prayer hall at the North York branch opened with "
-            "this Friday's jummah. All are warmly invited.",
-            style: AppTextStyles.body.copyWith(
-              fontSize: 14,
-              color: AppColors.textMuted,
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text('READ MORE →', style: AppTextStyles.goldAccent),
             ),
-          ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text('READ MORE →', style: AppTextStyles.goldAccent),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

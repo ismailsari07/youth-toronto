@@ -20,6 +20,7 @@ import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/hero_countdown_card.dart';
+import '../../../ui/components/refreshable.dart';
 
 /// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
 /// deliberately no separate "all times" screen (§7.2).
@@ -66,7 +67,11 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     final payload = async.valueOrNull;
     final loading = async.isLoading && payload == null;
 
-    return ListView(
+    return RefreshableList(
+      onRefresh: () async {
+        ref.invalidate(prayerProvider);
+        await ref.read(prayerProvider.future);
+      },
       padding: EdgeInsets.fromLTRB(
         AppSpace.pageGutter,
         topInset(context),

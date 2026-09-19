@@ -14,6 +14,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/refreshable.dart';
 
 /// Spec §7.9. Never empty: settings exist whether or not anyone is signed in.
 class ProfileRootScreen extends ConsumerStatefulWidget {
@@ -45,7 +46,11 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     final user = ref.watch(currentUserProvider);
     final profile = ref.watch(userProfileProvider).valueOrNull;
 
-    return ListView(
+    return RefreshableList(
+      onRefresh: () async {
+        ref.invalidate(userProfileProvider);
+        await ref.read(userProfileProvider.future);
+      },
       padding: EdgeInsets.fromLTRB(
         AppSpace.pageGutter,
         topInset(context),

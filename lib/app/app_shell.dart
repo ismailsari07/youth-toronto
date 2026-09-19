@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_strings.dart';
 import '../shared/providers/unread_provider.dart';
 import '../theme/app_icon.dart';
 import '../theme/app_tokens.dart';
@@ -15,9 +16,9 @@ class AppShell extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   static const _tabs = [
-    IslandTab(icon: AppIcons.mosque, label: 'Prayer'),
-    IslandTab(icon: AppIcons.calendar, label: 'Community'),
-    IslandTab(icon: AppIcons.person, label: 'Profile'),
+    IslandTab(icon: AppIcons.mosque, label: AppStrings.tabPrayer),
+    IslandTab(icon: AppIcons.calendar, label: AppStrings.tabCommunity),
+    IslandTab(icon: AppIcons.person, label: AppStrings.tabProfile),
   ];
 
   @override

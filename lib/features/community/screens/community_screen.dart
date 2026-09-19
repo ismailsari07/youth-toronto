@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models.dart';
+import '../../../l10n/app_strings.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/events_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
@@ -17,6 +18,7 @@ import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
+import '../../../ui/components/refreshable.dart';
 
 /// Spec §7.3 / §7.4 — Events and Announcements behind one segmented control.
 /// Phase B builds the structure; card detail work lands in phases D and E.
@@ -39,7 +41,15 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         ref.watch(newsProvider).valueOrNull ?? const <Announcement>[];
     final jumaa = ref.watch(prayerProvider).valueOrNull?.jumaaPrayerTime;
 
-    return ListView(
+    return RefreshableList(
+      onRefresh: () async {
+        ref.invalidate(eventsProvider);
+        ref.invalidate(newsProvider);
+        await Future.wait([
+          ref.read(eventsProvider.future),
+          ref.read(newsProvider.future),
+        ]);
+      },
       padding: EdgeInsets.fromLTRB(
         AppSpace.pageGutter,
         topInset(context),
@@ -53,7 +63,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         ),
         const SizedBox(height: 16),
         AppSegmented(
-          labels: const ['Events', 'Announcements'],
+          labels: const [AppStrings.events, AppStrings.announcements],
           index: _segment,
           onChanged: _onSegmentChanged,
         ),
@@ -200,9 +210,8 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       return [
         const EmptyStateCard(
           icon: AppIcons.mosque,
-          title: 'No events scheduled',
-          body: 'When the mosque publishes an event it will appear here. '
-              "Jumu'ah runs every Friday as usual.",
+          title: AppStrings.noEventsTitle,
+          body: AppStrings.noEventsBody,
         ),
       ];
     }
@@ -227,8 +236,8 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       return [
         const EmptyStateCard(
           icon: AppIcons.announcement,
-          title: 'No announcements',
-          body: 'Notices from the mosque office will appear here.',
+          title: AppStrings.noAnnouncementsTitle,
+          body: AppStrings.noAnnouncementsBody,
         ),
       ];
     }

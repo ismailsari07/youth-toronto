@@ -57,3 +57,6 @@ app.*.map.json
 *.jks
 *.keystore
 key.properties
+
+# Supabase CLI scratch state
+supabase/.temp/

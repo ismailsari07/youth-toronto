@@ -1,3 +1,5 @@
+import '../core/mosque_time.dart';
+
 // Date/time formatting shared by Home, Events and News.
 
 const _months3 = <String>[
@@ -66,4 +68,33 @@ const _weekdaysLong = <String>[
 const _monthsLong = <String>[
   '', 'January', 'February', 'March', 'April', 'May', 'June', 'July',
   'August', 'September', 'October', 'November', 'December',
+];
+
+/// prayer_cache mixes 24-hour morning times ("05:24") with 12-hour afternoon
+/// ones ("1:16"); mosque_time resolves which is which by prayer name. This
+/// renders them all as "5:24 AM".
+String prayerClock12(String prayerName, String stored) {
+  final clock = prayerClock(prayerName, stored);
+  if (clock == null) return stored;
+  final h = clock.hour % 12 == 0 ? 12 : clock.hour % 12;
+  final suffix = clock.hour >= 12 ? 'PM' : 'AM';
+  return '$h:${clock.minute.toString().padLeft(2, '0')} $suffix';
+}
+
+/// prayer_cache stores `hijriDate` as d.M.yyyy — "11.2.1448" → "11 Safar 1448".
+String? hijriTitle(String? raw) {
+  if (raw == null) return null;
+  final parts = raw.split('.');
+  if (parts.length != 3) return null;
+  final d = int.tryParse(parts[0]);
+  final m = int.tryParse(parts[1]);
+  final y = int.tryParse(parts[2]);
+  if (d == null || m == null || y == null || m < 1 || m > 12) return null;
+  return '$d ${_hijriMonths[m]} $y';
+}
+
+const _hijriMonths = <String>[
+  '', 'Muharram', 'Safar', "Rabi' al-Awwal", "Rabi' al-Thani",
+  'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', "Sha'ban", 'Ramadan',
+  'Shawwal', "Dhu al-Qi'dah", 'Dhu al-Hijjah',
 ];

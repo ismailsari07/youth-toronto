@@ -7,6 +7,7 @@ import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
 import '../features/profile/screens/delete_account_screen.dart';
+import '../features/profile/screens/mosque_info_screen.dart';
 import '../features/profile/screens/profile_root_screen.dart';
 import '../features/profile/screens/settings_screen.dart';
 import '../features/profile/screens/sign_in_screen.dart';
@@ -93,6 +94,11 @@ final router = GoRouter(
                   path: 'delete',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const DeleteAccountScreen(),
+                ),
+                GoRoute(
+                  path: 'mosque',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MosqueInfoScreen(),
                 ),
               ],
             ),

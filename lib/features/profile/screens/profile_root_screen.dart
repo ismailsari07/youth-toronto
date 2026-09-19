@@ -125,8 +125,8 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
             AppListRow(
               icon: AppIcons.pin,
               title: 'Mosque & contact',
-              // Wired to the mosque screen in the next phase.
               trailing: const RowChevron(),
+              onTap: () => context.push('/profile/mosque'),
             ),
             const AppListRow(
               divided: true,

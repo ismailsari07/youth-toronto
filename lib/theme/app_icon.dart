@@ -62,14 +62,16 @@ class AppIcon extends StatelessWidget {
   }
 }
 
-/// One of the two placeholder illustrations, tinted through `currentColor`.
+/// One of the two placeholder illustrations. `mosque-silhouette.svg` uses
+/// `currentColor` and takes [color]; `map-placeholder.svg` carries its own
+/// palette, so it is rendered untinted (pass no colour).
 class AppIllustration extends StatelessWidget {
   const AppIllustration(
     this.name, {
     super.key,
     this.width,
     this.height,
-    required this.color,
+    this.color,
     this.fit = BoxFit.contain,
   });
 
@@ -79,7 +81,7 @@ class AppIllustration extends StatelessWidget {
   final String name;
   final double? width;
   final double? height;
-  final Color color;
+  final Color? color;
   final BoxFit fit;
 
   @override
@@ -89,7 +91,9 @@ class AppIllustration extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      colorFilter: color == null
+          ? null
+          : ColorFilter.mode(color!, BlendMode.srcIn),
     );
   }
 }

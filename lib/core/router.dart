@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app/app_shell.dart';
+import '../features/community/screens/announcement_detail_screen.dart';
 import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
@@ -49,6 +50,13 @@ final router = GoRouter(
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) =>
                       EventDetailScreen(event: state.extra! as YouthEvent),
+                ),
+                GoRoute(
+                  path: 'announcement',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => AnnouncementDetailScreen(
+                    item: state.extra! as Announcement,
+                  ),
                 ),
               ],
             ),

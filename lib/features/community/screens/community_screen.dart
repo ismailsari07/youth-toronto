@@ -8,6 +8,7 @@ import '../../../core/models.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/events_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
+import '../../../shared/providers/unread_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -54,7 +55,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         AppSegmented(
           labels: const ['Events', 'Announcements'],
           index: _segment,
-          onChanged: (i) => setState(() => _segment = i),
+          onChanged: _onSegmentChanged,
         ),
         const SizedBox(height: 16),
         if (_segment == 0)
@@ -111,6 +112,20 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       title: "Jumu'ah · this Friday",
       subtitle: jumaa == null ? 'Every Friday' : 'Salah $jumaa PM',
     );
+  }
+
+  /// Opening the announcements list is what marks them read (spec §7.4's
+  /// unread dot is derived on-device, never from the server).
+  void _onSegmentChanged(int index) {
+    setState(() => _segment = index);
+    if (index == 1) {
+      // Captured before the delay so the context is not used across the gap.
+      final container = ProviderScope.containerOf(context, listen: false);
+      Future<void>.delayed(
+        const Duration(milliseconds: 600),
+        () => markAnnouncementsSeen(container),
+      );
+    }
   }
 
   String _inDays(DateTime dt) {
@@ -217,16 +232,20 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         ),
       ];
     }
+    final unread = ref.watch(unreadAnnouncementsProvider).map((a) => a.id).toSet();
     return [
       for (final a in items) ...[
-        _announcementCard(a),
+        _announcementCard(a, unread: unread.contains(a.id)),
         const SizedBox(height: AppSpace.cardGap),
       ],
     ];
   }
 
-  Widget _announcementCard(Announcement item) {
-    return AppCard(
+  Widget _announcementCard(Announcement item, {required bool unread}) {
+    return GestureDetector(
+      onTap: () => context.push('/community/announcement', extra: item),
+      behavior: HitTestBehavior.opaque,
+      child: AppCard(
       radius: AppRadius.listCard,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
       child: Row(
@@ -242,11 +261,31 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.title,
-                  style: AppText.rowTitle
-                      .copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.2)
-                      .c(AppColor.ink),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: AppText.rowTitle
+                            .copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
+                            )
+                            .c(AppColor.ink),
+                      ),
+                    ),
+                    if (unread)
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.only(left: 4, top: 6),
+                        decoration: const BoxDecoration(
+                          color: AppColor.green,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -265,6 +304,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

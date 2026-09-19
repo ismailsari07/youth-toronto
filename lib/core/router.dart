@@ -3,9 +3,12 @@ import 'package:go_router/go_router.dart';
 
 import '../app/app_shell.dart';
 import '../features/community/screens/community_screen.dart';
+import '../features/community/screens/event_detail_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
 import '../features/profile/screens/profile_root_screen.dart';
+import 'models.dart';
 
+final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _prayerKey = GlobalKey<NavigatorState>(debugLabel: 'prayer');
 final _communityKey = GlobalKey<NavigatorState>(debugLabel: 'community');
 final _profileKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
@@ -14,6 +17,7 @@ final _profileKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 /// announcement details, sign in/up, settings, mosque info) are added to
 /// their branch in later phases.
 final router = GoRouter(
+  navigatorKey: _rootKey,
   initialLocation: '/prayer',
   routes: [
     StatefulShellRoute.indexedStack(
@@ -37,6 +41,16 @@ final router = GoRouter(
               path: '/community',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: CommunityScreen()),
+              routes: [
+                // Pushed on the root navigator: pushed screens hide the
+                // island and own their own bottom bar (spec §1, §7.6).
+                GoRoute(
+                  path: 'event',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) =>
+                      EventDetailScreen(event: state.extra! as YouthEvent),
+                ),
+              ],
             ),
           ],
         ),

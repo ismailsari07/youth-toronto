@@ -98,3 +98,7 @@ const _hijriMonths = <String>[
   'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', "Sha'ban", 'Ramadan',
   'Shawwal', "Dhu al-Qi'dah", 'Dhu al-Hijjah',
 ];
+
+/// "Saturday 26 September" — used as a detail-screen row title.
+String longDate(DateTime dt) =>
+    '${_weekdaysLong[dt.weekday]} ${dt.day} ${_monthsLong[dt.month]}';

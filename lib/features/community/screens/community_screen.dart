@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models.dart';
 import '../../../shared/formatters.dart';
@@ -12,6 +15,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/event_card.dart';
 
 /// Spec §7.3 / §7.4 — Events and Announcements behind one segmented control.
 /// Phase B builds the structure; card detail work lands in phases D and E.
@@ -27,7 +31,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final events = ref.watch(eventsProvider).valueOrNull ?? const <YouthEvent>[];
+    final eventsAsync = ref.watch(eventsProvider);
+    final events = eventsAsync.valueOrNull ?? const <YouthEvent>[];
+    final eventsLoading = eventsAsync.isLoading && !eventsAsync.hasValue;
     final news =
         ref.watch(newsProvider).valueOrNull ?? const <Announcement>[];
     final jumaa = ref.watch(prayerProvider).valueOrNull?.jumaaPrayerTime;
@@ -51,7 +57,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           onChanged: (i) => setState(() => _segment = i),
         ),
         const SizedBox(height: 16),
-        if (_segment == 0) ..._events(events) else ..._announcements(news),
+        if (_segment == 0)
+          ...(eventsLoading ? _loadingCards() : _events(events))
+        else
+          ..._announcements(news),
       ],
     );
   }
@@ -111,6 +120,66 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     return '$days days';
   }
 
+  Future<void> _open(String url) async {
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (_) {
+      /* the button simply does nothing rather than crashing */
+    }
+  }
+
+  Future<void> _share(YouthEvent event) async {
+    final lines = <String>[
+      event.title,
+      heroDateTime(event.dateTime),
+      if (event.location != null && event.location!.trim().isNotEmpty)
+        event.location!.trim(),
+      if (event.registrationUri != null) 'Register: ${event.registrationUri}',
+    ];
+    try {
+      await SharePlus.instance.share(
+        ShareParams(text: lines.join('\n'), subject: event.title),
+      );
+    } catch (_) {
+      /* share sheet unavailable */
+    }
+  }
+
+  /// Spec §7.3b: three shimmer cards at the real radius, never a spinner.
+  List<Widget> _loadingCards() => [
+        for (var i = 0; i < 3; i++) ...[
+          Container(
+            height: 176,
+            decoration: BoxDecoration(
+              color: AppColor.card,
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              boxShadow: AppShadow.card,
+            ),
+            padding: const EdgeInsets.all(AppSpace.cardPadding),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Shimmer(width: 58, height: 64, radius: AppRadius.tile),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Shimmer(width: 180, height: 17),
+                      SizedBox(height: 8),
+                      Shimmer(width: 140, height: 13),
+                      SizedBox(height: 8),
+                      Shimmer(width: 110, height: 13),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpace.cardGap),
+        ],
+      ];
+
   List<Widget> _events(List<YouthEvent> events) {
     if (events.isEmpty) {
       return [
@@ -124,54 +193,18 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     }
     return [
       for (final e in events) ...[
-        _eventCard(e),
+        EventCard(
+          event: e,
+          onTap: () => context.push('/community/event', extra: e),
+          onRegister: () {
+            final uri = e.registrationUri;
+            if (uri != null) _open(uri.toString());
+          },
+          onShare: () => _share(e),
+        ),
         const SizedBox(height: AppSpace.cardGap),
       ],
     ];
-  }
-
-  Widget _eventCard(YouthEvent event) {
-    return AppCard(
-      padding: const EdgeInsets.all(AppSpace.cardPadding),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DateBadge(date: event.dateTime),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(event.title, style: AppText.cardTitle.c(AppColor.ink)),
-                const SizedBox(height: 5),
-                Text(
-                  heroDateTime(event.dateTime),
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)
-                      .c(AppColor.ink2),
-                ),
-                if (event.location != null) ...[
-                  const SizedBox(height: 5),
-                  Row(
-                    children: [
-                      const AppIcon(AppIcons.pin, size: 13, color: AppColor.ink3),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Text(
-                          event.location!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppText.caption.c(AppColor.ink3),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   List<Widget> _announcements(List<Announcement> items) {

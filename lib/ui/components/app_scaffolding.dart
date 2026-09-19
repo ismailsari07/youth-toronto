@@ -11,10 +11,19 @@ import 'app_row.dart';
 /// Spec §4.7. The gradient card at the top of each tab root. It always carries
 /// live content in [row] — a green band with only a title is decoration.
 class GradientTabHeader extends StatelessWidget {
-  const GradientTabHeader({super.key, required this.title, required this.row});
+  const GradientTabHeader({
+    super.key,
+    required this.title,
+    required this.row,
+    this.footer,
+  });
 
   final String title;
   final Widget row;
+
+  /// Extra content inside the card, below the row — e.g. the signed-out
+  /// sign in / create account buttons, which must sit on the gradient.
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +43,7 @@ class GradientTabHeader extends StatelessWidget {
           const Divider(height: 1, thickness: 1, color: AppColor.heroDivider),
           const SizedBox(height: 14),
           row,
+          if (footer != null) ...[const SizedBox(height: 14), footer!],
         ],
       ),
     );

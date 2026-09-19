@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/auth_service.dart';
-import '../../../core/notification_service.dart';
 import '../../../core/reminder_sync.dart';
+import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -14,9 +15,7 @@ import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 
-/// Spec §7.9 — the Profile tab root, signed in or out. Phase B wires the
-/// identity row, the reminders switch and the settings entries; the pushed
-/// screens (settings, sign in/up, delete, mosque) land in phases F and G.
+/// Spec §7.9. Never empty: settings exist whether or not anyone is signed in.
 class ProfileRootScreen extends ConsumerStatefulWidget {
   const ProfileRootScreen({super.key});
 
@@ -38,11 +37,6 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   Future<void> _setReminders(bool value) async {
     setState(() => _remindersOn = value);
     await ReminderSync.setEnabled(value);
-    if (value) {
-      await NotificationService.requestPermissions();
-    } else {
-      await NotificationService.cancelAll();
-    }
     ReminderSync.sync();
   }
 
@@ -61,23 +55,29 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       children: [
         GradientTabHeader(
           title: 'Profile',
-          row: user == null
-              ? const HeroRow(
-                  icon: AppIcons.person,
-                  title: "You're not signed in",
-                  subtitle: 'Sign in to register for events and keep your '
-                      'reminders across devices.',
-                  circleSize: 46,
-                )
-              : HeroRow(
-                  icon: AppIcons.person,
-                  title: (profile?['full_name'] as String?) ??
-                      user.email?.split('@').first ??
-                      'Member',
-                  subtitle: user.email ?? '',
-                  trailing: const RowChevron(color: Colors.white),
+          row: user == null ? _signedOutRow() : _identityRow(user, profile),
+          footer: user != null
+              ? null
+              : Column(
+                  children: [
+                    PrimaryOnGradientButton(
+                      label: 'Sign in',
+                      onTap: () => context.push('/profile/sign-in'),
+                    ),
+                    const SizedBox(height: 8),
+                    OutlinedOnGradientButton(
+                      label: 'Create an account',
+                      onTap: () => context.push('/profile/sign-up'),
+                    ),
+                  ],
                 ),
         ),
+        if (user != null) ...[
+          const SizedBox(height: AppSpace.cardGapWide),
+          const SectionHeader(title: 'Your details'),
+          const SizedBox(height: AppSpace.sectionHeaderGap),
+          _detailsCard(user, profile),
+        ],
         const SizedBox(height: AppSpace.cardGapWide),
         const SectionHeader(title: 'Settings'),
         const SizedBox(height: AppSpace.sectionHeaderGap),
@@ -99,22 +99,34 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('EN',
-                      style: const TextStyle(fontSize: 13.5).c(AppColor.ink3)),
+                  Text(
+                    'EN',
+                    style: const TextStyle(fontSize: 13.5).c(AppColor.ink3),
+                  ),
                   const SizedBox(width: 6),
                   const RowChevron(),
                 ],
               ),
             ),
+            if (user != null)
+              AppListRow(
+                divided: true,
+                icon: AppIcons.person,
+                title: 'Settings',
+                subtitle: 'Reminders, language, account',
+                trailing: const RowChevron(),
+                onTap: () => context.push('/profile/settings'),
+              ),
           ],
         ),
         const SizedBox(height: AppSpace.cardGapWide),
         GroupedRows(
           rows: [
-            const AppListRow(
+            AppListRow(
               icon: AppIcons.pin,
               title: 'Mosque & contact',
-              trailing: RowChevron(),
+              // Wired to the mosque screen in the next phase.
+              trailing: const RowChevron(),
             ),
             const AppListRow(
               divided: true,
@@ -123,22 +135,8 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
               subtitle: 'Version 1.0',
               trailing: RowChevron(),
             ),
-            if (user != null)
-              AppListRow(
-                divided: true,
-                icon: AppIcons.signOut,
-                tone: RowTone.neutral,
-                title: 'Sign out',
-                onTap: () => AuthService.signOut(),
-              ),
           ],
         ),
-        if (user == null) ...[
-          const SizedBox(height: AppSpace.cardGapWide),
-          PrimaryButton(label: 'Sign in', onTap: () {}),
-          const SizedBox(height: 8),
-          GhostButton(label: 'Create an account', height: 46, onTap: () {}),
-        ],
         const SizedBox(height: 20),
         Text(
           'Prayer times, events and announcements work without an account.',
@@ -147,5 +145,131 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
         ),
       ],
     );
+  }
+
+  Widget _signedOutRow() => const HeroRow(
+        icon: AppIcons.person,
+        title: "You're not signed in",
+        subtitle: 'Sign in to register for events and keep your reminders '
+            'across devices.',
+        circleSize: 46,
+      );
+
+  Widget _identityRow(User user, Map<String, dynamic>? profile) {
+    final name = (profile?['full_name'] as String?) ??
+        user.email?.split('@').first ??
+        'Member';
+    final since = _memberSince(profile?['created_at'] as String?);
+    return Row(
+      children: [
+        Container(
+          width: 54,
+          height: 54,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            color: AppColor.heroCircleBg,
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            _initials(name),
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+            ).c(AppColor.onHero),
+          ),
+        ),
+        const SizedBox(width: 13),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ).c(AppColor.onHero),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                since,
+                style: AppText.countdownSub.c(AppColor.onHeroSecondary),
+              ),
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () => context.push('/profile/settings'),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: AppColor.heroCircleBg,
+              shape: BoxShape.circle,
+            ),
+            child: const RowChevron(color: AppColor.onHero, size: 18),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _detailsCard(User user, Map<String, dynamic>? profile) {
+    final phone = profile?['phone'] as String?;
+    final dob = profile?['date_of_birth'] as String?;
+    return GroupedRows(
+      rows: [
+        AppListRow(
+          icon: AppIcons.person,
+          title: (profile?['full_name'] as String?) ?? '—',
+          subtitle: 'Name',
+        ),
+        AppListRow(
+          divided: true,
+          icon: AppIcons.mail,
+          title: user.email ?? '—',
+          subtitle: 'Email',
+        ),
+        AppListRow(
+          divided: true,
+          icon: AppIcons.phone,
+          title: phone == null || phone.isEmpty ? 'Not added' : phone,
+          subtitle: 'Phone',
+        ),
+        AppListRow(
+          divided: true,
+          icon: AppIcons.calendar,
+          title: _formatDob(dob) ?? 'Not added',
+          subtitle: 'Date of birth',
+        ),
+      ],
+    );
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
+    return name.isEmpty ? '?' : name[0].toUpperCase();
+  }
+
+  String _memberSince(String? createdAt) {
+    final date = createdAt == null ? null : DateTime.tryParse(createdAt);
+    if (date == null) return 'Member';
+    return 'Member since ${monthYear(date)}';
+  }
+
+  String? _formatDob(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    final date = DateTime.tryParse(raw);
+    return date == null ? null : longDate(date);
   }
 }

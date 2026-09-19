@@ -6,7 +6,11 @@ import '../features/community/screens/announcement_detail_screen.dart';
 import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
+import '../features/profile/screens/delete_account_screen.dart';
 import '../features/profile/screens/profile_root_screen.dart';
+import '../features/profile/screens/settings_screen.dart';
+import '../features/profile/screens/sign_in_screen.dart';
+import '../features/profile/screens/sign_up_screen.dart';
 import 'models.dart';
 
 final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -69,6 +73,28 @@ final router = GoRouter(
               path: '/profile',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: ProfileRootScreen()),
+              routes: [
+                GoRoute(
+                  path: 'sign-in',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const SignInScreen(),
+                ),
+                GoRoute(
+                  path: 'sign-up',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const SignUpScreen(),
+                ),
+                GoRoute(
+                  path: 'settings',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const SettingsScreen(),
+                ),
+                GoRoute(
+                  path: 'delete',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const DeleteAccountScreen(),
+                ),
+              ],
             ),
           ],
         ),

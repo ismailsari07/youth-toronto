@@ -102,3 +102,6 @@ const _hijriMonths = <String>[
 /// "Saturday 26 September" — used as a detail-screen row title.
 String longDate(DateTime dt) =>
     '${_weekdaysLong[dt.weekday]} ${dt.day} ${_monthsLong[dt.month]}';
+
+/// "March 2024" — used for "Member since".
+String monthYear(DateTime dt) => '${_monthsLong[dt.month]} ${dt.year}';

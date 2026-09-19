@@ -5,6 +5,13 @@ const _months3 = <String>[
   'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
 ];
 
+const _months = <String>[
+  '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+const _weekdays = <String>['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 /// Relative age, e.g. "3 hours ago", "2 weeks ago".
 String timeAgo(DateTime dt) {
   final diff = DateTime.now().difference(dt);
@@ -26,3 +33,37 @@ String eventTime(DateTime dt) {
 /// Event card date, e.g. "MAY 8 · 7:30 PM".
 String eventCardDate(DateTime dt) =>
     '${_months3[dt.month]} ${dt.day} · ${eventTime(dt)}';
+
+/// Hero/subtitle date, kept short so it stays on one line:
+/// "Sat 26 Sep · 6:30 PM".
+String heroDateTime(DateTime dt) =>
+    '${_weekdays[dt.weekday]} ${dt.day} ${_months[dt.month]} · ${eventTime(dt)}';
+
+/// Screen title date: "Wednesday, 23 September".
+String todayTitle() {
+  final now = DateTime.now();
+  return '${_weekdaysLong[now.weekday]}, ${now.day} ${_monthsLong[now.month]}';
+}
+
+/// prayer_cache stores `gregorianDate` as dd.MM.yyyy.
+String? gregorianTitle(String? raw) {
+  if (raw == null) return null;
+  final parts = raw.split('.');
+  if (parts.length != 3) return null;
+  final d = int.tryParse(parts[0]);
+  final m = int.tryParse(parts[1]);
+  final y = int.tryParse(parts[2]);
+  if (d == null || m == null || y == null || m < 1 || m > 12) return null;
+  final weekday = DateTime(y, m, d).weekday;
+  return '${_weekdaysLong[weekday]}, $d ${_monthsLong[m]}';
+}
+
+const _weekdaysLong = <String>[
+  '', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+  'Sunday',
+];
+
+const _monthsLong = <String>[
+  '', 'January', 'February', 'March', 'April', 'May', 'June', 'July',
+  'August', 'September', 'October', 'November', 'December',
+];

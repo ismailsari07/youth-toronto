@@ -110,6 +110,9 @@ abstract final class AppSpace {
   static const rowPaddingV = 13.0;
   static const rowPaddingH = 18.0;
   static const rowGap = 13.0;
+  // Present in IMPLEMENTATION-SPEC.md §2 (spacing table) but absent from the
+  // handoff file; added here so screens don't hardcode it.
+  static const sectionHeaderGap = 10.0;
   static const islandInset = 16.0; // left/right
   static const islandBottom = 30.0;
   static const islandHeight = 64.0;

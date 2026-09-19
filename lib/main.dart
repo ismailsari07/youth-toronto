@@ -7,7 +7,7 @@ import 'core/notification_service.dart';
 import 'core/prayer_service.dart';
 import 'core/reminder_sync.dart';
 import 'core/router.dart';
-import 'core/theme.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,7 +62,7 @@ class _MytAppState extends State<MytApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'MYT',
+      title: 'Pape Mosque',
       theme: appTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

@@ -15,15 +15,30 @@ class CountdownArc extends StatelessWidget {
 
   static const designWidth = 300.0;
   static const designHeight = 170.0;
+  static const stackHeightDesign = 180.0;
+
+  /// The art is fixed-size (spec §6): it only ever scales *down*, on screens
+  /// narrower than the design. Scaling up would push the arc's ends past the
+  /// 180 stack and over the row beneath it.
+  static double scaleFor(double width) =>
+      math.min(1.0, width / designWidth);
+
+  /// Height the surrounding stack must reserve for this arc.
+  static double stackHeight(double width) =>
+      stackHeightDesign * scaleFor(width);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final scale = constraints.maxWidth / designWidth;
+        final scale = scaleFor(constraints.maxWidth);
         return CustomPaint(
           size: Size(constraints.maxWidth, designHeight * scale),
-          painter: _ArcPainter(progress: progress.clamp(0, 1), scale: scale),
+          painter: _ArcPainter(
+            progress: progress.clamp(0, 1),
+            scale: scale,
+            availableWidth: constraints.maxWidth,
+          ),
         );
       },
     );
@@ -31,10 +46,15 @@ class CountdownArc extends StatelessWidget {
 }
 
 class _ArcPainter extends CustomPainter {
-  _ArcPainter({required this.progress, required this.scale});
+  _ArcPainter({
+    required this.progress,
+    required this.scale,
+    required this.availableWidth,
+  });
 
   final double progress;
   final double scale;
+  final double availableWidth;
 
   static const _centre = Offset(150, 150);
   static const _radius = 128.0;
@@ -44,6 +64,9 @@ class _ArcPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.save();
     canvas.scale(scale);
+    // Centre the fixed-size art in whatever width the card gives us.
+    final dx = (availableWidth - CountdownArc.designWidth * scale) / 2;
+    canvas.translate(dx / scale, 0);
 
     final rect = Rect.fromCircle(center: _centre, radius: _radius);
     final track = Paint()
@@ -84,5 +107,7 @@ class _ArcPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ArcPainter old) =>
-      old.progress != progress || old.scale != scale;
+      old.progress != progress ||
+      old.scale != scale ||
+      old.availableWidth != availableWidth;
 }

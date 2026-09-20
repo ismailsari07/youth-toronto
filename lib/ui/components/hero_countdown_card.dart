@@ -77,25 +77,29 @@ class _HeroCountdownCardState extends State<HeroCountdownCard> {
         children: [
           _topRow(),
           const SizedBox(height: 6),
-          SizedBox(
-            height: 180,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: _sweep, end: _sweep),
-                    duration: const Duration(milliseconds: 600),
-                    curve: Curves.easeInOut,
-                    builder: (_, value, _) => CountdownArc(progress: value),
+          LayoutBuilder(
+            builder: (context, constraints) => SizedBox(
+              // Derived from the arc, so the box can never be shorter than
+              // what the painter draws (spec §6's 180 stack at design size).
+              height: CountdownArc.stackHeight(constraints.maxWidth),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: _sweep, end: _sweep),
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeInOut,
+                      builder: (_, value, _) => CountdownArc(progress: value),
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: 74,
-                  left: 0,
-                  right: 0,
-                  child: _centreText(window),
-                ),
-              ],
+                  Positioned(
+                    top: 74,
+                    left: 0,
+                    right: 0,
+                    child: _centreText(window),
+                  ),
+                ],
+              ),
             ),
           ),
           _bottomRow(window),

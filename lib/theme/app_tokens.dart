@@ -29,6 +29,12 @@ abstract final class AppColor {
   static const gradMid = Color(0xFF0F4538);
   static const gradBottom = Color(0xFF072A26);
 
+  // Night — Prayer root moon card
+  static const night = Color(0xFF0E1A2B);
+  static const nightPill = Color(0x24FFFFFF); // 14%
+  static const nightChip = Color(0x1AFFFFFF); // 10%
+  static const nightDivider = Color(0x1AFFFFFF); // 10%
+
   // Text
   static const ink = Color(0xFF0F1C17); // primary
   static const ink2 = Color(0xFF4E5F58); // secondary
@@ -98,6 +104,14 @@ abstract final class AppRadius {
   static const pill = 999.0;
 }
 
+// ----------------------------------------------------------------- MOON
+
+abstract final class AppMoon {
+  static const box = 176.0; // reserved square for the moon widget
+  static const disc = 144.0; // moon diameter inside it; 16 px glow ring each side
+  static const topInCard = 58.0; // 20 padding + 26 top row + 12 gap
+}
+
 // -------------------------------------------------------------- SPACING
 
 abstract final class AppSpace {
@@ -149,6 +163,15 @@ abstract final class AppShadow {
         offset: Offset(0, 18),
         blurRadius: 36,
         spreadRadius: -12),
+  ];
+
+  static const night = <BoxShadow>[
+    BoxShadow(color: Color(0x38080E1A), offset: Offset(0, 2), blurRadius: 6),
+    BoxShadow(
+        color: Color(0x8C080E1A),
+        offset: Offset(0, 22),
+        blurRadius: 46,
+        spreadRadius: -14),
   ];
 
   static const floatingButton = <BoxShadow>[

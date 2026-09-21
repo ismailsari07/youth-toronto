@@ -19,7 +19,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
-import '../../../ui/components/hero_countdown_card.dart';
+import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/refreshable.dart';
 
 /// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
@@ -81,7 +81,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       children: [
         _header(payload, loading),
         const SizedBox(height: 14),
-        HeroCountdownCard(prayers: payload?.dailyPrayerTimes),
+        MoonCountdownCard(prayers: payload?.dailyPrayerTimes),
         const SizedBox(height: AppSpace.cardGapWide),
         const SectionHeader(
           title: 'Today at the mosque',

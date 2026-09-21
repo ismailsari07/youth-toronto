@@ -265,11 +265,16 @@ class Shimmer extends StatefulWidget {
     required this.width,
     required this.height,
     this.radius = 8,
+    this.onDark = false,
   });
 
   final double width;
   final double height;
   final double radius;
+
+  /// Pale grey reads as a bright block on the navy moon card; on dark
+  /// surfaces the block is a low-opacity white instead.
+  final bool onDark;
 
   @override
   State<Shimmer> createState() => _ShimmerState();
@@ -283,6 +288,8 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
 
   static const _from = Color(0xFFE8EDEB);
   static const _to = Color(0xFFF4F7F6);
+  static const _darkFrom = Color(0x14FFFFFF);
+  static const _darkTo = Color(0x2EFFFFFF);
 
   @override
   void dispose() {
@@ -298,7 +305,9 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
         width: widget.width,
         height: widget.height,
         decoration: BoxDecoration(
-          color: Color.lerp(_from, _to, _c.value),
+          color: widget.onDark
+              ? Color.lerp(_darkFrom, _darkTo, _c.value)
+              : Color.lerp(_from, _to, _c.value),
           borderRadius: BorderRadius.circular(widget.radius),
         ),
       ),

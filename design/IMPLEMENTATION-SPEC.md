@@ -7,7 +7,7 @@ This document is complete on its own. You do not need to see the design canvas.
 Every value below is exact. Accompanying files:
 
 - `app_tokens.dart` — all tokens as Dart constants, drop into `lib/theme/`
-- `assets/icons/*.svg` — 26 icons, 24×24, stroke-based, `currentColor`
+- `assets/icons/*.svg` — 34 icons, 24×24, stroke-based, `currentColor`
 - `assets/illustrations/*.svg` — 2 placeholder illustrations
 - `DESIGN-README.md` — the design rationale and the rules that must not be broken
 
@@ -37,8 +37,9 @@ distinguishes them from events at a glance.
 
 **Gold is reserved for Jumu'ah and Eid.** Nowhere else, ever.
 
-**Gradient green only on tab roots.** Prayer, Community and Profile roots carry a
-gradient card, and it always carries live content. Pushed screens get a plain nav bar
+**Hero cards only on tab roots.** The Prayer root carries the night-navy moon card
+(section 6); Community and Profile roots carry the green gradient card. Either way the
+hero always carries live content. Pushed screens get a plain nav bar
 on the light ground. A green band holding only a back button and a title is decoration.
 
 **No fake chrome.** Do not draw a status bar, home indicator or keyboard. The top
@@ -424,65 +425,86 @@ a one-widget swap if it is ever wanted.
 
 ---
 
-## 6. Signature element — the prayer countdown arc
+## 6. Signature element — the moon countdown card
 
-This is the thing people will remember. Get it exact.
+The Prayer root's hero is a night-navy card holding an animated moon that fills with
+glowing white liquid as the next prayer approaches. **The moon widget and all of its
+animation (fill level, surface ripple, glow) are built in code and are out of scope for
+this spec.** This section fixes the card, the layout around the moon, and the exact
+square the moon widget must occupy.
 
-**Geometry.** Draw in a 300×170 coordinate space inside a 180 px tall stack.
-Arc centre `(150, 150)`, radius `128`. A semicircle sweeping from 180° (left,
-at `(22, 150)`) to 0° (right, at `(278, 150)`), passing over the top.
+### Card
 
-**Track.** Full semicircle. Stroke white at 18%, width 6, round cap.
+| Property | Value |
+|---|---|
+| Position | Prayer root, first element after the date header, 14 below it (y 119 on a 390×844 screen) |
+| Width | Full content width: screen − 2 × 20 (350 on a 390 screen) |
+| Height | Content-driven, ≈ 407. **Do not hard-code** — it follows from the children below |
+| Fill | `#0E1A2B` (night navy), solid. No gradient |
+| Radius | 28 |
+| Padding | 20 top, 20 left/right, 18 bottom |
+| Shadow | `0 2px 6px rgba(8,14,26,.22)` + `0 22px 46px -14px rgba(8,14,26,.55)` |
+| Clip | Clip children to the 28 radius (the glow must not leak past the card edge) |
 
-**Progress.** Same path, drawn from the left end clockwise for `progress × 180°`.
-Stroke solid white, width 6, round cap.
-
-**Knob.** At the progress end point, two concentric circles: r = 10 filled white at
-22%, then r = 5.2 filled solid white.
-
-**End point maths.**
-
-```dart
-final angleDeg = 180 - progress * 180;          // progress in 0..1
-final a = angleDeg * math.pi / 180;
-final x = 150 + 128 * math.cos(a);
-final y = 150 - 128 * math.sin(a);
-```
-
-**What progress means.** The elapsed fraction of the *current* prayer window: from the
-current prayer's athan to the next prayer's athan.
-`progress = (now − currentAthan) / (nextAthan − currentAthan)`, clamped to 0..1.
-
-**Centre text block.** Absolutely positioned, full width, centred, top edge at 74 px
-from the top of the 180 px stack. Three lines, 2 px gaps:
+### Vertical layout, top to bottom
 
 ```
-ASR                              12/700/+1.6, white 80%
-1:22:41                          43/700/−1.4, white, tabular
-Athan 4:42 PM · Iqamah 5:00 PM   12.5/500, white 78%
+20   padding
+26   top row: NEXT PRAYER pill (left) · location chip (right)
+12   gap
+176  MOON AREA — 176 × 176 square, horizontally centred
+14   gap
+15   prayer label        ASR
+2    gap
+46   countdown           1:22:41
+2    gap
+15   sub line            Athan 4:42 PM · Iqamah 5:00 PM
+16   gap
+1    divider, white 10%
+14   gap
+30   bottom row: current prayer (left) · next prayer (right)
+18   padding
+───
+≈407
 ```
 
-**Behaviour.** The digits tick every second (`Timer.periodic`, one second). The arc
-animates only on rebuild, not per tick — redrawing the arc 60 times a minute is
-wasteful and visibly stutters; update the sweep once a minute.
-At rollover (countdown hits zero) advance to the next prayer and reset the arc to 0,
-animated over 600 ms with `Curves.easeInOut`.
+### Moon area — the one number that matters
 
-**Surrounding hero card.**
+- Reserve a **176 × 176** square, centred horizontally in the card.
+- Its top edge is **58** below the card's top edge (20 + 26 + 12). Its centre is at card
+  y **146**.
+- Inside it, the moon **disc is Ø 144**, centred. The remaining **16 px ring on every
+  side is for the glow** — the widget may paint into it freely; nothing else overlaps it.
+- Give the moon widget a fixed `SizedBox(width: 176, height: 176)`; never let it size
+  itself from content.
+- Accessibility: wrap the moon in `ExcludeSemantics`. The countdown text carries the
+  meaning. When iOS **Reduce Motion** is on (`MediaQuery.disableAnimations`), stop the
+  ripple; keep updating the fill level in steps.
 
-```
-Gradient card, radius 28, padding 20/20/16, shadow hero
-  Row, height 26:
-    left  — pill: height 26, radius 999, fill white 16%, padding 0/11,
-            "NEXT PRAYER" 10/700/+1.1 white
-    right — chip: height 26, radius 999, fill white 12%, padding 0/11/0/8,
-            pin icon 13 + "Toronto" 11.5/600, white 85%
-  6 px gap
-  The 180 px arc stack described above
-  Row, space-between:
-    left  — "Dhuhr · now" 12.5/600 white  /  "1:05 PM" 11.5 white 78%
-    right — "Asr" 12.5/600 white          /  "4:42 PM" 11.5 white 78%  (right-aligned)
-```
+### Elements
+
+| Element | Spec |
+|---|---|
+| NEXT PRAYER pill | Height 26, radius 999, fill white 14%, padding 0/11. Text 10 / 700 / +1.1, white |
+| Location chip | Height 26, radius 999, fill white 10%, padding 0 11 0 8, gap 5. `pin.svg` 13 + "Toronto" 11.5 / 600, white 85% |
+| Prayer label | Upper-case prayer name. 12 / 700 / +1.6, white 80%, centred |
+| Countdown | `H:MM:SS`. 43 / 700 / −1.4, line-height 1.06, white, **tabular figures**, centred |
+| Sub line | "Athan 4:42 PM · Iqamah 5:00 PM". 12.5 / 500, white 78%, centred |
+| Divider | 1 px, white 10%, full inner width |
+| Bottom row | Space-between. Each side: 28×28 circle, white 10%, prayer icon 16 white, gap 9, then name 12.5 / 600 white over time 11.5 white 78%. Left = current prayer with " · now"; right = next prayer, right-aligned, circle on the outside |
+
+All text on the navy card follows the same opacity ladder as the green hero:
+100 / 85 / 80 / 78%. No coloured text on the card.
+
+### Behaviour of the text (the moon is yours)
+
+The digits tick every second (`Timer.periodic`). The fill fraction you feed the moon is
+the elapsed share of the current prayer window:
+`(now − currentAthan) / (nextAthan − currentAthan)`, clamped 0..1. At zero, advance to the
+next prayer and let the moon drain to empty over 600 ms.
+
+The old semicircle arc is retired. Its exploration artboards remain on the canvas for
+history only.
 
 ---
 
@@ -540,14 +562,14 @@ Everything above is unchanged — that is what keeps the screen full. The sectio
 loses its "See all" link.
 
 **7.1b Loading.** Prayer times arrive from cache almost always, so the common case is
-no spinner. On a cold start with no cache: keep the layout, render the hero card with
-the gradient and a 43 px shimmer block where the digits go, and six shimmer rows in the
+no spinner. On a cold start with no cache: keep the layout, render the navy moon card
+with an empty moon and a 43 px shimmer block where the digits go, and six shimmer rows in the
 times card (shimmer: `#E8EDEB` → `#F4F7F6`, 1.2 s). Never show a full-screen spinner —
 the chrome is known before the data is.
 
 **7.1c Error.** If prayer times cannot be loaded at all, the hero card shows
-"Times unavailable" 20/600 white, "Pull to refresh" 12.5 white 78%, and the arc renders
-track-only at 0 progress. The rest of the screen renders normally.
+"Times unavailable" 20/600 white, "Pull to refresh" 12.5 white 78%, and the moon renders
+empty with no ripple. The rest of the screen renders normally.
 
 ### 7.2 Full daily prayer times
 
@@ -788,11 +810,139 @@ Use `flutter_svg`. For the tab bar and list rows, wrap in
 
 ---
 
+## 8a. Marriage service (added after v1 approval)
+
+A confidential, traditional introduction service run by the mosque. A signed-in member
+uploads **one document** about themselves; the mosque's marriage coordinator reads it and
+contacts them privately if there is a suitable match. There are no form fields and there
+is no directory. Matching is done off-app by the admin (dashboard to follow).
+
+### Placement
+
+A row under a new **"Mosque services"** section on the Profile tab root — the first
+section after the gradient identity card. Not in Community: Community is a public feed,
+and putting a private service next to events signals the opposite of what it is. Not a
+fourth tab: a rarely used, personal service does not earn permanent navigation weight.
+Profile is already the home of everything account-gated and personal.
+
+Discovery: the mosque announces the service through a normal Announcement, and that
+announcement deep-links to the service. The app itself never advertises it on the Prayer
+or Community tabs.
+
+| Profile state | Row title | Row subtitle | Trailing | Opens |
+|---|---|---|---|---|
+| Signed out | Marriage service | Confidential introductions through the mosque | chevron | Gate |
+| Signed in, nothing submitted | Marriage service | Confidential introductions through the mosque | chevron | Upload |
+| Signed in, submitted | Marriage service | Submitted 12 September | "Under review" pill (24 h, greenTint fill, greenDark 11/700) + chevron | Status |
+
+Row icon: `document-lock.svg` in a greenTint circle.
+
+### Screens
+
+All pushed screens: plain nav bar, eyebrow `MARRIAGE SERVICE`. The island is hidden.
+
+**1. Gate (signed out).** Title "Confidential introductions", subtitle "A service of Pape
+Mosque". A card with one paragraph explaining the service. Section "Your privacy" → a
+grouped card of three rows, all greenTint circles:
+`shield-check` "Only you and the coordinator / Your document is never shown to other
+members"; `close` "No profiles, no browsing / There is no listing or directory of
+applicants"; `trash` "Withdraw at any time / Your document is deleted when you withdraw".
+Caption 12.5 ink3 "Open to members aged 18 and over." Sticky bar: primary "Sign in to
+continue", ghost "Create an account", caption "An account lets the coordinator reach
+you privately." After sign-in, return here and continue straight to Upload.
+
+**2. Upload — choose.** Title "Share your document", subtitle "One file, read only by
+the coordinator". Drop-zone card: radius 26, white, **1.5 px dashed `#BFD3C8`** border,
+`card` shadow, padding 26/20/20, centred: 60×60 greenTint circle with `upload` icon 26,
+"Choose one file" 17/700, "PDF, JPG or PNG · up to 4 MB" 13 ink3, then two ghost
+buttons side by side — "Files" (`document` icon → document picker) and "Photos"
+(`photo` icon → photo library). Section "What to include" → card with two paragraphs of
+gentle guidance (no template, Turkish or English fine, only share what you're
+comfortable with). Privacy strip: greenTint rounded rect radius 18, padding 12/16,
+`shield-check` 18 green + "Private to you and the mosque's marriage coordinator. Never
+shown to other members." 12.5 greenDark. Sticky bar: disabled "Submit"
+(fill `#E3E8E5`, text `#7C8A84`) + caption "Choose a file to continue."
+
+Picking a file uploads immediately — there is no separate confirm step, because there is
+nothing else to fill in.
+
+**3. Uploading.** Drop zone is replaced by a file card: 46×54 radius-12 greenTint tile
+with `document` icon and the extension (9/700), file name 15.5/600, "1.8 MB · PDF"
+caption, 44×44 outlined cancel button (`close`). Progress track 6 px `#E3E8E5`, fill
+`green`, radius 999. Below: "Uploading privately…" 12.5/600 greenDark left,
+percentage tabular right. Sticky: primary at 55% opacity "Uploading…", caption "Keep
+the app open until the upload finishes."
+
+**4. Rejected file.** Same card with a 1.5 px `#E9C3BF` border, dangerTint tile,
+"5.6 MB · too large" 12.5/600 danger, explanation 13.5 ink2 ("Files must be under 4 MB.
+Try exporting the PDF at a smaller size, or choose a single photo instead of several."),
+and the Files / Photos buttons again. Same pattern for an unsupported type:
+"Only PDF, JPG or PNG files can be shared." Validate size and type **on device before
+uploading**.
+
+**5. Received.** No nav bar. Centred: 88×88 gradient circle, `check` 40 white, `hero`
+shadow. "Received, thank you" 26/700. Body 14.5 ink2. Section "What happens next" →
+grouped card of three numbered rows (28×28 greenTint circle with 13/700 number):
+"The coordinator reads it", "You're contacted privately", "You decide". Privacy strip.
+Sticky primary "Done" → Status.
+
+**6. Your application (status).** Title "Your application", subtitle "Submitted 12
+September". Status card: pill "● Under review" (26 h, greenTint, greenDark 12/700,
+7 px green dot) + one reassuring paragraph ("there's nothing more you need to do").
+Section "Your document" → file card with two ghost buttons: "View" (`eye`, opens the
+file with a short-lived signed URL in an in-app viewer) and "Replace" (`replace`, goes
+to Upload; the new file overwrites the old one only after the new upload succeeds).
+Privacy strip. Then a destructive row card: dangerTint circle, `trash`, "Withdraw my
+application" 15.5/600 danger, "Deletes your document from the mosque's records"
+caption, chevron `#C99A95`.
+
+**7. Withdraw sheet.** Bottom sheet over the status screen, scrim
+`rgba(15,28,23,.42)`. Sheet: white, top radius 28, padding 10/20/34, grabber 40×5
+`#DDE3E0`. 56×56 dangerTint circle with `trash` 24, "Withdraw your application?"
+20/700 centred, body 14.5 ink2 centred ("permanently deleted… You can apply again at
+any time"). Buttons stacked 10 apart: destructive "Withdraw and delete", ghost "Keep my
+application". On success → Upload screen in its empty state.
+
+v1 states are only: none → uploading → under review → (withdrawn = none). Further
+states ("contacted", "closed") are the admin's concern and are **not** shown in the app
+in v1 — the coordinator contacts people directly.
+
+### Tone rules
+
+Serious, modest, discreet. Say "marriage service", "introduction", "coordinator",
+"suitable match". Never "dating", "profile", "matches" as a noun list, "swipe", "like".
+No hearts, rings, couples, pink or gold. The only iconography is documents, a shield and
+a lock. The word "private" appears on every screen of the flow.
+
+### Privacy requirements — enforce on the server, not in the UI
+
+The design promises the document is visible only to its owner and the coordinator. That
+promise is only true if the backend makes it true.
+
+1. Store files in a **private** Supabase Storage bucket. No public URLs, ever.
+2. RLS on both the storage objects and the `marriage_applications` row: `select` /
+   `insert` / `update` / `delete` for `auth.uid() = user_id`; `select` for the admin
+   role only. No other role, no service key in the client.
+3. Viewing uses `createSignedUrl` with a 60-second expiry, generated per tap.
+4. Strip EXIF (including GPS) from photos **before** upload. Convert HEIC to JPG on
+   device.
+5. Never put the file name, the fact of application, or any content into push
+   notifications, analytics events, crash reports or logs.
+6. Withdrawal and account deletion **hard-delete** the object and the row. The Delete
+   account screen copy already says so.
+7. Enforce 18+ on the server from the profile's date of birth, not only in the UI.
+8. One active document per user (unique constraint on `user_id`).
+
+New icons for this feature (in `assets/icons/`): `document-lock.svg`, `document.svg`,
+`upload.svg`, `shield-check.svg`, `eye.svg`, `replace.svg`, `close.svg`, `photo.svg`.
+
+---
+
 ## 9. Build order
 
 1. Tokens (`app_tokens.dart`), then the shared components in section 4.
-2. The countdown arc as a standalone `CustomPainter` with a slider-driven demo page —
-   it is the one piece worth getting right in isolation.
+2. The moon card shell (section 6) with a placeholder 176×176 box, then drop the moon
+   widget in. Build it on a demo page with a slider driving the fill fraction.
 3. Prayer tab: home, all three states (data, empty community, loading).
 4. Tab scaffold and the island.
 5. Community tab and its four pushed screens.

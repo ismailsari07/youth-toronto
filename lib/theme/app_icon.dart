@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// The design's 34 stroke icons. All are 24×24 with `stroke="currentColor"`,
+/// The design's 35 stroke icons. All are 24×24 with `stroke="currentColor"`,
 /// so the colour is applied here, not in the file.
 abstract final class AppIcons {
   static const fajr = 'prayer-fajr';
@@ -41,6 +41,9 @@ abstract final class AppIcons {
   static const close = 'close';
   static const photo = 'photo';
 
+  // Recurring events (spec §7.3).
+  static const repeat = 'repeat';
+
   /// Prayer row icon for a prayer name from `prayer_cache`.
   static String forPrayer(String name) => switch (name) {
         'Fajr' => fajr,
@@ -50,6 +53,17 @@ abstract final class AppIcons {
         'Maghrib' => maghrib,
         'Isha' => isha,
         _ => mosque,
+      };
+
+  /// Event-card icon for `youth_events.category` (case-insensitive).
+  /// Unknown categories, including `community`, get the calendar.
+  static String forEventCategory(String category) =>
+      switch (category.trim().toLowerCase()) {
+        'education' => document, // Qur'an lessons, classes, study circles
+        'youth' => person,
+        'family' => users,
+        'worship' => mosque, // prayer nights, tarawih, khatm
+        _ => calendar,
       };
 }
 

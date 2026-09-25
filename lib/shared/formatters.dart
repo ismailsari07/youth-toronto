@@ -1,3 +1,5 @@
+import '../core/event_schedule.dart';
+import '../core/models.dart';
 import '../core/mosque_time.dart';
 
 // Date/time formatting shared by Home, Events and News.
@@ -117,3 +119,111 @@ String fileSize(int bytes) {
 
 /// "March 2024" — used for "Member since".
 String monthYear(DateTime dt) => '${_monthsLong[dt.month]} ${dt.year}';
+
+// ── Recurring and prayer-linked events (spec §7.3) ──────────────────────────
+// Every DateTime passed here is a mosque-clock time (event_schedule.dart).
+
+/// What the recurring badge means, for screen readers: "Repeats weekly".
+String recurrenceSpoken(EventRecurrence r) => switch (r) {
+      EventRecurrence.weekly => 'Repeats weekly',
+      EventRecurrence.biweekly => 'Repeats every 2 weeks',
+      EventRecurrence.monthly => 'Repeats monthly',
+      EventRecurrence.none => '',
+    };
+
+/// The cadence at the start of the when line: "Every Wednesday",
+/// "Every 2 weeks", "Monthly".
+String recurrenceWhen(EventRecurrence r, DateTime session) => switch (r) {
+      EventRecurrence.weekly => 'Every ${_weekdaysLong[session.weekday]}',
+      EventRecurrence.biweekly => 'Every 2 weeks',
+      EventRecurrence.monthly => 'Monthly',
+      EventRecurrence.none => '',
+    };
+
+/// Detail eyebrow: "WEEKLY PROGRAMME"; one-off events keep "EVENT".
+String eventEyebrow(EventRecurrence r) => switch (r) {
+      EventRecurrence.weekly => 'WEEKLY PROGRAMME',
+      EventRecurrence.biweekly => 'BIWEEKLY PROGRAMME',
+      EventRecurrence.monthly => 'MONTHLY PROGRAMME',
+      EventRecurrence.none => 'EVENT',
+    };
+
+/// Detail repeat row: ("Every Wednesday", "Weekly programme").
+(String, String) recurrenceRow(EventRecurrence r, DateTime session) =>
+    switch (r) {
+      EventRecurrence.weekly => (
+          'Every ${_weekdaysLong[session.weekday]}',
+          'Weekly programme',
+        ),
+      EventRecurrence.biweekly => (
+          'Every other ${_weekdaysLong[session.weekday]}',
+          'Programme every 2 weeks',
+        ),
+      EventRecurrence.monthly => (
+          'Every month on the ${_ordinal(session.day)}',
+          'Monthly programme',
+        ),
+      EventRecurrence.none => ('', ''),
+    };
+
+String _ordinal(int n) {
+  if (n % 100 >= 11 && n % 100 <= 13) return '${n}th';
+  return switch (n % 10) {
+    1 => '${n}st',
+    2 => '${n}nd',
+    3 => '${n}rd',
+    _ => '${n}th',
+  };
+}
+
+/// "Wed 30 Sep".
+String shortDate(DateTime dt) =>
+    '${_weekdays[dt.weekday]} ${dt.day} ${_months[dt.month]}';
+
+/// "next: Wed 30 Sep".
+String nextShort(DateTime dt) => 'next: ${shortDate(dt)}';
+
+/// "30 September".
+String dayMonthLong(DateTime dt) => '${dt.day} ${_monthsLong[dt.month]}';
+
+/// "Maghrib" for `maghrib`.
+String prayerDisplay(String key) => prayerName(key);
+
+/// The single plain-text line for a session, used where there is no room
+/// for icons (the Community header, share text):
+/// "Every Wednesday · 7:30 PM", "Fri 2 Oct · after Maghrib",
+/// "Every Friday · after Maghrib", "Sat 26 Sep · 6:30 PM".
+String sessionLine(UpcomingEvent u) {
+  final e = u.event;
+  final lead = e.repeats.isRecurring
+      ? recurrenceWhen(e.repeats, u.startsAt)
+      : shortDate(u.startsAt);
+  final prayer = e.startsAfterPrayer;
+  final when = prayer == null
+      ? eventTime(u.startsAt)
+      : 'after ${prayerDisplay(prayer)}';
+  return '$lead · $when';
+}
+
+/// The next session with its date: "Wed 30 Sep · 7:30 PM", or
+/// "Fri 2 Oct · after Maghrib" when prayer-linked.
+String nextSessionLine(UpcomingEvent u) {
+  final prayer = u.event.startsAfterPrayer;
+  return prayer == null
+      ? heroDateTime(u.startsAt)
+      : '${shortDate(u.startsAt)} · after ${prayerDisplay(prayer)}';
+}
+
+/// Share text for an event: title, when, place, registration link.
+String eventShareText(UpcomingEvent u) {
+  final e = u.event;
+  final location = e.location?.trim();
+  return [
+    e.title,
+    e.repeats.isRecurring
+        ? '${sessionLine(u)} (${nextShort(u.startsAt)})'
+        : nextSessionLine(u),
+    if (location != null && location.isNotEmpty) location,
+    if (e.registrationUri != null) 'Register: ${e.registrationUri}',
+  ].join('\n');
+}

@@ -1,22 +1,22 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'event_schedule.dart';
 import 'models.dart';
+import 'mosque_time.dart';
 
 class EventsNewsService {
-  /// Events from the start of today (local) onward, soonest first. Today's
-  /// events stay listed all day since there's no end time. Errors propagate.
+  /// One-off events from the start of today (mosque calendar) onward, plus
+  /// every recurring event whatever its stored first date — a weekly
+  /// programme that began last month is still on. Which session to show is
+  /// worked out on the device (event_schedule.dart). Errors propagate.
   static Future<List<YouthEvent>> fetchEvents() async {
+    final cutoff = mosqueStartOfDay(mosqueNow()).toUtc().toIso8601String();
     final rows = await Supabase.instance.client
         .from('youth_events')
         .select()
-        .gte('date_time', startOfToday().toUtc().toIso8601String())
+        .or('date_time.gte.$cutoff,recurrence.in.(weekly,biweekly,monthly)')
         .order('date_time');
     return rows.map((row) => YouthEvent.fromJson(row)).toList();
-  }
-
-  static DateTime startOfToday() {
-    final now = DateTime.now();
-    return DateTime(now.year, now.month, now.day);
   }
 
   /// Published, unexpired announcements, newest first. Errors propagate so the

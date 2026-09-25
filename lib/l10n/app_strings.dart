@@ -61,6 +61,11 @@ abstract final class AppStrings {
   static const everyoneWelcome = 'Everyone is welcome';
   static const freeToAttend = 'Free to attend';
   static const map = 'Map';
+  static const dropIn = 'Drop in — no registration needed';
+  static const nextSession = 'Next session';
+  static const startTime = 'Start time';
+  static const date = 'Date';
+  static const beginsAfterJamaah = "Begins once the jama'ah finishes";
 
   // ── Profile and account ───────────────────────────────────────────────────
   static const notSignedIn = "You're not signed in";

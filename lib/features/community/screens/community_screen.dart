@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/event_schedule.dart';
 import '../../../core/models.dart';
+import '../../../core/mosque_time.dart';
 import '../../../l10n/app_strings.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/events_news_provider.dart';
@@ -35,7 +37,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   @override
   Widget build(BuildContext context) {
     final eventsAsync = ref.watch(eventsProvider);
-    final events = eventsAsync.valueOrNull ?? const <YouthEvent>[];
+    final events = eventsAsync.valueOrNull ?? const <UpcomingEvent>[];
     final eventsLoading = eventsAsync.isLoading && !eventsAsync.hasValue;
     final news =
         ref.watch(newsProvider).valueOrNull ?? const <Announcement>[];
@@ -79,7 +81,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   /// The row always carries live content: the next event, else Jumu'ah,
   /// which is never empty (spec §4.7).
   Widget _headerRow(
-    List<YouthEvent> events,
+    List<UpcomingEvent> events,
     List<Announcement> news,
     String? jumaa,
   ) {
@@ -105,10 +107,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       final next = events.first;
       return HeroRow(
         icon: AppIcons.calendar,
-        title: next.title,
-        subtitle: heroDateTime(next.dateTime),
+        title: next.event.title,
+        subtitle: nextSessionLine(next),
         trailing: AppBadge(
-          label: _inDays(next.dateTime),
+          label: _inDays(next.startsAt),
           fill: AppColor.heroArcTrack,
           height: 24,
           fontSize: 11,
@@ -138,8 +140,12 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     }
   }
 
-  String _inDays(DateTime dt) {
-    final days = dt.difference(DateTime.now()).inHours ~/ 24;
+  /// Calendar days until [session] on the mosque's calendar.
+  String _inDays(DateTime session) {
+    final now = mosqueNow();
+    final days = DateTime.utc(session.year, session.month, session.day)
+        .difference(DateTime.utc(now.year, now.month, now.day))
+        .inDays;
     if (days <= 0) return 'Today';
     if (days == 1) return 'Tomorrow';
     return '$days days';
@@ -153,17 +159,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     }
   }
 
-  Future<void> _share(YouthEvent event) async {
-    final lines = <String>[
-      event.title,
-      heroDateTime(event.dateTime),
-      if (event.location != null && event.location!.trim().isNotEmpty)
-        event.location!.trim(),
-      if (event.registrationUri != null) 'Register: ${event.registrationUri}',
-    ];
+  Future<void> _share(UpcomingEvent u) async {
     try {
       await SharePlus.instance.share(
-        ShareParams(text: lines.join('\n'), subject: event.title),
+        ShareParams(text: eventShareText(u), subject: u.event.title),
       );
     } catch (_) {
       /* share sheet unavailable */
@@ -205,7 +204,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         ],
       ];
 
-  List<Widget> _events(List<YouthEvent> events) {
+  List<Widget> _events(List<UpcomingEvent> events) {
     if (events.isEmpty) {
       return [
         const EmptyStateCard(
@@ -218,10 +217,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     return [
       for (final e in events) ...[
         EventCard(
-          event: e,
+          upcoming: e,
           onTap: () => context.push('/community/event', extra: e),
           onRegister: () {
-            final uri = e.registrationUri;
+            final uri = e.event.registrationUri;
             if (uri != null) _open(uri.toString());
           },
           onShare: () => _share(e),

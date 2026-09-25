@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/models.dart';
+import '../../core/event_schedule.dart';
 import '../../shared/formatters.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
@@ -8,30 +8,44 @@ import '../../theme/app_tokens.dart';
 import 'app_buttons.dart';
 import 'app_card.dart';
 import 'app_controls.dart';
+import 'event_when_line.dart';
 
 /// Spec §7.3. Two finished variants of the same card: with a photo band, and
-/// starting at the date badge when there is no photo. A photo is a layer,
+/// starting at the left element when there is no photo. A photo is a layer,
 /// never the content — title, date, time and location always come from text
 /// fields.
+///
+/// The left element is the square date tile for an event with a real date
+/// (one-off, including prayer-linked one-offs). A recurring programme gets a
+/// light circle with its category's icon and a small repeat mark; its
+/// cadence is spelled out by the when line ("Every Monday · 7:30 PM"), so
+/// the list carries no separate pill.
 class EventCard extends StatelessWidget {
   const EventCard({
     super.key,
-    required this.event,
+    required this.upcoming,
     this.onTap,
     this.onRegister,
     this.onShare,
   });
 
-  final YouthEvent event;
+  final UpcomingEvent upcoming;
   final VoidCallback? onTap;
   final VoidCallback? onRegister;
   final VoidCallback? onShare;
 
-  bool get _hasActions => event.registrationUri != null;
+  bool get _hasActions => upcoming.event.registrationUri != null;
+  bool get _recurring => upcoming.event.repeats.isRecurring;
+
+  RecurringBadge _recurringBadge({bool onPhoto = false}) => RecurringBadge(
+        icon: AppIcons.forEventCategory(upcoming.event.category),
+        spokenLabel: recurrenceSpoken(upcoming.event.repeats),
+        onPhoto: onPhoto,
+      );
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = event.imageUrl;
+    final imageUrl = upcoming.event.imageUrl;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -40,7 +54,13 @@ class EventCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (imageUrl != null) PhotoBand(url: imageUrl, date: event.dateTime),
+            if (imageUrl != null)
+              PhotoBand(
+                url: imageUrl,
+                topLeft: _recurring
+                    ? _recurringBadge(onPhoto: true)
+                    : DateBadgeOnPhoto(date: upcoming.startsAt),
+              ),
             Padding(
               padding: imageUrl != null
                   ? const EdgeInsets.fromLTRB(18, 16, 18, 18)
@@ -72,7 +92,9 @@ class EventCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        DateBadge(date: event.dateTime),
+        _recurring
+            ? _recurringBadge()
+            : DateBadge(date: upcoming.startsAt),
         const SizedBox(width: 14),
         Expanded(child: _body()),
       ],
@@ -80,17 +102,13 @@ class EventCard extends StatelessWidget {
   }
 
   Widget _body() {
-    final location = event.location;
+    final location = upcoming.event.location;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(event.title, style: AppText.cardTitle.c(AppColor.ink)),
+        Text(upcoming.event.title, style: AppText.cardTitle.c(AppColor.ink)),
         const SizedBox(height: 5),
-        Text(
-          heroDateTime(event.dateTime),
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)
-              .c(AppColor.ink2),
-        ),
+        EventWhenLine(upcoming: upcoming),
         if (location != null && location.trim().isNotEmpty) ...[
           const SizedBox(height: 5),
           Row(
@@ -120,17 +138,19 @@ class PhotoBand extends StatelessWidget {
   const PhotoBand({
     super.key,
     required this.url,
-    this.date,
+    this.topLeft,
     this.height = 160,
   });
 
   final String url;
-  final DateTime? date;
+
+  /// The date tile or recurring badge, 16 / 16 from the top-left.
+  final Widget? topLeft;
   final double height;
 
   @override
   Widget build(BuildContext context) {
-    final badgeDate = date;
+    final left = topLeft;
     return SizedBox(
       height: height,
       child: Stack(
@@ -144,12 +164,7 @@ class PhotoBand extends StatelessWidget {
                   progress == null ? child : const PhotoBandFallback(),
             ),
           ),
-          if (badgeDate != null)
-            Positioned(
-              left: 16,
-              top: 16,
-              child: DateBadgeOnPhoto(date: badgeDate),
-            ),
+          if (left != null) Positioned(left: 16, top: 16, child: left),
         ],
       ),
     );

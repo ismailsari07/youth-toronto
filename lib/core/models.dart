@@ -99,6 +99,24 @@ class NextPrayer {
   });
 }
 
+/// `youth_events.recurrence`. Anything else (including '' and 'none') is a
+/// one-off event.
+enum EventRecurrence {
+  none,
+  weekly,
+  biweekly,
+  monthly;
+
+  static EventRecurrence parse(String? raw) => switch (raw?.trim()) {
+        'weekly' => weekly,
+        'biweekly' => biweekly,
+        'monthly' => monthly,
+        _ => none,
+      };
+
+  bool get isRecurring => this != none;
+}
+
 class YouthEvent {
   final String id;
   final String title;
@@ -114,6 +132,10 @@ class YouthEvent {
   final String recurrence;
   final bool isPublished;
 
+  /// `fajr | dhuhr | asr | maghrib | isha`, or null for a normal clock time.
+  /// When set, the event begins after that prayer's jama'ah (spec §7.3).
+  final String? startsAfterPrayer;
+
   const YouthEvent({
     required this.id,
     required this.title,
@@ -128,7 +150,10 @@ class YouthEvent {
     this.registrationLink,
     required this.recurrence,
     required this.isPublished,
+    this.startsAfterPrayer,
   });
+
+  EventRecurrence get repeats => EventRecurrence.parse(recurrence);
 
   /// registration_link as a launchable web URL, or null if blank or unsafe.
   /// Admins may omit the scheme ("forms.gle/abc"), so https:// is assumed.
@@ -149,7 +174,9 @@ class YouthEvent {
         title: json['title'] as String,
         description: json['description'] as String?,
         location: json['location'] as String?,
-        dateTime: DateTime.parse(json['date_time'] as String).toLocal(),
+        // A UTC instant. Everything shown to users goes through the mosque's
+        // clock (see event_schedule.dart), never the device's time zone.
+        dateTime: DateTime.parse(json['date_time'] as String).toUtc(),
         isFree: json['is_free'] as bool? ?? false,
         price: json['price'] as String?,
         attendingCount: (json['attending_count'] as num?)?.toInt() ?? 0,
@@ -158,7 +185,15 @@ class YouthEvent {
         registrationLink: json['registration_link'] as String?,
         recurrence: json['recurrence'] as String? ?? '',
         isPublished: json['is_published'] as bool? ?? false,
+        startsAfterPrayer: _prayerKey(json['starts_after_prayer'] as String?),
       );
+
+  static const prayerKeys = {'fajr', 'dhuhr', 'asr', 'maghrib', 'isha'};
+
+  static String? _prayerKey(String? raw) {
+    final key = raw?.trim().toLowerCase();
+    return prayerKeys.contains(key) ? key : null;
+  }
 }
 
 class Announcement {

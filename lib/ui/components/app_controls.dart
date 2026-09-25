@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
 
@@ -225,6 +226,81 @@ class DateBadgeOnPhoto extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A recurring event's left element: a light 40×40 greenTint circle with the
+/// event's category icon in green, plus a small repeat mark on its
+/// bottom-right corner so the card still reads as recurring at a glance.
+/// It sits centred in the date tile's 58×64 footprint, so one-off and
+/// recurring cards keep their text columns aligned.
+///
+/// [onPhoto] is the variant over a photo band: a white circle (which holds
+/// up against any photograph) with a soft shadow, and no footprint box.
+/// [spokenLabel] ("Repeats weekly") is what screen readers announce.
+class RecurringBadge extends StatelessWidget {
+  const RecurringBadge({
+    super.key,
+    required this.icon,
+    required this.spokenLabel,
+    this.onPhoto = false,
+  });
+
+  final String icon;
+  final String spokenLabel;
+  final bool onPhoto;
+
+  static const _size = 40.0;
+  static const _markSize = 17.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final circle = SizedBox(
+      width: _size + 4,
+      height: _size + 4,
+      child: Stack(
+        children: [
+          Container(
+            width: _size,
+            height: _size,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: onPhoto ? Colors.white : AppColor.greenTint,
+              shape: BoxShape.circle,
+              boxShadow: onPhoto ? AppShadow.badgeOnPhoto : null,
+            ),
+            child: AppIcon(icon, size: 19, color: AppColor.green),
+          ),
+          // The repeat mark: white ring so it separates from the circle.
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: _markSize,
+              height: _markSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColor.green,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              child: const AppIcon(
+                AppIcons.repeat,
+                size: 10,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return Semantics(
+      label: spokenLabel,
+      excludeSemantics: true,
+      child: onPhoto
+          ? circle
+          : SizedBox(width: 58, height: 64, child: Center(child: circle)),
     );
   }
 }

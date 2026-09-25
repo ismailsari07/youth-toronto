@@ -18,6 +18,7 @@ import '../features/profile/screens/profile_root_screen.dart';
 import '../features/profile/screens/settings_screen.dart';
 import '../features/profile/screens/sign_in_screen.dart';
 import '../features/profile/screens/sign_up_screen.dart';
+import 'event_schedule.dart';
 import 'models.dart';
 
 final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -60,7 +61,7 @@ final router = GoRouter(
                   path: 'event',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) =>
-                      EventDetailScreen(event: state.extra! as YouthEvent),
+                      EventDetailScreen(upcoming: state.extra! as UpcomingEvent),
                 ),
                 GoRoute(
                   path: 'announcement',

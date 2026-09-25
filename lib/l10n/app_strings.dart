@@ -91,10 +91,12 @@ abstract final class AppStrings {
   // "private" appears on every screen of the flow.
   static const mosqueServices = 'Mosque services';
   static const marriageService = 'Marriage service';
-  static const marriageServiceRow =
-      'Confidential introductions through the mosque';
+  // Shortened from the spec's "…through the mosque" so it fits one line at
+  // 393 px; the "Mosque services" header already says where it comes from.
+  static const marriageServiceRow = 'Confidential introductions';
   static const marriageEyebrow = 'MARRIAGE SERVICE';
   static const underReview = 'Under review';
+  static String submittedOn(String date) => 'Submitted $date';
 
   // Gate (signed out)
   static const marriageGateTitle = 'Confidential introductions';

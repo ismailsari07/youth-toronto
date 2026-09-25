@@ -4,6 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/reminder_sync.dart';
+import '../../../l10n/app_strings.dart';
+import '../../marriage/data/marriage_application.dart';
+import '../../marriage/marriage_provider.dart';
+import '../../marriage/marriage_routes.dart';
+import '../../marriage/widgets/marriage_widgets.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -49,6 +54,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     return RefreshableList(
       onRefresh: () async {
         ref.invalidate(userProfileProvider);
+        ref.invalidate(myApplicationProvider);
         await ref.read(userProfileProvider.future);
       },
       padding: EdgeInsets.fromLTRB(
@@ -76,6 +82,16 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
                     ),
                   ],
                 ),
+        ),
+        const SizedBox(height: AppSpace.cardGapWide),
+        const SectionHeader(title: AppStrings.mosqueServices),
+        const SizedBox(height: AppSpace.sectionHeaderGap),
+        GroupedRows(
+          rows: [
+            _marriageRow(
+              user == null ? null : ref.watch(myApplicationProvider).valueOrNull,
+            ),
+          ],
         ),
         if (user != null) ...[
           const SizedBox(height: AppSpace.cardGapWide),
@@ -149,6 +165,27 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           style: const TextStyle(fontSize: 12, height: 1.5).c(AppColor.ink3),
         ),
       ],
+    );
+  }
+
+  /// Spec §8a placement table. Signed out or not applied: the plain row.
+  /// Applied: "Submitted 12 September" and the "Under review" pill. While
+  /// the application loads (or if it can't), the plain row shows — tapping
+  /// it still resolves the right screen.
+  Widget _marriageRow(MarriageApplication? application) {
+    return AppListRow(
+      icon: AppIcons.documentLock,
+      title: AppStrings.marriageService,
+      subtitle: application == null
+          ? AppStrings.marriageServiceRow
+          : AppStrings.submittedOn(dayMonth(application.createdAt)),
+      trailing: application == null
+          ? const RowChevron()
+          : const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [UnderReviewPill(), SizedBox(width: 8), RowChevron()],
+            ),
+      onTap: () => MarriageRoutes.open(context, ref),
     );
   }
 

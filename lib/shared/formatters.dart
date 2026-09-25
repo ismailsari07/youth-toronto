@@ -103,5 +103,8 @@ const _hijriMonths = <String>[
 String longDate(DateTime dt) =>
     '${_weekdaysLong[dt.weekday]} ${dt.day} ${_monthsLong[dt.month]}';
 
+/// "12 September" — the marriage service's "Submitted" date.
+String dayMonth(DateTime dt) => '${dt.day} ${_monthsLong[dt.month]}';
+
 /// "March 2024" — used for "Member since".
 String monthYear(DateTime dt) => '${_monthsLong[dt.month]} ${dt.year}';

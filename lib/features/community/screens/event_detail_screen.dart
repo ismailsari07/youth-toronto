@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -164,36 +162,12 @@ class EventDetailScreen extends StatelessWidget {
       ),
       bottomNavigationBar: registration == null
           ? null
-          : _StickyBar(
+          : StickyBottomBar(
               child: PrimaryButton(
                 label: event.isFree ? 'Register · free' : 'Register',
                 onTap: () => _open(registration.toString()),
               ),
             ),
-    );
-  }
-}
-
-/// Spec §7.6: white at 82% with a 22-sigma blur and a hairline top border.
-class _StickyBar extends StatelessWidget {
-  const _StickyBar({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xD1FFFFFF),
-            border: Border(top: BorderSide(color: Color(0x120A3222))),
-          ),
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-          child: SafeArea(top: false, child: child),
-        ),
-      ),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_strings.dart';
@@ -309,6 +311,31 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
               ? Color.lerp(_darkFrom, _darkTo, _c.value)
               : Color.lerp(_from, _to, _c.value),
           borderRadius: BorderRadius.circular(widget.radius),
+        ),
+      ),
+    );
+  }
+}
+
+/// Spec §7.6: the sticky action bar on pushed screens. White at 82% with a
+/// 22-sigma blur and a hairline top border.
+class StickyBottomBar extends StatelessWidget {
+  const StickyBottomBar({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Color(0xD1FFFFFF),
+            border: Border(top: BorderSide(color: Color(0x120A3222))),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: SafeArea(top: false, child: child),
         ),
       ),
     );

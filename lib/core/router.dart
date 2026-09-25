@@ -5,6 +5,11 @@ import '../app/app_shell.dart';
 import '../features/community/screens/announcement_detail_screen.dart';
 import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
+import '../features/marriage/screens/marriage_gate_screen.dart';
+import '../features/marriage/screens/marriage_received_screen.dart';
+import '../features/marriage/screens/marriage_status_screen.dart';
+import '../features/marriage/screens/marriage_upload_screen.dart';
+import '../features/marriage/screens/marriage_viewer_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
 import '../features/profile/screens/delete_account_screen.dart';
 import '../features/profile/screens/mosque_info_screen.dart';
@@ -99,6 +104,32 @@ final router = GoRouter(
                   path: 'mosque',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const MosqueInfoScreen(),
+                ),
+                // Marriage service (spec §8a). Paths match MarriageRoutes.
+                GoRoute(
+                  path: 'marriage/gate',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MarriageGateScreen(),
+                ),
+                GoRoute(
+                  path: 'marriage/upload',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MarriageUploadScreen(),
+                ),
+                GoRoute(
+                  path: 'marriage/received',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MarriageReceivedScreen(),
+                ),
+                GoRoute(
+                  path: 'marriage/status',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MarriageStatusScreen(),
+                ),
+                GoRoute(
+                  path: 'marriage/view',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MarriageViewerScreen(),
                 ),
               ],
             ),

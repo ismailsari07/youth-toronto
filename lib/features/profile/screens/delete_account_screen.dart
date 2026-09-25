@@ -12,8 +12,9 @@ import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 
 /// Spec §7.11, on the working deletion flow: AuthService.deleteAccount() calls
-/// the `delete-account` edge function, which removes the auth user (and the
-/// profile row with it) and then clears the local session.
+/// the `delete-account` edge function, which deletes any marriage-service
+/// document and application, then the auth user (and the profile row with
+/// it), and then clears the local session.
 class DeleteAccountScreen extends StatefulWidget {
   const DeleteAccountScreen({super.key});
 
@@ -101,8 +102,12 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       ),
                       const SizedBox(height: 14),
                       Text(
+                        // Shown to everyone, whether or not they applied, so
+                        // the copy never reveals who used the service.
                         'Deleting your account removes your name, email, phone '
-                        'number and date of birth from the mosque’s records.',
+                        'number and date of birth from the mosque’s records, '
+                        'along with any document you shared with the marriage '
+                        'service.',
                         style: AppText.body.c(AppColor.ink2),
                       ),
                       const SizedBox(height: 12),

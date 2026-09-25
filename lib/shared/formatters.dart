@@ -106,5 +106,14 @@ String longDate(DateTime dt) =>
 /// "12 September" — the marriage service's "Submitted" date.
 String dayMonth(DateTime dt) => '${dt.day} ${_monthsLong[dt.month]}';
 
+/// "1.8 MB", "240 KB" — file sizes on the marriage service's file card.
+/// Decimal units, as phones show them in their file pickers.
+String fileSize(int bytes) {
+  if (bytes >= 1000 * 1000) {
+    return '${(bytes / (1000 * 1000)).toStringAsFixed(1)} MB';
+  }
+  return '${(bytes / 1000).ceil()} KB';
+}
+
 /// "March 2024" — used for "Member since".
 String monthYear(DateTime dt) => '${_monthsLong[dt.month]} ${dt.year}';

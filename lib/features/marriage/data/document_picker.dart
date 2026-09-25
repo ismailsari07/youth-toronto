@@ -39,8 +39,19 @@ abstract final class DocumentPicker {
     try {
       return await photo.readAsBytes();
     } finally {
-      await _quietly(() => File(photo.path).delete());
+      if (_isPickerTempCopy(photo.path)) {
+        await _quietly(() => File(photo.path).delete());
+      }
     }
+  }
+
+  /// On iOS and Android the photo picker hands back a copy in the app's own
+  /// temp directory, which is ours to delete. On desktop it returns the
+  /// member's original file, which must never be touched.
+  static bool _isPickerTempCopy(String path) {
+    if (!Platform.isIOS && !Platform.isAndroid) return false;
+    final temp = Directory.systemTemp.absolute.path;
+    return File(path).absolute.path.startsWith('$temp${Platform.pathSeparator}');
   }
 
   static Future<void> _quietly(Future<Object?> Function() action) async {

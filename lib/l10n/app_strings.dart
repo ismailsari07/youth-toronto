@@ -129,7 +129,9 @@ abstract final class AppStrings {
       'of birth is saved to your account and cannot be changed afterwards, '
       'so please check it before you continue.';
   static const dobField = 'Date of birth';
+  static const dobHint = 'Choose a date';
   static const dobContinue = 'Save and continue';
+  static const saving = 'Saving…';
   static const dobSaveFailed =
       "Couldn't save your date of birth. Please try again.";
 
@@ -169,6 +171,10 @@ abstract final class AppStrings {
   static const unsupportedTypeBody =
       'Only PDF, JPG or PNG files can be shared.';
   static const unreadableFile = "Couldn't read this file. Try another one.";
+  static const cantBeRead = "can't be read";
+  static const preparingPrivately = 'Preparing privately…';
+  static const detailsUnavailable =
+      "Couldn't load your account details. Please try again.";
   static const uploadFailed =
       "The upload didn't finish. Check your connection and try again.";
 

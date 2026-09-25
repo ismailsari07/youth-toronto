@@ -202,6 +202,11 @@ abstract final class AppStrings {
   static const withdrawTitle = 'Withdraw my application';
   static const withdrawCaption = "Deletes your document from the mosque's records";
   static const openFailed = "Couldn't open your document. Please try again.";
+  static const openingPrivately = 'Opening privately…';
+  static const replaceSubtitle =
+      'Your current document stays until the new one is uploaded';
+  static const applicationUnavailable =
+      "Couldn't load your application. Please try again.";
 
   // Withdraw sheet
   static const withdrawSheetTitle = 'Withdraw your application?';
@@ -209,6 +214,7 @@ abstract final class AppStrings {
       'Your document will be permanently deleted and the Imam will no longer '
       'see it. You can apply again at any time.';
   static const withdrawConfirm = 'Withdraw and delete';
+  static const withdrawing = 'Deleting…';
   static const withdrawKeep = 'Keep my application';
   static const withdrawFailed =
       "Couldn't withdraw your application. Please try again.";

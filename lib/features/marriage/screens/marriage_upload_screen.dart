@@ -236,7 +236,9 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
     final stage = _stage;
     return _Frame(
       title: AppStrings.uploadTitle,
-      subtitle: AppStrings.uploadSubtitle,
+      subtitle: widget.replacing
+          ? AppStrings.replaceSubtitle
+          : AppStrings.uploadSubtitle,
       onBack: () => context.pop(),
       body: [
         switch (stage) {

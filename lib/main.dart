@@ -11,6 +11,7 @@ import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _silencePdfViewerLogs();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // Prayer times and reminders run on Toronto time; load the zone data first.
   try {
@@ -31,6 +32,23 @@ void main() async {
     debugPrint('Notification init failed: $e');
   }
   runApp(const ProviderScope(child: MytApp()));
+}
+
+/// pdfrx reports every PDF it opens through `debugPrint` — in release builds
+/// too, where that reaches the device log. Opening a marriage-service
+/// document must never leave a trace in a log, so its lines are dropped.
+/// Everything else still prints as before.
+void _silencePdfViewerLogs() {
+  final print = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    final text = message ?? '';
+    if (text.startsWith('PdfDocument') ||
+        text.startsWith('PdfViewer') ||
+        text.startsWith('pdfrx')) {
+      return;
+    }
+    print(message, wrapWidth: wrapWidth);
+  };
 }
 
 class MytApp extends StatefulWidget {

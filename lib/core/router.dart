@@ -5,6 +5,7 @@ import '../app/app_shell.dart';
 import '../features/community/screens/announcement_detail_screen.dart';
 import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
+import '../features/marriage/data/marriage_application.dart';
 import '../features/marriage/screens/marriage_gate_screen.dart';
 import '../features/marriage/screens/marriage_received_screen.dart';
 import '../features/marriage/screens/marriage_status_screen.dart';
@@ -114,7 +115,9 @@ final router = GoRouter(
                 GoRoute(
                   path: 'marriage/upload',
                   parentNavigatorKey: _rootKey,
-                  builder: (context, state) => const MarriageUploadScreen(),
+                  // extra: true when replacing an existing document.
+                  builder: (context, state) =>
+                      MarriageUploadScreen(replacing: state.extra == true),
                 ),
                 GoRoute(
                   path: 'marriage/received',
@@ -129,7 +132,9 @@ final router = GoRouter(
                 GoRoute(
                   path: 'marriage/view',
                   parentNavigatorKey: _rootKey,
-                  builder: (context, state) => const MarriageViewerScreen(),
+                  builder: (context, state) => MarriageViewerScreen(
+                    application: state.extra! as MarriageApplication,
+                  ),
                 ),
               ],
             ),

@@ -280,3 +280,42 @@ class StickyCaption extends StatelessWidget {
     );
   }
 }
+
+/// Spec §8a screen 6: "● Under review" — 26 tall, greenTint, greenDark
+/// 12/700, with a 7 px green dot.
+class StatusPill extends StatelessWidget {
+  const StatusPill({super.key, this.label = AppStrings.underReview});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 26,
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: BoxDecoration(
+        color: AppColor.greenTint,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: const BoxDecoration(
+              color: AppColor.green,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 7),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)
+                .c(AppColor.greenDark),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -26,13 +26,11 @@ class AuthService {
     try {
       final dob =
           '${dateOfBirth.year}-${dateOfBirth.month.toString().padLeft(2, '0')}-${dateOfBirth.day.toString().padLeft(2, '0')}';
-      final response = await _client.auth.signUp(
+      await _client.auth.signUp(
         email: email,
         password: password,
         data: {'full_name': fullName, 'phone': phone, 'date_of_birth': dob},
       );
-      // ignore: avoid_print
-      print('auth sign up response: ${response.user?.id}');
       return null;
     } on AuthException catch (e) {
       return e.message;

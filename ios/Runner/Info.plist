@@ -39,5 +39,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose a photo of a document to share privately with the mosque. Only the photo you pick is used.</string>
 </dict>
 </plist>

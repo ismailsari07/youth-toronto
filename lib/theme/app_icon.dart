@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// The design's 26 stroke icons. All are 24×24 with `stroke="currentColor"`,
+/// The design's 34 stroke icons. All are 24×24 with `stroke="currentColor"`,
 /// so the colour is applied here, not in the file.
 abstract final class AppIcons {
   static const fajr = 'prayer-fajr';
@@ -30,6 +30,16 @@ abstract final class AppIcons {
   static const signOut = 'sign-out';
   static const chevronRight = 'chevron-right';
   static const chevronLeft = 'chevron-left';
+
+  // Marriage service (spec §8a).
+  static const documentLock = 'document-lock';
+  static const document = 'document';
+  static const upload = 'upload';
+  static const shieldCheck = 'shield-check';
+  static const eye = 'eye';
+  static const replace = 'replace';
+  static const close = 'close';
+  static const photo = 'photo';
 
   /// Prayer row icon for a prayer name from `prayer_cache`.
   static String forPrayer(String name) => switch (name) {

@@ -86,6 +86,126 @@ abstract final class AppStrings {
   static const typeDeleteToConfirm = 'Type DELETE to confirm';
   static const accountDeleted = 'Your account has been deleted.';
 
+  // ── Marriage service (spec §8a) ───────────────────────────────────────────
+  // Tone: serious, modest, discreet. "Imam", never "coordinator". The word
+  // "private" appears on every screen of the flow.
+  static const mosqueServices = 'Mosque services';
+  static const marriageService = 'Marriage service';
+  static const marriageServiceRow =
+      'Confidential introductions through the mosque';
+  static const marriageEyebrow = 'MARRIAGE SERVICE';
+  static const underReview = 'Under review';
+
+  // Gate (signed out)
+  static const marriageGateTitle = 'Confidential introductions';
+  static const marriageGateSubtitle = 'A service of Pape Mosque';
+  static const marriageGateBody =
+      'If you are looking to marry, you can share one document about yourself '
+      "with the mosque's Imam. The Imam reads it in private and, if there is "
+      'a suitable match, contacts you directly. Nothing is published and no '
+      'one else sees it.';
+  static const yourPrivacy = 'Your privacy';
+  static const privacyOnlyImam = 'Only you and the Imam';
+  static const privacyOnlyImamBody =
+      'Your document is never shown to other members';
+  static const privacyNoProfiles = 'No profiles, no browsing';
+  static const privacyNoProfilesBody =
+      'There is no listing or directory of applicants';
+  static const privacyWithdraw = 'Withdraw at any time';
+  static const privacyWithdrawBody =
+      'Your document is deleted when you withdraw';
+  static const marriageAgeNote = 'Open to members aged 18 and over.';
+  static const signInToContinue = 'Sign in to continue';
+  static const marriageGateCaption =
+      'An account lets the Imam reach you privately.';
+
+  // Date of birth (one-time entry for accounts created without one)
+  static const dobTitle = 'Your date of birth';
+  static const dobSubtitle = 'Needed once, kept private';
+  static const dobBody =
+      'The marriage service is open to members aged 18 and over. Your date '
+      'of birth is saved to your account and cannot be changed afterwards, '
+      'so please check it before you continue.';
+  static const dobField = 'Date of birth';
+  static const dobContinue = 'Save and continue';
+  static const dobSaveFailed =
+      "Couldn't save your date of birth. Please try again.";
+
+  // Not eligible (under 18)
+  static const notEligibleTitle = 'Open to members aged 18 and over';
+  static const notEligibleBody =
+      'The marriage service is only available to adult members. Your account '
+      'and everything else in the app are unaffected.';
+
+  // Upload
+  static const uploadTitle = 'Share your document';
+  static const uploadSubtitle = 'One file, read only by the Imam';
+  static const chooseOneFile = 'Choose one file';
+  static const fileRules = 'PDF, JPG or PNG · up to 4 MB';
+  static const files = 'Files';
+  static const photos = 'Photos';
+  static const whatToInclude = 'What to include';
+  static const whatToIncludeBody1 =
+      'There is no template. Write about yourself in your own words: your '
+      'background, your family, your practice and what you are hoping for '
+      'in a spouse. Turkish or English are both fine.';
+  static const whatToIncludeBody2 =
+      'Only share what you are comfortable with. The Imam will ask you '
+      'directly if anything more is needed.';
+  static const privacyStrip =
+      "Private to you and the mosque's Imam. Never shown to other members.";
+  static const submit = 'Submit';
+  static const chooseFileToContinue = 'Choose a file to continue.';
+  static const uploadingPrivately = 'Uploading privately…';
+  static const uploading = 'Uploading…';
+  static const keepAppOpen = 'Keep the app open until the upload finishes.';
+  static const tooLarge = 'too large';
+  static const tooLargeBody =
+      'Files must be under 4 MB. Try exporting the PDF at a smaller size, or '
+      'choose a single photo instead of several.';
+  static const unsupportedType = 'not supported';
+  static const unsupportedTypeBody =
+      'Only PDF, JPG or PNG files can be shared.';
+  static const unreadableFile = "Couldn't read this file. Try another one.";
+  static const uploadFailed =
+      "The upload didn't finish. Check your connection and try again.";
+
+  // Received
+  static const receivedTitle = 'Received, thank you';
+  static const receivedBody =
+      'Your document is stored privately. Only you and the Imam can open it.';
+  static const whatHappensNext = 'What happens next';
+  static const nextImamReads = 'The Imam reads it';
+  static const nextImamReadsBody = 'In private, when they are next available';
+  static const nextContacted = "You're contacted privately";
+  static const nextContactedBody = 'Only if there is a suitable match';
+  static const nextYouDecide = 'You decide';
+  static const nextYouDecideBody = 'Nothing happens without your agreement';
+  static const done = 'Done';
+
+  // Status
+  static const yourApplication = 'Your application';
+  static const underReviewBody =
+      'The Imam has your document and will contact you privately if there is '
+      "a suitable match. There's nothing more you need to do.";
+  static const yourDocument = 'Your document';
+  static const view = 'View';
+  static const replace = 'Replace';
+  static const withdrawTitle = 'Withdraw my application';
+  static const withdrawCaption = "Deletes your document from the mosque's records";
+  static const openFailed = "Couldn't open your document. Please try again.";
+
+  // Withdraw sheet
+  static const withdrawSheetTitle = 'Withdraw your application?';
+  static const withdrawSheetBody =
+      'Your document will be permanently deleted and the Imam will no longer '
+      'see it. You can apply again at any time.';
+  static const withdrawConfirm = 'Withdraw and delete';
+  static const withdrawKeep = 'Keep my application';
+  static const withdrawFailed =
+      "Couldn't withdraw your application. Please try again.";
+  static const withdrawn = 'Your application has been withdrawn.';
+
   // ── The mosque ────────────────────────────────────────────────────────────
   static const theMosque = 'THE MOSQUE';
   static const openingHours = 'Opening hours';

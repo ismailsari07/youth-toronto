@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models.dart';
 import '../../../core/mosque_info.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -45,7 +46,9 @@ class AnnouncementDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final posted = 'Posted ${timeAgo(item.date)} · Mosque office';
+    final l = context.l10n;
+    final ago = l.postedAgo(timeAgo(l, item.date));
+    final posted = '$ago · ${l.mosqueOffice}';
 
     return Scaffold(
       backgroundColor: AppColor.ground,
@@ -53,7 +56,7 @@ class AnnouncementDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PlainNavBar(
-            eyebrow: 'ANNOUNCEMENT',
+            eyebrow: l.announcementEyebrow,
             title: item.title,
             subtitle: posted,
           ),
@@ -101,7 +104,7 @@ class AnnouncementDetailScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Mosque office',
+                                l.mosqueOffice,
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -109,7 +112,7 @@ class AnnouncementDetailScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Posted ${timeAgo(item.date)}',
+                                ago,
                                 style:
                                     const TextStyle(fontSize: 12).c(AppColor.ink3),
                               ),
@@ -126,14 +129,14 @@ class AnnouncementDetailScreen extends StatelessWidget {
                   rows: [
                     AppListRow(
                       icon: AppIcons.share,
-                      title: 'Share this announcement',
+                      title: l.shareThisAnnouncement,
                       trailing: const RowChevron(),
                       onTap: _share,
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.phone,
-                      title: 'Call the mosque office',
+                      title: l.callTheOffice,
                       subtitle: MosqueInfo.phone,
                       trailing: const RowChevron(),
                       onTap: _call,

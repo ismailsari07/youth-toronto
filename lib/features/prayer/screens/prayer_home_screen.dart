@@ -9,6 +9,7 @@ import '../../../core/mosque_time.dart';
 import '../../../core/notification_service.dart';
 import '../../../core/prayer_utils.dart';
 import '../../../core/reminder_sync.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -66,6 +67,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     final async = ref.watch(prayerProvider);
     final payload = async.valueOrNull;
     final loading = async.isLoading && payload == null;
+    final l = context.l10n;
 
     return RefreshableList(
       onRefresh: () async {
@@ -83,9 +85,9 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         const SizedBox(height: 14),
         MoonCountdownCard(prayers: payload?.dailyPrayerTimes),
         const SizedBox(height: AppSpace.cardGapWide),
-        const SectionHeader(
-          title: 'Today at the mosque',
-          trailingText: 'Athan · Iqamah',
+        SectionHeader(
+          title: l.todayAtTheMosque,
+          trailingText: l.athanIqamah,
         ),
         const SizedBox(height: AppSpace.sectionHeaderGap),
         _timesCard(payload, loading),
@@ -99,7 +101,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
 
   /// Eyebrow, Gregorian date and the Hijri date beneath it (spec §0 note).
   Widget _header(PrayerCachePayload? payload, bool loading) {
-    final hijri = hijriTitle(payload?.hijriDate);
+    final l = context.l10n;
+    final hijri = hijriTitle(l, payload?.hijriDate);
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 46),
       child: Row(
@@ -111,13 +114,13 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'PAPE MOSQUE',
+                  l.mosqueEyebrow,
                   style: AppText.eyebrow
                       .copyWith(fontSize: 11.5, letterSpacing: 0.9, height: 1.2)
                       .c(AppColor.green),
                 ),
                 Text(
-                  gregorianTitle(payload?.gregorianDate) ?? todayTitle(),
+                  gregorianTitle(l, payload?.gregorianDate) ?? todayTitle(l),
                   style: AppText.dateTitle.c(AppColor.ink),
                 ),
                 if (loading)
@@ -146,6 +149,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
 
   /// Spec §7.1 step 4, and §7.1b for the shimmer variant.
   Widget _timesCard(PrayerCachePayload? payload, bool loading) {
+    final l = context.l10n;
     if (payload == null && !loading) {
       // Spec §7.15: an inline failure with a way out, never a blank screen.
       return AppCard(
@@ -154,19 +158,18 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Today's times aren't available",
+              l.timesUnavailableTitle,
               style: AppText.cardTitle.c(AppColor.ink),
             ),
             const SizedBox(height: 6),
             Text(
-              'The mosque calendar could not be reached. Reminders already '
-              'scheduled on this device still run.',
+              l.timesUnavailableBody,
               style: const TextStyle(fontSize: 13.5, height: 1.45)
                   .c(AppColor.ink2),
             ),
             const SizedBox(height: 16),
             GhostButton(
-              label: 'Try again',
+              label: l.tryAgain,
               onTap: () => ref.invalidate(prayerProvider),
             ),
           ],
@@ -207,15 +210,15 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           iconFill: isNext ? AppColor.greenTintStrong : null,
           iconGlyph: isNext ? AppColor.greenDark : null,
           background: isNext ? AppColor.greenRowBg : null,
-          title: p.name,
+          title: prayerLabel(l, p.name),
           titleStyle: isNext
               ? AppText.prayerName
                   .copyWith(fontWeight: FontWeight.w700)
                   .c(AppColor.greenDeep)
               : AppText.prayerName.c(past ? AppColor.ink2 : AppColor.ink),
           subtitle: isSunrise
-              ? 'Fajr window closes'
-              : 'Athan ${prayerClock12(p.name, p.time)}',
+              ? l.fajrWindowCloses
+              : l.athanAt(prayerClock12(p.name, p.time)),
           subtitleStyle: AppText.caption.c(AppColor.ink3),
           trailing: _trailing(p, isNext),
         ),
@@ -230,8 +233,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         divided: true,
         icon: AppIcons.bell,
         background: AppColor.cardMuted,
-        title: 'Prayer reminders',
-        subtitle: '5 minutes before each iqamah',
+        title: context.l10n.prayerReminders,
+        subtitle: context.l10n.prayerRemindersDetail,
         trailing: AppSwitch(
           value: _remindersOn ?? true,
           onChanged: _remindersOn == null ? null : _setReminders,
@@ -251,7 +254,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'IQAMAH',
+          context.l10n.iqamah,
           style: AppText.iqamahLabel
               .c(isNext ? const Color(0xFF5C7E6D) : AppColor.ink4),
         ),
@@ -277,21 +280,23 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   /// Gold is reserved for Jumu'ah and Eid (spec §0). Eid replaces Jumu'ah when
   /// its date is near.
   Widget _occasionCard(PrayerCachePayload? payload) {
+    final l = context.l10n;
     final eid = _upcomingEid(payload?.eidPrayerTimes);
     if (eid != null) {
+      final name = eid.fitr ? l.eidFitr : l.eidAdha;
       return _goldCard(
-        title: '${eid.$1} · ${eid.$2}',
-        subtitle: 'Salah ${eid.$3} · Second jamaah ${eid.$4}',
+        title: '$name · ${longDate(l, eid.date)}',
+        subtitle: l.eidTimes(eid.first, eid.second),
       );
     }
     final jumaa = payload?.jumaaPrayerTime;
     return _goldCard(
-      title: "Jumu'ah · this Friday",
+      title: l.jumuahThisFriday,
       // Only what the data actually carries: there is no khutbah time in
       // prayer_cache, so none is shown.
       subtitle: jumaa == null
-          ? 'Every Friday at the mosque'
-          : 'Salah ${prayerClock12('Dhuhr', jumaa)}',
+          ? l.jumuahEveryFriday
+          : l.salahAt(prayerClock12('Dhuhr', jumaa)),
     );
   }
 
@@ -344,21 +349,28 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     );
   }
 
-  /// (name, date, first iqamah, second iqamah) when an Eid falls within the
-  /// next week.
+  /// The Eid that falls within the next week, if any.
   ///
   /// NOTE: `eidPrayerTimes.date` arrives as a Turkish string from the upstream
   /// Diyanet feed ("20 Mart 2026 Cuma"), so this parse is deliberately
   /// defensive — an unparseable date simply leaves the Jumu'ah card in place.
-  (String, String, String, String)? _upcomingEid(EidPrayerTimes? eid) {
+  /// The parsed date is shown, formatted for the app's language.
+  ({bool fitr, DateTime date, String first, String second})? _upcomingEid(
+    EidPrayerTimes? eid,
+  ) {
     if (eid == null) return null;
-    for (final entry in [('Eid al-Fitr', eid.eidFitr), ('Eid al-Adha', eid.eidAdha)]) {
+    for (final entry in [(true, eid.eidFitr), (false, eid.eidAdha)]) {
       final date = _parseTurkishDate(entry.$2.date);
       if (date == null) continue;
       final now = mosqueNow();
       final days = date.difference(DateTime(now.year, now.month, now.day)).inDays;
       if (days >= 0 && days <= 7) {
-        return (entry.$1, entry.$2.date, entry.$2.firstIqamah, entry.$2.secondIqamah);
+        return (
+          fitr: entry.$1,
+          date: date,
+          first: entry.$2.firstIqamah,
+          second: entry.$2.secondIqamah,
+        );
       }
     }
     return null;
@@ -383,6 +395,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
 
   /// Spec §7.1 step 8.
   Widget _mosqueCard() {
+    final l = context.l10n;
     return AppCard(
       radius: AppRadius.listCard,
       grouped: true,
@@ -391,7 +404,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           AppListRow(
             icon: AppIcons.pin,
             title: MosqueInfo.name,
-            subtitle: '${MosqueInfo.street}, Toronto',
+            subtitle: '${MosqueInfo.street}, ${l.city}',
             trailing: const RowChevron(),
             onTap: () => context.push('/profile/mosque'),
           ),
@@ -401,7 +414,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               children: [
                 Expanded(
                   child: GhostButton(
-                    label: 'Directions',
+                    label: l.directions,
                     icon: AppIcons.navigate,
                     onTap: () => _open(MosqueInfo.mapsUri),
                   ),
@@ -409,7 +422,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: GhostButton(
-                    label: 'Call office',
+                    label: l.callOffice,
                     icon: AppIcons.phone,
                     onTap: () => _open(MosqueInfo.phoneUri),
                   ),

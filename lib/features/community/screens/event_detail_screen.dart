@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/event_schedule.dart';
 import '../../../core/mosque_info.dart';
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -35,11 +35,11 @@ class EventDetailScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _share() async {
+  Future<void> _share(AppLocalizations l) async {
     try {
       await SharePlus.instance.share(
         ShareParams(
-          text: eventShareText(upcoming),
+          text: eventShareText(l, upcoming),
           subject: upcoming.event.title,
         ),
       );
@@ -52,7 +52,7 @@ class EventDetailScreen extends ConsumerWidget {
   /// and a "Next session" row; for a one-off, its date and time. A
   /// prayer-linked session's time row names the prayer, and says roughly
   /// when it begins only if that day's prayer times are known.
-  List<Widget> _whenRows(WidgetRef ref) {
+  List<Widget> _whenRows(AppLocalizations l, WidgetRef ref) {
     final event = upcoming.event;
     final start = upcoming.startsAt;
     final prayer = event.startsAfterPrayer;
@@ -60,7 +60,6 @@ class EventDetailScreen extends ConsumerWidget {
 
     Widget? prayerRow({required bool divided}) {
       if (prayer == null) return null;
-      final name = prayerDisplay(prayer);
       final estimate = prayerLinkedEstimate(
         prayerKey: prayer,
         day: DateTime(start.year, start.month, start.day),
@@ -68,17 +67,20 @@ class EventDetailScreen extends ConsumerWidget {
       );
       return AppListRow(
         divided: divided,
-        icon: AppIcons.forPrayer(name),
-        title: 'After $name prayer',
+        icon: AppIcons.forPrayer(prayerName(prayer)),
+        title: l.afterPrayerTitle(prayer),
         subtitle: estimate == null
-            ? AppStrings.beginsAfterJamaah
-            : '${AppStrings.beginsAfterJamaah} — about '
-                '${eventTime(estimate)} on ${dayMonthLong(start)}',
+            ? l.beginsAfterJamaah
+            : l.beginsAboutOn(
+                l.beginsAfterJamaah,
+                eventTime(estimate),
+                dayMonthLong(l, start),
+              ),
       );
     }
 
     if (repeats.isRecurring) {
-      final (cadence, kind) = recurrenceRow(repeats, start);
+      final (cadence, kind) = recurrenceRow(l, repeats, start);
       return [
         AppListRow(icon: AppIcons.repeat, title: cadence, subtitle: kind),
         prayerRow(divided: true) ??
@@ -86,13 +88,13 @@ class EventDetailScreen extends ConsumerWidget {
               divided: true,
               icon: AppIcons.clock,
               title: eventTime(start),
-              subtitle: AppStrings.startTime,
+              subtitle: l.startTime,
             ),
         AppListRow(
           divided: true,
           icon: AppIcons.calendar,
-          title: AppStrings.nextSession,
-          subtitle: longDate(start),
+          title: l.nextSession,
+          subtitle: longDate(l, start),
         ),
       ];
     }
@@ -100,14 +102,14 @@ class EventDetailScreen extends ConsumerWidget {
       if (prayer == null)
         AppListRow(
           icon: AppIcons.clock,
-          title: longDate(start),
+          title: longDate(l, start),
           subtitle: eventTime(start),
         )
       else ...[
         AppListRow(
           icon: AppIcons.calendar,
-          title: longDate(start),
-          subtitle: AppStrings.date,
+          title: longDate(l, start),
+          subtitle: l.date,
         ),
         prayerRow(divided: true)!,
       ],
@@ -122,6 +124,7 @@ class EventDetailScreen extends ConsumerWidget {
     final registration = event.registrationUri;
     final description = event.description;
     final location = event.location;
+    final l = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColor.ground,
@@ -129,12 +132,12 @@ class EventDetailScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PlainNavBar(
-            eyebrow: eventEyebrow(event.repeats),
+            eyebrow: eventEyebrow(l, event.repeats),
             title: event.title,
             subtitle: recurring
-                ? '${recurrenceWhen(event.repeats, upcoming.startsAt)} · '
-                    '${nextShort(upcoming.startsAt)}'
-                : nextSessionLine(upcoming),
+                ? '${recurrenceWhen(l, event.repeats, upcoming.startsAt)} · '
+                    '${nextShort(l, upcoming.startsAt)}'
+                : nextSessionLine(l, upcoming),
           ),
           Expanded(
             child: ListView(
@@ -157,7 +160,7 @@ class EventDetailScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpace.cardGap),
                 GroupedRows(
                   rows: [
-                    ..._whenRows(ref),
+                    ..._whenRows(l, ref),
                     if (location != null && location.trim().isNotEmpty)
                       AppListRow(
                         divided: true,
@@ -173,7 +176,7 @@ class EventDetailScreen extends ConsumerWidget {
                               horizontal: 4,
                             ),
                             child: Text(
-                              'Map',
+                              l.map,
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -185,23 +188,25 @@ class EventDetailScreen extends ConsumerWidget {
                     AppListRow(
                       divided: true,
                       icon: AppIcons.users,
-                      title: event.isFree ? 'Free to attend' : (event.price ?? 'Ticketed'),
-                      subtitle: 'Everyone is welcome',
+                      title: event.isFree
+                          ? l.freeToAttend
+                          : (event.price ?? l.ticketed),
+                      subtitle: l.everyoneWelcome,
                     ),
                     // No registration link: a drop-in session. (A weekly
                     // reminder action is a later task, so there is no
                     // sticky button in this case.)
                     if (registration == null)
-                      const AppListRow(
+                      AppListRow(
                         divided: true,
                         icon: AppIcons.check,
-                        title: AppStrings.dropIn,
+                        title: l.dropIn,
                       ),
                   ],
                 ),
                 if (description != null && description.trim().isNotEmpty) ...[
                   const SizedBox(height: AppSpace.cardGapWide),
-                  const SectionHeader(title: 'About this event'),
+                  SectionHeader(title: l.aboutThisEvent),
                   const SizedBox(height: AppSpace.sectionHeaderGap),
                   AppCard(
                     padding: const EdgeInsets.all(AppSpace.cardPadding),
@@ -216,17 +221,17 @@ class EventDetailScreen extends ConsumerWidget {
                   rows: [
                     AppListRow(
                       icon: AppIcons.phone,
-                      title: 'Questions?',
-                      subtitle: 'Call the mosque office',
+                      title: l.questions,
+                      subtitle: l.callTheOffice,
                       trailing: const RowChevron(),
                       onTap: () => _open(MosqueInfo.phoneUri),
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.share,
-                      title: 'Share this event',
+                      title: l.shareThisEvent,
                       trailing: const RowChevron(),
-                      onTap: _share,
+                      onTap: () => _share(l),
                     ),
                   ],
                 ),
@@ -239,7 +244,7 @@ class EventDetailScreen extends ConsumerWidget {
           ? null
           : StickyBottomBar(
               child: PrimaryButton(
-                label: event.isFree ? 'Register · free' : 'Register',
+                label: event.isFree ? l.registerFree : l.register,
                 onTap: () => _open(registration.toString()),
               ),
             ),

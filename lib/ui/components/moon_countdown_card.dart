@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/models.dart';
 import '../../core/prayer_utils.dart';
+import '../../l10n/l10n.dart';
 import '../../shared/formatters.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
@@ -152,7 +153,7 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
               borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
             child: Text(
-              'NEXT PRAYER',
+              context.l10n.nextPrayer,
               style:
                   AppText.badge.copyWith(letterSpacing: 1.1).c(AppColor.onHero),
             ),
@@ -171,7 +172,7 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
                     size: 13, color: AppColor.onHeroChipText),
                 const SizedBox(width: 5),
                 Text(
-                  'Toronto',
+                  context.l10n.city,
                   style:
                       const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)
                           .c(AppColor.onHeroChipText),
@@ -199,18 +200,19 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
   }
 
   Widget _text(PrayerWindow? window) {
+    final l = context.l10n;
     if (window == null) {
       // Spec §7.1c — times unavailable: the card still renders, moon empty.
       return Column(
         children: [
           Text(
-            'Times unavailable',
+            context.l10n.timesUnavailable,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
                 .c(AppColor.onHero),
           ),
           const SizedBox(height: 4),
           Text(
-            'Pull to refresh',
+            context.l10n.pullToRefresh,
             style: AppText.countdownSub.c(AppColor.onHeroSecondary),
           ),
         ],
@@ -228,15 +230,18 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
     return Column(
       children: [
         Text(
-          next.name.toUpperCase(),
+          upper(prayerLabel(l, next.name), l.localeName),
           style: AppText.countdownLabel.c(AppColor.onHeroLabel),
         ),
         const SizedBox(height: 2),
         Text(digits, style: AppText.countdown.c(AppColor.onHero)),
         const SizedBox(height: 2),
         Text(
-          'Athan ${prayerClock12(next.name, next.time)}'
-          '${next.iqamah == null ? '' : ' · Iqamah ${prayerClock12(next.name, next.iqamah!)}'}',
+          [
+            l.athanAt(prayerClock12(next.name, next.time)),
+            if (next.iqamah != null)
+              l.iqamahAt(prayerClock12(next.name, next.iqamah!)),
+          ].join(' · '),
           style: AppText.countdownSub.c(AppColor.onHeroSecondary),
         ),
       ],
@@ -245,13 +250,18 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
 
   Widget _bottomRow(PrayerWindow? window) {
     if (window == null) return const SizedBox(height: 30);
+    final l = context.l10n;
     return SizedBox(
       height: 30,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _edge(window.current, '${window.current.name} · now', leading: true),
-          _edge(window.next, window.next.name, leading: false),
+          _edge(
+            window.current,
+            l.prayerNow(prayerLabel(l, window.current.name)),
+            leading: true,
+          ),
+          _edge(window.next, prayerLabel(l, window.next.name), leading: false),
         ],
       ),
     );

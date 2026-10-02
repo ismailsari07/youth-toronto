@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -36,6 +36,7 @@ class MarriageUploadScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = context.l10n;
     final profile = ref.watch(userProfileProvider);
     return switch (profile) {
       AsyncData(value: final row?) =>
@@ -49,7 +50,7 @@ class MarriageUploadScreen extends ConsumerWidget {
       AsyncData() || AsyncError() => _ProfileUnavailableView(
           onRetry: () => ref.invalidate(userProfileProvider),
         ),
-      _ => const _Frame(title: AppStrings.uploadTitle, body: []),
+      _ => _Frame(title: l.uploadTitle, body: []),
     };
   }
 }
@@ -72,13 +73,14 @@ class _Frame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PlainNavBar(
-            eyebrow: AppStrings.marriageEyebrow,
+            eyebrow: l.marriageEyebrow,
             title: title,
             subtitle: subtitle,
             onBack: onBack,
@@ -110,7 +112,7 @@ sealed class _Stage {
 /// Nothing chosen yet. [error] is shown after a failed or cancelled upload.
 final class _Choosing extends _Stage {
   const _Choosing({this.error});
-  final String? error;
+  final MarriageFailure? error;
 }
 
 /// Picked; being checked and cleaned on the device.
@@ -189,7 +191,7 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
     try {
       started = await MarriageService.startUpload(document);
     } catch (_) {
-      _setStage(const _Choosing(error: AppStrings.uploadFailed));
+      _setStage(const _Choosing(error: MarriageFailure.uploadFailed));
       return;
     }
     if (!mounted) {
@@ -203,7 +205,7 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
     } on UploadFailed catch (e) {
       await MarriageService.discard(started.path);
       if (!e.cancelled) {
-        _setStage(const _Choosing(error: AppStrings.uploadFailed));
+        _setStage(const _Choosing(error: MarriageFailure.uploadFailed));
       }
       return;
     }
@@ -211,7 +213,7 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
     try {
       await MarriageService.commit(started.path, document);
     } on MarriageException catch (e) {
-      _setStage(_Choosing(error: e.message));
+      _setStage(_Choosing(error: e.failure));
       return;
     }
     ref.invalidate(myApplicationProvider);
@@ -233,23 +235,24 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final stage = _stage;
     return _Frame(
-      title: AppStrings.uploadTitle,
+      title: l.uploadTitle,
       subtitle: widget.replacing
-          ? AppStrings.replaceSubtitle
-          : AppStrings.uploadSubtitle,
+          ? l.replaceSubtitle
+          : l.uploadSubtitle,
       onBack: () => context.pop(),
       body: [
         switch (stage) {
           _Choosing(:final error) => _ChooseCard(
-              error: error,
+              error: error?.message(l),
               onFiles: () => _pick(DocumentPicker.pickFile),
               onPhotos: () => _pick(DocumentPicker.pickPhoto),
             ),
           _Preparing(:final rawSize) => _ProgressCard(
-              caption: fileSize(rawSize),
-              label: AppStrings.preparingPrivately,
+              caption: fileSize(l, rawSize),
+              label: l.preparingPrivately,
               progress: null,
             ),
           _Uploading(:final upload, :final document) =>
@@ -257,8 +260,8 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
               valueListenable: upload.progress,
               builder: (_, value, _) => _ProgressCard(
                 typeLabel: document.kind.label,
-                caption: '${fileSize(document.size)} · ${document.kind.label}',
-                label: AppStrings.uploadingPrivately,
+                caption: '${fileSize(l, document.size)} · ${document.kind.label}',
+                label: l.uploadingPrivately,
                 progress: value,
                 onCancel: value < 1 ? _cancel : null,
               ),
@@ -270,7 +273,7 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
             ),
         },
         const SizedBox(height: AppSpace.cardGapWide),
-        const SectionHeader(title: AppStrings.whatToInclude),
+        SectionHeader(title: l.whatToInclude),
         const SizedBox(height: AppSpace.sectionHeaderGap),
         AppCard(
           padding: const EdgeInsets.all(AppSpace.cardPadding),
@@ -278,12 +281,12 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppStrings.whatToIncludeBody1,
+                l.whatToIncludeBody1,
                 style: AppText.body.c(AppColor.ink2),
               ),
               const SizedBox(height: 10),
               Text(
-                AppStrings.whatToIncludeBody2,
+                l.whatToIncludeBody2,
                 style: AppText.body.c(AppColor.ink2),
               ),
             ],
@@ -293,21 +296,21 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
         const PrivacyStrip(),
       ],
       bottom: _busy
-          ? const Column(
+          ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Opacity(
                   opacity: 0.55,
-                  child: PrimaryButton(label: AppStrings.uploading),
+                  child: PrimaryButton(label: l.uploading),
                 ),
-                StickyCaption(AppStrings.keepAppOpen),
+                StickyCaption(l.keepAppOpen),
               ],
             )
-          : const Column(
+          : Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DisabledSubmitButton(),
-                StickyCaption(AppStrings.chooseFileToContinue),
+                StickyCaption(l.chooseFileToContinue),
               ],
             ),
     );
@@ -322,11 +325,12 @@ class _PickButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Row(
       children: [
         Expanded(
           child: GhostButton(
-            label: AppStrings.files,
+            label: l.files,
             icon: AppIcons.document,
             height: 46,
             onTap: onFiles,
@@ -335,7 +339,7 @@ class _PickButtons extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: GhostButton(
-            label: AppStrings.photos,
+            label: l.photos,
             icon: AppIcons.photo,
             height: 46,
             onTap: onPhotos,
@@ -360,6 +364,7 @@ class _ChooseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final message = error;
     return DropZoneCard(
       child: Column(
@@ -380,13 +385,13 @@ class _ChooseCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            AppStrings.chooseOneFile,
+            l.chooseOneFile,
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)
                 .c(AppColor.ink),
           ),
           const SizedBox(height: 4),
           Text(
-            AppStrings.fileRules,
+            l.fileRules,
             style: const TextStyle(fontSize: 13).c(AppColor.ink3),
           ),
           if (message != null) ...[
@@ -488,16 +493,17 @@ class _RejectedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final (why, explanation) = switch (rejected.reason) {
-      RejectReason.tooLarge => (AppStrings.tooLarge, AppStrings.tooLargeBody),
+      RejectReason.tooLarge => (l.tooLarge, l.tooLargeBody),
       RejectReason.unsupportedType => (
-          AppStrings.unsupportedType,
-          AppStrings.unsupportedTypeBody,
+          l.unsupportedType,
+          l.unsupportedTypeBody,
         ),
-      RejectReason.unreadable => (AppStrings.cantBeRead, AppStrings.unreadableFile),
+      RejectReason.unreadable => (l.cantBeRead, l.unreadableFile),
     };
     final caption =
-        rejected.size > 0 ? '${fileSize(rejected.size)} · $why' : why;
+        rejected.size > 0 ? '${fileSize(l, rejected.size)} · $why' : why;
     return AppCard(
       padding: const EdgeInsets.all(AppSpace.cardPadding),
       border: Border.all(color: const Color(0xFFE9C3BF), width: 1.5),
@@ -532,9 +538,10 @@ class _NotEligibleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return _Frame(
-      title: AppStrings.marriageGateTitle,
-      subtitle: AppStrings.marriageGateSubtitle,
+      title: l.marriageGateTitle,
+      subtitle: l.marriageGateSubtitle,
       body: [
         AppCard(
           padding: const EdgeInsets.all(AppSpace.cardPadding),
@@ -551,7 +558,7 @@ class _NotEligibleView extends StatelessWidget {
                   const SizedBox(width: 13),
                   Expanded(
                     child: Text(
-                      AppStrings.notEligibleTitle,
+                      l.notEligibleTitle,
                       style: AppText.cardTitle.c(AppColor.ink),
                     ),
                   ),
@@ -559,7 +566,7 @@ class _NotEligibleView extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                AppStrings.notEligibleBody,
+                l.notEligibleBody,
                 style: AppText.body.c(AppColor.ink2),
               ),
             ],
@@ -579,9 +586,10 @@ class _ProfileUnavailableView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return _Frame(
-      title: AppStrings.uploadTitle,
-      subtitle: AppStrings.uploadSubtitle,
+      title: l.uploadTitle,
+      subtitle: l.uploadSubtitle,
       body: [
         AppCard(
           padding: const EdgeInsets.all(AppSpace.cardPadding),
@@ -589,11 +597,11 @@ class _ProfileUnavailableView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppStrings.detailsUnavailable,
+                l.detailsUnavailable,
                 style: AppText.body.c(AppColor.ink2),
               ),
               const SizedBox(height: 14),
-              GhostButton(label: AppStrings.tryAgain, onTap: onRetry),
+              GhostButton(label: l.tryAgain, onTap: onRetry),
             ],
           ),
         ),

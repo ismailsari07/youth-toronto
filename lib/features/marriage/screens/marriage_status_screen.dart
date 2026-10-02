@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -31,6 +31,8 @@ class MarriageStatusScreen extends ConsumerStatefulWidget {
 class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
   bool _leaving = false;
 
+  AppLocalizations get l => context.l10n;
+
   Future<void> _withdraw() async {
     final withdrawn = await showWithdrawSheet(context);
     if (!withdrawn || !mounted) return;
@@ -39,7 +41,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
     final messenger = ScaffoldMessenger.of(context);
     context.pushReplacement(MarriageRoutes.upload);
     messenger.showSnackBar(
-      const SnackBar(content: Text(AppStrings.withdrawn)),
+      SnackBar(content: Text(l.withdrawn)),
     );
   }
 
@@ -67,12 +69,12 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    AppStrings.applicationUnavailable,
+                    l.applicationUnavailable,
                     style: AppText.body.c(AppColor.ink2),
                   ),
                   const SizedBox(height: 14),
                   GhostButton(
-                    label: AppStrings.tryAgain,
+                    label: l.tryAgain,
                     onTap: () => ref.invalidate(myApplicationProvider),
                   ),
                 ],
@@ -91,8 +93,8 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PlainNavBar(
-            eyebrow: AppStrings.marriageEyebrow,
-            title: AppStrings.yourApplication,
+            eyebrow: l.marriageEyebrow,
+            title: l.yourApplication,
             subtitle: subtitle,
           ),
           Expanded(
@@ -123,7 +125,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
 
   Widget _body(MarriageApplication app) {
     return _frame(
-      subtitle: AppStrings.submittedOn(dayMonth(app.createdAt)),
+      subtitle: l.submittedOn(dayMonth(l, app.createdAt)),
       children: [
         AppCard(
           padding: const EdgeInsets.all(AppSpace.cardPadding),
@@ -133,14 +135,14 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
               const StatusPill(),
               const SizedBox(height: 12),
               Text(
-                AppStrings.underReviewBody,
+                l.underReviewBody,
                 style: AppText.body.c(AppColor.ink2),
               ),
             ],
           ),
         ),
         const SizedBox(height: AppSpace.cardGapWide),
-        const SectionHeader(title: AppStrings.yourDocument),
+        SectionHeader(title: l.yourDocument),
         const SizedBox(height: AppSpace.sectionHeaderGap),
         AppCard(
           padding: const EdgeInsets.all(AppSpace.cardPadding),
@@ -148,14 +150,14 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
             children: [
               FileTile(
                 typeLabel: app.kind.label,
-                caption: '${fileSize(app.sizeBytes)} · ${app.kind.label}',
+                caption: '${fileSize(l, app.sizeBytes)} · ${app.kind.label}',
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: GhostButton(
-                      label: AppStrings.view,
+                      label: l.view,
                       icon: AppIcons.eye,
                       height: 46,
                       onTap: () => context.push(MarriageRoutes.view, extra: app),
@@ -164,7 +166,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: GhostButton(
-                      label: AppStrings.replace,
+                      label: l.replace,
                       icon: AppIcons.replace,
                       height: 46,
                       onTap: () =>
@@ -194,7 +196,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppStrings.withdrawTitle,
+                        l.withdrawTitle,
                         style: const TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.w600,
@@ -202,7 +204,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        AppStrings.withdrawCaption,
+                        l.withdrawCaption,
                         style: const TextStyle(fontSize: 12.5)
                             .c(AppColor.ink3),
                       ),

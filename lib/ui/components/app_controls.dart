@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
+import '../../shared/formatters.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
@@ -132,12 +134,6 @@ class DateBadge extends StatelessWidget {
 
   final DateTime date;
 
-  static const _weekdays = ['', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-  static const _months = [
-    '', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -151,7 +147,7 @@ class DateBadge extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            _weekdays[date.weekday],
+            badgeWeekday(context.l10n, date),
             style: const TextStyle(
               fontSize: 9.5,
               fontWeight: FontWeight.w700,
@@ -168,7 +164,7 @@ class DateBadge extends StatelessWidget {
             ).c(AppColor.greenDark),
           ),
           Text(
-            _months[date.month],
+            badgeMonth(context.l10n, date),
             style: const TextStyle(
               fontSize: 9.5,
               fontWeight: FontWeight.w600,
@@ -200,7 +196,7 @@ class DateBadgeOnPhoto extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            DateBadge._weekdays[date.weekday],
+            badgeWeekday(context.l10n, date),
             style: const TextStyle(
               fontSize: 9.5,
               fontWeight: FontWeight.w700,
@@ -217,7 +213,7 @@ class DateBadgeOnPhoto extends StatelessWidget {
             ).c(AppColor.greenDark),
           ),
           Text(
-            DateBadge._months[date.month],
+            badgeMonth(context.l10n, date),
             style: const TextStyle(
               fontSize: 9.5,
               fontWeight: FontWeight.w600,

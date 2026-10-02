@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/reminder_sync.dart';
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../marriage/data/marriage_application.dart';
 import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
@@ -20,6 +20,7 @@ import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/refreshable.dart';
+import '../widgets/language_sheet.dart';
 
 /// Spec §7.9. Never empty: settings exist whether or not anyone is signed in.
 class ProfileRootScreen extends ConsumerStatefulWidget {
@@ -50,6 +51,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
     final profile = ref.watch(userProfileProvider).valueOrNull;
+    final l = context.l10n;
 
     return RefreshableList(
       onRefresh: () async {
@@ -65,76 +67,62 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       ),
       children: [
         GradientTabHeader(
-          title: 'Profile',
-          row: user == null ? _signedOutRow() : _identityRow(user, profile),
+          title: l.tabProfile,
+          row: user == null ? _signedOutRow(l) : _identityRow(l, user, profile),
           footer: user != null
               ? null
               : Column(
                   children: [
                     PrimaryOnGradientButton(
-                      label: 'Sign in',
+                      label: l.signIn,
                       onTap: () => context.push('/profile/sign-in'),
                     ),
                     const SizedBox(height: 8),
                     OutlinedOnGradientButton(
-                      label: 'Create an account',
+                      label: l.createAccount,
                       onTap: () => context.push('/profile/sign-up'),
                     ),
                   ],
                 ),
         ),
         const SizedBox(height: AppSpace.cardGapWide),
-        const SectionHeader(title: AppStrings.mosqueServices),
+        SectionHeader(title: l.mosqueServices),
         const SizedBox(height: AppSpace.sectionHeaderGap),
         GroupedRows(
           rows: [
             _marriageRow(
+              l,
               user == null ? null : ref.watch(myApplicationProvider).valueOrNull,
             ),
           ],
         ),
         if (user != null) ...[
           const SizedBox(height: AppSpace.cardGapWide),
-          const SectionHeader(title: 'Your details'),
+          SectionHeader(title: l.yourDetails),
           const SizedBox(height: AppSpace.sectionHeaderGap),
-          _detailsCard(user, profile),
+          _detailsCard(l, user, profile),
         ],
         const SizedBox(height: AppSpace.cardGapWide),
-        const SectionHeader(title: 'Settings'),
+        SectionHeader(title: l.settings),
         const SizedBox(height: AppSpace.sectionHeaderGap),
         GroupedRows(
           rows: [
             AppListRow(
               icon: AppIcons.bell,
-              title: 'Prayer reminders',
-              subtitle: '5 minutes before each iqamah',
+              title: l.prayerReminders,
+              subtitle: l.prayerRemindersDetail,
               trailing: AppSwitch(
                 value: _remindersOn ?? true,
                 onChanged: _remindersOn == null ? null : _setReminders,
               ),
             ),
-            AppListRow(
-              divided: true,
-              icon: AppIcons.globe,
-              title: 'Language',
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'EN',
-                    style: const TextStyle(fontSize: 13.5).c(AppColor.ink3),
-                  ),
-                  const SizedBox(width: 6),
-                  const RowChevron(),
-                ],
-              ),
-            ),
+            const LanguageRow(divided: true),
             if (user != null)
               AppListRow(
                 divided: true,
                 icon: AppIcons.person,
-                title: 'Settings',
-                subtitle: 'Reminders, language, account',
+                title: l.settings,
+                subtitle: l.settingsRowSubtitle,
                 trailing: const RowChevron(),
                 onTap: () => context.push('/profile/settings'),
               ),
@@ -145,22 +133,22 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           rows: [
             AppListRow(
               icon: AppIcons.pin,
-              title: 'Mosque & contact',
+              title: l.mosqueAndContact,
               trailing: const RowChevron(),
               onTap: () => context.push('/profile/mosque'),
             ),
-            const AppListRow(
+            AppListRow(
               divided: true,
               icon: AppIcons.info,
-              title: 'About this app',
-              subtitle: 'Version 1.0',
-              trailing: RowChevron(),
+              title: l.aboutThisApp,
+              subtitle: l.versionLabel('1.0'),
+              trailing: const RowChevron(),
             ),
           ],
         ),
         const SizedBox(height: 20),
         Text(
-          'Prayer times, events and announcements work without an account.',
+          l.worksWithoutAccount,
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 12, height: 1.5).c(AppColor.ink3),
         ),
@@ -172,13 +160,13 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   /// Applied: "Submitted 12 September" and the "Under review" pill. While
   /// the application loads (or if it can't), the plain row shows — tapping
   /// it still resolves the right screen.
-  Widget _marriageRow(MarriageApplication? application) {
+  Widget _marriageRow(AppLocalizations l, MarriageApplication? application) {
     return AppListRow(
       icon: AppIcons.documentLock,
-      title: AppStrings.marriageService,
+      title: l.marriageService,
       subtitle: application == null
-          ? AppStrings.marriageServiceRow
-          : AppStrings.submittedOn(dayMonth(application.createdAt)),
+          ? l.marriageServiceRow
+          : l.submittedOn(dayMonth(l, application.createdAt)),
       trailing: application == null
           ? const RowChevron()
           : const Row(
@@ -189,19 +177,22 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     );
   }
 
-  Widget _signedOutRow() => const HeroRow(
+  Widget _signedOutRow(AppLocalizations l) => HeroRow(
         icon: AppIcons.person,
-        title: "You're not signed in",
-        subtitle: 'Sign in to register for events and keep your reminders '
-            'across devices.',
+        title: l.notSignedIn,
+        subtitle: l.notSignedInBody,
         circleSize: 46,
       );
 
-  Widget _identityRow(User user, Map<String, dynamic>? profile) {
+  Widget _identityRow(
+    AppLocalizations l,
+    User user,
+    Map<String, dynamic>? profile,
+  ) {
     final name = (profile?['full_name'] as String?) ??
         user.email?.split('@').first ??
-        'Member';
-    final since = _memberSince(profile?['created_at'] as String?);
+        l.member;
+    final since = _memberSince(l, profile?['created_at'] as String?);
     return Row(
       children: [
         Container(
@@ -213,7 +204,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
             shape: BoxShape.circle,
           ),
           child: Text(
-            _initials(name),
+            _initials(l, name),
             style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.w700,
@@ -263,7 +254,11 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     );
   }
 
-  Widget _detailsCard(User user, Map<String, dynamic>? profile) {
+  Widget _detailsCard(
+    AppLocalizations l,
+    User user,
+    Map<String, dynamic>? profile,
+  ) {
     final phone = profile?['phone'] as String?;
     final dob = profile?['date_of_birth'] as String?;
     return GroupedRows(
@@ -271,47 +266,48 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
         AppListRow(
           icon: AppIcons.person,
           title: (profile?['full_name'] as String?) ?? '—',
-          subtitle: 'Name',
+          subtitle: l.name,
         ),
         AppListRow(
           divided: true,
           icon: AppIcons.mail,
           title: user.email ?? '—',
-          subtitle: 'Email',
+          subtitle: l.email,
         ),
         AppListRow(
           divided: true,
           icon: AppIcons.phone,
-          title: phone == null || phone.isEmpty ? 'Not added' : phone,
-          subtitle: 'Phone',
+          title: phone == null || phone.isEmpty ? l.notAdded : phone,
+          subtitle: l.phone,
         ),
         AppListRow(
           divided: true,
           icon: AppIcons.calendar,
-          title: _formatDob(dob) ?? 'Not added',
-          subtitle: 'Date of birth',
+          title: _formatDob(l, dob) ?? l.notAdded,
+          subtitle: l.dobField,
         ),
       ],
     );
   }
 
-  String _initials(String name) {
+  /// Turkish-aware, so "ismail" gives "İ" in Turkish.
+  String _initials(AppLocalizations l, String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
     if (parts.length >= 2) {
-      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+      return upper('${parts.first[0]}${parts.last[0]}', l.localeName);
     }
-    return name.isEmpty ? '?' : name[0].toUpperCase();
+    return name.isEmpty ? '?' : upper(name[0], l.localeName);
   }
 
-  String _memberSince(String? createdAt) {
+  String _memberSince(AppLocalizations l, String? createdAt) {
     final date = createdAt == null ? null : DateTime.tryParse(createdAt);
-    if (date == null) return 'Member';
-    return 'Member since ${monthYear(date)}';
+    if (date == null) return l.member;
+    return l.memberSince(monthYear(l, date));
   }
 
-  String? _formatDob(String? raw) {
+  String? _formatDob(AppLocalizations l, String? raw) {
     if (raw == null || raw.isEmpty) return null;
     final date = DateTime.tryParse(raw);
-    return date == null ? null : longDate(date);
+    return date == null ? null : longDate(l, date);
   }
 }

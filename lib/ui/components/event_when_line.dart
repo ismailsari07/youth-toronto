@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/event_schedule.dart';
+import '../../l10n/l10n.dart';
 import '../../shared/formatters.dart';
 import '../../shared/providers/prayer_provider.dart';
 import '../../theme/app_icon.dart';
@@ -24,10 +25,11 @@ class EventWhenLine extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = context.l10n;
     final event = upcoming.event;
     final prayer = event.startsAfterPrayer;
     if (prayer == null) {
-      return Text(sessionLine(upcoming), style: _main.c(AppColor.ink2));
+      return Text(sessionLine(l, upcoming), style: _main.c(AppColor.ink2));
     }
 
     final start = upcoming.startsAt;
@@ -36,16 +38,16 @@ class EventWhenLine extends ConsumerWidget {
       day: DateTime(start.year, start.month, start.day),
       cache: ref.watch(prayerProvider).valueOrNull,
     );
-    final name = prayerDisplay(prayer);
     final lead = event.repeats.isRecurring
-        ? '${recurrenceWhen(event.repeats, start)} · after $name'
-        : 'After $name';
-    final about = estimate == null ? null : 'about ${eventTime(estimate)}';
+        ? '${recurrenceWhen(l, event.repeats, start)} · '
+            '${l.afterPrayerInline(prayer)}'
+        : l.afterPrayer(prayer);
+    final about = estimate == null ? null : l.aboutTime(eventTime(estimate));
 
     return Semantics(
       label: [
-        if (event.repeats.isRecurring) recurrenceWhen(event.repeats, start),
-        'Starts after $name prayer',
+        if (event.repeats.isRecurring) recurrenceWhen(l, event.repeats, start),
+        l.afterPrayerTitle(prayer),
         ?about,
       ].join(', '),
       excludeSemantics: true,
@@ -57,7 +59,7 @@ class EventWhenLine extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(top: 2),
             child: AppIcon(
-              AppIcons.forPrayer(name),
+              AppIcons.forPrayer(prayerName(prayer)),
               size: 14,
               color: AppColor.green,
             ),

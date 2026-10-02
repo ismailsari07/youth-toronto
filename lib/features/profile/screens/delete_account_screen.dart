@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -25,7 +26,7 @@ class DeleteAccountScreen extends StatefulWidget {
 class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   final _confirm = TextEditingController();
   bool _busy = false;
-  String? _error;
+  AuthError? _error;
 
   @override
   void initState() {
@@ -39,7 +40,15 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     super.dispose();
   }
 
-  bool get _ready => _confirm.text.trim() == 'DELETE';
+  /// The confirmation word in the app's language (DELETE / SUPPRIMER /
+  /// SİL). Case doesn't matter, and in Turkish "SIL" typed on a keyboard
+  /// without İ counts too.
+  bool get _ready {
+    final l = context.l10n;
+    String norm(String s) =>
+        upper(s.trim(), l.localeName).replaceAll('İ', 'I');
+    return norm(_confirm.text) == norm(l.deleteConfirmWord);
+  }
 
   Future<void> _delete() async {
     setState(() {
@@ -51,7 +60,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     if (error == null) {
       context.go('/profile');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Your account has been deleted.')),
+        SnackBar(content: Text(context.l10n.accountDeleted)),
       );
       return;
     }
@@ -63,12 +72,14 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final error = _error;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PlainNavBar(eyebrow: 'ACCOUNT', title: 'Delete account'),
+          PlainNavBar(eyebrow: l.accountEyebrow, title: l.deleteAccount),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(
@@ -94,7 +105,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                           const SizedBox(width: 13),
                           Expanded(
                             child: Text(
-                              'This cannot be undone',
+                              l.cannotBeUndone,
                               style: AppText.cardTitle.c(AppColor.ink),
                             ),
                           ),
@@ -104,57 +115,51 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       Text(
                         // Shown to everyone, whether or not they applied, so
                         // the copy never reveals who used the service.
-                        'Deleting your account removes your name, email, phone '
-                        'number and date of birth from the mosque’s records, '
-                        'along with any document you shared with the marriage '
-                        'service.',
+                        l.deleteAccountBody1,
                         style: AppText.body.c(AppColor.ink2),
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'The app keeps working without an account: prayer '
-                        'times, events and announcements are all available '
-                        'signed out.',
+                        l.deleteAccountBody2,
                         style: AppText.body.c(AppColor.ink2),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
-                const SectionHeader(title: 'What stays'),
+                SectionHeader(title: l.whatStays),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 GroupedRows(
                   rows: [
-                    const AppListRow(
+                    AppListRow(
                       icon: AppIcons.bell,
-                      title: 'Prayer reminders',
-                      subtitle: 'Kept on this device; they are not tied to '
-                          'your account',
+                      title: l.prayerReminders,
+                      subtitle: l.remindersStay,
                     ),
-                    const AppListRow(
+                    AppListRow(
                       divided: true,
                       icon: AppIcons.check,
-                      title: 'Attendance already recorded',
-                      subtitle: 'Kept as a count, without your name',
+                      title: l.attendanceRecorded,
+                      subtitle: l.attendanceStays,
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
-                const SectionHeader(title: 'Confirm'),
+                SectionHeader(title: l.confirm),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 FieldGroup(
                   children: [
                     AppField(
-                      label: 'Type DELETE to confirm',
+                      label: l.typeWordToConfirm(l.deleteConfirmWord),
                       controller: _confirm,
-                      hint: 'DELETE',
+                      hint: l.deleteConfirmWord,
                     ),
                   ],
                 ),
-                if (_error != null) ...[
+                if (error != null) ...[
                   const SizedBox(height: 12),
                   Text(
-                    _error!,
+                    authErrorText(l, error),
                     style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
                   ),
                 ],
@@ -175,13 +180,13 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   Opacity(
                     opacity: _ready && !_busy ? 1 : 0.4,
                     child: DestructiveButton(
-                      label: _busy ? 'Deleting…' : 'Delete my account',
+                      label: _busy ? l.deleting : l.deleteMyAccount,
                       onTap: _ready && !_busy ? _delete : null,
                     ),
                   ),
                   const SizedBox(height: 10),
                   GhostButton(
-                    label: 'Keep my account',
+                    label: l.keepMyAccount,
                     height: 46,
                     onTap: _busy ? null : () => context.pop(),
                   ),

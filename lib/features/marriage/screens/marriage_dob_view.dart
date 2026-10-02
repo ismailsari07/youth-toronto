@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -29,7 +29,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
   final _field = TextEditingController();
   DateTime? _date;
   bool _busy = false;
-  String? _error;
+  MarriageFailure? _error;
 
   @override
   void dispose() {
@@ -48,7 +48,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
     if (picked == null) return;
     setState(() {
       _date = picked;
-      _field.text = longDate(picked);
+      _field.text = longDate(context.l10n, picked);
       _error = null;
     });
   }
@@ -67,7 +67,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
       if (mounted) {
         setState(() {
           _busy = false;
-          _error = e.message;
+          _error = e.failure;
         });
       }
     }
@@ -75,6 +75,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final error = _error;
     final ready = _date != null && !_busy;
     return Scaffold(
@@ -82,10 +83,10 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PlainNavBar(
-            eyebrow: AppStrings.marriageEyebrow,
-            title: AppStrings.dobTitle,
-            subtitle: AppStrings.dobSubtitle,
+          PlainNavBar(
+            eyebrow: l.marriageEyebrow,
+            title: l.dobTitle,
+            subtitle: l.dobSubtitle,
           ),
           Expanded(
             child: ListView(
@@ -99,7 +100,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
                 AppCard(
                   padding: const EdgeInsets.all(AppSpace.cardPadding),
                   child: Text(
-                    AppStrings.dobBody,
+                    l.dobBody,
                     style: AppText.body.c(AppColor.ink2),
                   ),
                 ),
@@ -107,10 +108,10 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
                 FieldGroup(
                   children: [
                     AppField(
-                      label: AppStrings.dobField,
+                      label: l.dobField,
                       icon: AppIcons.calendar,
                       controller: _field,
-                      hint: AppStrings.dobHint,
+                      hint: l.dobHint,
                       readOnly: true,
                       onTap: _busy ? null : _pickDate,
                     ),
@@ -119,7 +120,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
                 if (error != null) ...[
                   const SizedBox(height: 12),
                   Text(
-                    error,
+                    error.message(l),
                     style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
                   ),
                 ],
@@ -134,7 +135,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
         child: Opacity(
           opacity: ready ? 1 : 0.4,
           child: PrimaryButton(
-            label: _busy ? AppStrings.saving : AppStrings.dobContinue,
+            label: _busy ? l.saving : l.dobContinue,
             onTap: ready ? _save : null,
           ),
         ),

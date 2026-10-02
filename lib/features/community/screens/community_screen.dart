@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/event_schedule.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/events_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
@@ -42,6 +42,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     final news =
         ref.watch(newsProvider).valueOrNull ?? const <Announcement>[];
     final jumaa = ref.watch(prayerProvider).valueOrNull?.jumaaPrayerTime;
+    final l = context.l10n;
 
     return RefreshableList(
       onRefresh: () async {
@@ -60,12 +61,12 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       ),
       children: [
         GradientTabHeader(
-          title: 'Community',
+          title: l.tabCommunity,
           row: _headerRow(events, news, jumaa),
         ),
         const SizedBox(height: 16),
         AppSegmented(
-          labels: const [AppStrings.events, AppStrings.announcements],
+          labels: [l.events, l.announcements],
           index: _segment,
           onChanged: _onSegmentChanged,
         ),
@@ -85,15 +86,16 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     List<Announcement> news,
     String? jumaa,
   ) {
+    final l = context.l10n;
     if (_segment == 1 && news.isNotEmpty) {
       final latest = news.first;
       return HeroRow(
         icon: AppIcons.announcement,
         title: latest.title,
-        subtitle: 'Posted ${timeAgo(latest.date)}',
+        subtitle: l.postedAgo(timeAgo(l, latest.date)),
         trailing: latest.isNew
-            ? const AppBadge(
-                label: 'New',
+            ? AppBadge(
+                label: l.newBadge,
                 fill: AppColor.heroArcTrack,
                 height: 24,
                 fontSize: 11,
@@ -108,9 +110,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       return HeroRow(
         icon: AppIcons.calendar,
         title: next.event.title,
-        subtitle: nextSessionLine(next),
+        subtitle: nextSessionLine(l, next),
         trailing: AppBadge(
-          label: _inDays(next.startsAt),
+          label: _inDays(l, next.startsAt),
           fill: AppColor.heroArcTrack,
           height: 24,
           fontSize: 11,
@@ -121,8 +123,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     }
     return HeroRow(
       icon: AppIcons.mosque,
-      title: "Jumu'ah · this Friday",
-      subtitle: jumaa == null ? 'Every Friday' : 'Salah $jumaa PM',
+      title: l.jumuahThisFriday,
+      subtitle: jumaa == null
+          ? l.everyFriday
+          : l.salahAt(prayerClock12('Dhuhr', jumaa)),
     );
   }
 
@@ -141,14 +145,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   }
 
   /// Calendar days until [session] on the mosque's calendar.
-  String _inDays(DateTime session) {
+  String _inDays(AppLocalizations l, DateTime session) {
     final now = mosqueNow();
     final days = DateTime.utc(session.year, session.month, session.day)
         .difference(DateTime.utc(now.year, now.month, now.day))
         .inDays;
-    if (days <= 0) return 'Today';
-    if (days == 1) return 'Tomorrow';
-    return '$days days';
+    if (days <= 0) return l.today;
+    if (days == 1) return l.tomorrow;
+    return l.inDays(days);
   }
 
   Future<void> _open(String url) async {
@@ -162,7 +166,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   Future<void> _share(UpcomingEvent u) async {
     try {
       await SharePlus.instance.share(
-        ShareParams(text: eventShareText(u), subject: u.event.title),
+        ShareParams(
+          text: eventShareText(context.l10n, u),
+          subject: u.event.title,
+        ),
       );
     } catch (_) {
       /* share sheet unavailable */
@@ -207,10 +214,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   List<Widget> _events(List<UpcomingEvent> events) {
     if (events.isEmpty) {
       return [
-        const EmptyStateCard(
+        EmptyStateCard(
           icon: AppIcons.mosque,
-          title: AppStrings.noEventsTitle,
-          body: AppStrings.noEventsBody,
+          title: context.l10n.noEventsTitle,
+          body: context.l10n.noEventsBody,
         ),
       ];
     }
@@ -233,10 +240,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   List<Widget> _announcements(List<Announcement> items) {
     if (items.isEmpty) {
       return [
-        const EmptyStateCard(
+        EmptyStateCard(
           icon: AppIcons.announcement,
-          title: AppStrings.noAnnouncementsTitle,
-          body: AppStrings.noAnnouncementsBody,
+          title: context.l10n.noAnnouncementsTitle,
+          body: context.l10n.noAnnouncementsBody,
         ),
       ];
     }
@@ -305,7 +312,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Posted ${timeAgo(item.date)}',
+                  context.l10n.postedAgo(timeAgo(context.l10n, item.date)),
                   style: const TextStyle(fontSize: 12).c(AppColor.ink3),
                 ),
               ],

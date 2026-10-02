@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -9,12 +9,14 @@ import '../../../ui/components/app_controls.dart';
 /// Spec §8a: greenTint strip, radius 18, padding 12/16, `shield-check` 18
 /// green and one line of greenDark 12.5 copy.
 class PrivacyStrip extends StatelessWidget {
-  const PrivacyStrip({super.key, this.text = AppStrings.privacyStrip});
+  const PrivacyStrip({super.key, this.text});
 
-  final String text;
+  /// Defaults to l10n.privacyStrip.
+  final String? text;
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
@@ -28,7 +30,7 @@ class PrivacyStrip extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              text,
+              text ?? l.privacyStrip,
               style: const TextStyle(fontSize: 12.5, height: 1.4)
                   .c(AppColor.greenDark),
             ),
@@ -46,8 +48,9 @@ class UnderReviewPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const AppBadge(
-      label: AppStrings.underReview,
+    final l = context.l10n;
+    return AppBadge(
+      label: l.underReview,
       fill: AppColor.greenTint,
       textColor: AppColor.greenDark,
       height: 24,
@@ -151,6 +154,7 @@ class FileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final tint = danger ? AppColor.dangerTint : AppColor.greenTint;
     final ink = danger ? AppColor.danger : AppColor.green;
     return Row(
@@ -187,7 +191,7 @@ class FileTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                AppStrings.yourDocument,
+                l.yourDocument,
                 style: const TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
@@ -241,12 +245,14 @@ class UploadProgressBar extends StatelessWidget {
 /// fill `#E3E8E5`, text `#7C8A84`. Submission happens on pick, so it is
 /// never enabled.
 class DisabledSubmitButton extends StatelessWidget {
-  const DisabledSubmitButton({super.key, this.label = AppStrings.submit});
+  const DisabledSubmitButton({super.key, this.label});
 
-  final String label;
+  /// Defaults to l10n.submit.
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Container(
       height: 50,
       alignment: Alignment.center,
@@ -255,7 +261,7 @@ class DisabledSubmitButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
-        label,
+        label ?? l.submit,
         style: AppText.buttonLarge.c(const Color(0xFF7C8A84)),
       ),
     );
@@ -284,12 +290,14 @@ class StickyCaption extends StatelessWidget {
 /// Spec §8a screen 6: "● Under review" — 26 tall, greenTint, greenDark
 /// 12/700, with a 7 px green dot.
 class StatusPill extends StatelessWidget {
-  const StatusPill({super.key, this.label = AppStrings.underReview});
+  const StatusPill({super.key, this.label});
 
-  final String label;
+  /// Defaults to l10n.underReview.
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Container(
       height: 26,
       padding: const EdgeInsets.symmetric(horizontal: 11),
@@ -310,7 +318,7 @@ class StatusPill extends StatelessWidget {
           ),
           const SizedBox(width: 7),
           Text(
-            label,
+            label ?? l.underReview,
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)
                 .c(AppColor.greenDark),
           ),

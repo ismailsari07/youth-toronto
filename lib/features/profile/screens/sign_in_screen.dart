@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -22,7 +23,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _busy = false;
-  String? _error;
+  AuthError? _error;
 
   @override
   void dispose() {
@@ -50,15 +51,17 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final error = _error;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PlainNavBar(
-            eyebrow: 'ACCOUNT',
-            title: 'Welcome back',
-            subtitle: 'Sign in to register for events',
+          PlainNavBar(
+            eyebrow: l.accountEyebrow,
+            title: l.welcomeBack,
+            subtitle: l.signInSubtitle,
           ),
           Expanded(
             child: ListView(
@@ -72,14 +75,14 @@ class _SignInScreenState extends State<SignInScreen> {
                 FieldGroup(
                   children: [
                     AppField(
-                      label: 'Email',
+                      label: l.email,
                       icon: AppIcons.mail,
                       controller: _email,
-                      hint: 'you@example.com',
+                      hint: l.emailHint,
                       keyboardType: TextInputType.emailAddress,
                     ),
                     AppField(
-                      label: 'Password',
+                      label: l.password,
                       icon: AppIcons.lock,
                       controller: _password,
                       obscure: true,
@@ -87,16 +90,16 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ],
                 ),
-                if (_error != null) ...[
+                if (error != null) ...[
                   const SizedBox(height: 12),
                   Text(
-                    _error!,
+                    authErrorText(l, error),
                     style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
                   ),
                 ],
                 const SizedBox(height: 18),
                 PrimaryButton(
-                  label: _busy ? 'Signing in…' : 'Sign in',
+                  label: _busy ? l.signingIn : l.signIn,
                   onTap: _busy ? null : _submit,
                 ),
                 const SizedBox(height: 24),
@@ -108,7 +111,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        'New to Pape Mosque?',
+                        l.noAccountYet,
                         style: const TextStyle(fontSize: 12).c(AppColor.ink3),
                       ),
                     ),
@@ -126,7 +129,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     child: Center(
                       child: Text(
-                        'Create an account',
+                        l.createAccount,
                         style: AppText.buttonLarge.c(AppColor.greenDark),
                       ),
                     ),
@@ -134,8 +137,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'An account is optional. Prayer times, events and '
-                  'announcements work without one.',
+                  l.accountOptional,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 12.5, height: 1.5)
                       .c(AppColor.ink3),

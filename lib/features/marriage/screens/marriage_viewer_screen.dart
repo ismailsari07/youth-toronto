@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfrx/pdfrx.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_buttons.dart';
@@ -30,7 +30,7 @@ class MarriageViewerScreen extends StatefulWidget {
 
 class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
   Uint8List? _bytes;
-  String? _error;
+  MarriageFailure? _error;
 
   /// A random per-view id for pdfrx's cache key, so nothing identifying is
   /// ever handed to the library.
@@ -58,12 +58,13 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
       final bytes = await MarriageService.downloadOwn(widget.application);
       if (mounted) setState(() => _bytes = bytes);
     } on MarriageException catch (e) {
-      if (mounted) setState(() => _error = e.message);
+      if (mounted) setState(() => _error = e.failure);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final bytes = _bytes;
     final error = _error;
     final kind = widget.application.kind;
@@ -73,8 +74,8 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PlainNavBar(
-            eyebrow: AppStrings.marriageEyebrow,
-            title: AppStrings.yourDocument,
+            eyebrow: l.marriageEyebrow,
+            title: l.yourDocument,
             subtitle: kind.label,
           ),
           const SizedBox(height: 14),
@@ -87,9 +88,9 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
                 AppSpace.pageGutter,
               ),
               child: error != null
-                  ? _Message(text: error, onRetry: _load)
+                  ? _Message(text: error.message(l), onRetry: _load)
                   : bytes == null
-                      ? const _Message(text: AppStrings.openingPrivately)
+                      ? _Message(text: l.openingPrivately)
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(AppRadius.card),
                           child: ColoredBox(
@@ -135,7 +136,7 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
         backgroundColor: AppColor.ground,
         margin: 8,
         errorBannerBuilder: (context, error, stackTrace, documentRef) =>
-            const _Message(text: AppStrings.openFailed),
+            _Message(text: context.l10n.openFailed),
       ),
     );
   }
@@ -149,6 +150,7 @@ class _Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final retry = onRetry;
     return Align(
       alignment: Alignment.topCenter,
@@ -161,7 +163,7 @@ class _Message extends StatelessWidget {
             Text(text, style: AppText.body.c(AppColor.ink2)),
             if (retry != null) ...[
               const SizedBox(height: 14),
-              GhostButton(label: AppStrings.tryAgain, onTap: retry),
+              GhostButton(label: l.tryAgain, onTap: retry),
             ],
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -27,7 +28,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _password = TextEditingController();
   DateTime? _birthDate;
   bool _busy = false;
-  String? _error;
+  /// Rendered at build time, so it follows a language change.
+  String Function(AppLocalizations l)? _error;
 
   @override
   void dispose() {
@@ -50,24 +52,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (picked == null) return;
     setState(() {
       _birthDate = picked;
-      _dob.text = longDate(picked);
+      _dob.text = longDate(context.l10n, picked);
     });
   }
 
   Future<void> _submit() async {
     final name = _name.text.trim();
     final email = _email.text.trim();
-    if (name.isEmpty) return setState(() => _error = 'Please enter your name.');
+    if (name.isEmpty) return setState(() => _error = (l) => l.enterName);
     if (!email.contains('@')) {
-      return setState(() => _error = 'Please enter a valid email.');
+      return setState(() => _error = (l) => l.enterValidEmail);
     }
     if (_password.text.length < 6) {
-      return setState(
-        () => _error = 'Password must be at least 6 characters.',
-      );
+      return setState(() => _error = (l) => l.passwordTooShort);
     }
     if (_birthDate == null) {
-      return setState(() => _error = 'Please choose your date of birth.');
+      return setState(() => _error = (l) => l.chooseDob);
     }
 
     setState(() {
@@ -84,22 +84,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (!mounted) return;
     setState(() {
       _busy = false;
-      _error = error;
+      _error = error == null ? null : (l) => authErrorText(l, error);
     });
     if (error == null) context.pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final error = _error;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PlainNavBar(
-            eyebrow: 'ACCOUNT',
-            title: 'Create an account',
-            subtitle: "So the office knows who's coming",
+          PlainNavBar(
+            eyebrow: l.accountEyebrow,
+            title: l.createAccount,
+            subtitle: l.signUpSubtitle,
           ),
           Expanded(
             child: ListView(
@@ -113,21 +115,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 FieldGroup(
                   children: [
                     AppField(
-                      label: 'Full name',
+                      label: l.fullName,
                       icon: AppIcons.person,
                       controller: _name,
-                      hint: 'Your name',
+                      hint: l.yourName,
                     ),
                     AppField(
-                      label: 'Email',
+                      label: l.email,
                       icon: AppIcons.mail,
                       controller: _email,
-                      hint: 'you@example.com',
+                      hint: l.emailHint,
                       keyboardType: TextInputType.emailAddress,
                       divided: true,
                     ),
                     AppField(
-                      label: 'Phone (optional)',
+                      label: l.phoneOptional,
                       icon: AppIcons.phone,
                       controller: _phone,
                       hint: '647 000 0000',
@@ -135,16 +137,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       divided: true,
                     ),
                     AppField(
-                      label: 'Date of birth',
+                      label: l.dobField,
                       icon: AppIcons.calendar,
                       controller: _dob,
-                      hint: 'Choose a date',
+                      hint: l.dobHint,
                       readOnly: true,
                       onTap: _pickDate,
                       divided: true,
                     ),
                     AppField(
-                      label: 'Password',
+                      label: l.password,
                       icon: AppIcons.lock,
                       controller: _password,
                       obscure: true,
@@ -152,22 +154,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ],
                 ),
-                if (_error != null) ...[
+                if (error != null) ...[
                   const SizedBox(height: 12),
                   Text(
-                    _error!,
+                    error(l),
                     style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
                   ),
                 ],
                 const SizedBox(height: 14),
                 Text(
-                  'Your details are shared only with the mosque office.',
+                  l.detailsSharedOnlyWithOffice,
                   style: const TextStyle(fontSize: 12.5, height: 1.5)
                       .c(AppColor.ink3),
                 ),
                 const SizedBox(height: 18),
                 PrimaryButton(
-                  label: _busy ? 'Creating…' : 'Create account',
+                  label: _busy ? l.creatingAccount : l.createAccountButton,
                   onTap: _busy ? null : _submit,
                 ),
                 const SizedBox(height: 20),
@@ -178,7 +180,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8),
                       child: Text(
-                        'Already have an account? Sign in',
+                        l.alreadyHaveAccount,
                         style: const TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,

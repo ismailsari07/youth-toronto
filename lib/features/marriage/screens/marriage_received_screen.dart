@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -19,6 +19,7 @@ class MarriageReceivedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: ListView(
@@ -49,7 +50,7 @@ class MarriageReceivedScreen extends StatelessWidget {
           ),
           const SizedBox(height: 22),
           Text(
-            AppStrings.receivedTitle,
+            l.receivedTitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 26,
@@ -59,32 +60,32 @@ class MarriageReceivedScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            AppStrings.receivedBody,
+            l.receivedBody,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 14.5, height: 1.45)
                 .c(AppColor.ink2),
           ),
           const SizedBox(height: 28),
-          const SectionHeader(title: AppStrings.whatHappensNext),
+          SectionHeader(title: l.whatHappensNext),
           const SizedBox(height: AppSpace.sectionHeaderGap),
-          const GroupedRows(
+          GroupedRows(
             rows: [
               AppListRow(
                 leading: _StepNumber(1),
-                title: AppStrings.nextImamReads,
-                subtitle: AppStrings.nextImamReadsBody,
+                title: l.nextImamReads,
+                subtitle: l.nextImamReadsBody,
               ),
               AppListRow(
                 divided: true,
                 leading: _StepNumber(2),
-                title: AppStrings.nextContacted,
-                subtitle: AppStrings.nextContactedBody,
+                title: l.nextContacted,
+                subtitle: l.nextContactedBody,
               ),
               AppListRow(
                 divided: true,
                 leading: _StepNumber(3),
-                title: AppStrings.nextYouDecide,
-                subtitle: AppStrings.nextYouDecideBody,
+                title: l.nextYouDecide,
+                subtitle: l.nextYouDecideBody,
               ),
             ],
           ),
@@ -94,7 +95,7 @@ class MarriageReceivedScreen extends StatelessWidget {
       ),
       bottomNavigationBar: StickyBottomBar(
         child: PrimaryButton(
-          label: AppStrings.done,
+          label: l.done,
           onTap: () => context.pushReplacement(MarriageRoutes.status),
         ),
       ),

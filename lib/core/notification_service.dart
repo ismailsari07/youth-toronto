@@ -5,7 +5,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'mosque_time.dart';
 
 const _channelId = 'prayer_reminders';
-const _channelName = 'Prayer Reminders';
 
 /// One reminder to schedule. [at] is an absolute instant (a Toronto
 /// TZDateTime), so it fires at the right moment wherever the device is.
@@ -61,17 +60,35 @@ class NotificationService {
 
   /// Replaces every pending reminder with [reminders]. All date/time logic
   /// lives in ReminderSync; this only talks to the plugin.
-  static Future<void> scheduleReminders(List<Reminder> reminders) async {
+  ///
+  /// [channelName] is what Android shows for these notifications in the
+  /// system settings; re-creating the channel with the same id renames it
+  /// when the app's language changes.
+  static Future<void> scheduleReminders(
+    List<Reminder> reminders, {
+    required String channelName,
+  }) async {
     await cancelAll();
 
-    const details = NotificationDetails(
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(
+          AndroidNotificationChannel(
+            _channelId,
+            channelName,
+            importance: Importance.high,
+          ),
+        );
+
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
-        _channelName,
+        channelName,
         importance: Importance.high,
         priority: Priority.high,
       ),
-      iOS: DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(),
     );
 
     for (final r in reminders) {

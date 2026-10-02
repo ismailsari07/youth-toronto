@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/l10n.dart';
 import 'models.dart';
 import 'mosque_time.dart';
 import 'notification_service.dart';
@@ -78,13 +79,22 @@ class ReminderSync {
       }
       if (days.isEmpty) return;
 
-      await NotificationService.scheduleReminders(_buildReminders(days));
+      // Reminder text is fixed when scheduled, so it is written in the
+      // language the app shows now; changing language re-runs this sync.
+      final l = await currentAppLocalizations();
+      await NotificationService.scheduleReminders(
+        _buildReminders(days, l),
+        channelName: l.prayerReminders,
+      );
     } catch (e) {
       debugPrint('ReminderSync: sync failed: $e');
     }
   }
 
-  static List<Reminder> _buildReminders(List<_Day> days) {
+  static List<Reminder> _buildReminders(
+    List<_Day> days,
+    AppLocalizations l,
+  ) {
     final byDate = {for (final d in days) d.date: d.payload};
     final now = mosqueNow();
     final reminders = <Reminder>[];
@@ -107,8 +117,8 @@ class ReminderSync {
         if (!at.isAfter(now)) continue;
         reminders.add((
           id: i * 10 + index,
-          title: item.name,
-          body: 'Iqamah in 5 minutes',
+          title: l.prayerSalah(item.name.toLowerCase()),
+          body: l.reminderBody,
           at: at,
         ));
       }

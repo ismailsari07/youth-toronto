@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../l10n/app_strings.dart';
+import '../l10n/l10n.dart';
 import '../shared/providers/unread_provider.dart';
 import '../theme/app_icon.dart';
 import '../theme/app_tokens.dart';
@@ -15,23 +15,22 @@ class AppShell extends ConsumerWidget {
 
   final StatefulNavigationShell navigationShell;
 
-  static const _tabs = [
-    IslandTab(icon: AppIcons.mosque, label: AppStrings.tabPrayer),
-    IslandTab(icon: AppIcons.calendar, label: AppStrings.tabCommunity),
-    IslandTab(icon: AppIcons.person, label: AppStrings.tabProfile),
-  ];
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Unread announcements dot the Community tab, where they live (spec §5
     // puts it on Profile; moved deliberately).
     final unread = ref.watch(hasUnreadAnnouncementsProvider);
+    final l = context.l10n;
     return Scaffold(
       backgroundColor: AppColor.ground,
       extendBody: true, // content must flow under the island
       body: navigationShell,
       bottomNavigationBar: IslandTabBar(
-        tabs: _tabs,
+        tabs: [
+          IslandTab(icon: AppIcons.mosque, label: l.tabPrayer),
+          IslandTab(icon: AppIcons.calendar, label: l.tabCommunity),
+          IslandTab(icon: AppIcons.person, label: l.tabProfile),
+        ],
         index: navigationShell.currentIndex,
         badgeIndex: unread ? 1 : null,
         onSelect: (i) => navigationShell.goBranch(

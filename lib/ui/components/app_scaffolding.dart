@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../l10n/app_strings.dart';
+import '../../l10n/l10n.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
@@ -248,7 +248,7 @@ class EmptyStateCard extends StatelessWidget {
           const Divider(height: 1, thickness: 1, color: AppColor.hairline),
           AppListRow(
             icon: AppIcons.bell,
-            title: AppStrings.notifyMe,
+            title: context.l10n.notifyMe,
             titleStyle: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)
                 .c(AppColor.ink),
             trailing: AppSwitch(value: notifyValue, onChanged: onNotifyChanged),

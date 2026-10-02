@@ -1,22 +1,44 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+/// Why an auth call failed. The UI turns it into a sentence in the app's
+/// language (`authErrorText`); Supabase's own messages are English only.
+enum AuthFailure {
+  invalidCredentials,
+  emailTaken,
+  weakPassword,
+  emailNotConfirmed,
+  rateLimited,
+  network,
+  sessionExpired,
+  adminAccount,
+  deleteFailed,
+  unexpected,
+}
+
+/// [serverMessage] is Supabase's English text, kept for failures this app
+/// has no sentence of its own for.
+typedef AuthError = ({AuthFailure kind, String? serverMessage});
+
 class AuthService {
   static SupabaseClient get _client => Supabase.instance.client;
 
   static User? get currentUser => _client.auth.currentUser;
 
-  static Future<String?> signInWithEmail(String email, String password) async {
+  static Future<AuthError?> signInWithEmail(
+    String email,
+    String password,
+  ) async {
     try {
       await _client.auth.signInWithPassword(email: email, password: password);
       return null;
     } on AuthException catch (e) {
-      return e.message;
+      return _fromAuthException(e);
     } catch (_) {
-      return 'An unexpected error occurred.';
+      return (kind: AuthFailure.unexpected, serverMessage: null);
     }
   }
 
-  static Future<String?> signUpWithEmail(
+  static Future<AuthError?> signUpWithEmail(
     String email,
     String password,
     String fullName, {
@@ -33,10 +55,29 @@ class AuthService {
       );
       return null;
     } on AuthException catch (e) {
-      return e.message;
+      return _fromAuthException(e);
     } catch (_) {
-      return 'An unexpected error occurred.';
+      return (kind: AuthFailure.unexpected, serverMessage: null);
     }
+  }
+
+  static AuthError _fromAuthException(AuthException e) {
+    if (e is AuthRetryableFetchException) {
+      return (kind: AuthFailure.network, serverMessage: null);
+    }
+    final kind = switch (e.code) {
+      'invalid_credentials' => AuthFailure.invalidCredentials,
+      'user_already_exists' || 'email_exists' => AuthFailure.emailTaken,
+      'weak_password' => AuthFailure.weakPassword,
+      'email_not_confirmed' => AuthFailure.emailNotConfirmed,
+      'over_request_rate_limit' ||
+      'over_email_send_rate_limit' =>
+        AuthFailure.rateLimited,
+      _ when e.message == 'Invalid login credentials' =>
+        AuthFailure.invalidCredentials,
+      _ => AuthFailure.unexpected,
+    };
+    return (kind: kind, serverMessage: e.message);
   }
 
   static Future<void> signOut() async {
@@ -45,9 +86,9 @@ class AuthService {
 
   /// Permanently deletes the signed-in user's account via the
   /// `delete-account` Edge Function (which holds the service-role key).
-  /// Returns null on success, else a message to show. On success the local
+  /// Returns null on success, else why it failed. On success the local
   /// session is cleared, so the UI falls back to the signed-out state.
-  static Future<String?> deleteAccount() async {
+  static Future<AuthError?> deleteAccount() async {
     try {
       await _client.functions.invoke('delete-account');
       await _signOutLocally();
@@ -55,16 +96,15 @@ class AuthService {
     } on FunctionException catch (e) {
       if (e.status == 401) {
         await _signOutLocally();
-        return 'Your session has expired. Sign in again, then retry.';
+        return (kind: AuthFailure.sessionExpired, serverMessage: null);
       }
       final details = e.details;
       if (e.status == 409 &&
           details is Map &&
           details['error'] == 'admin_account') {
-        return "Admin accounts can't be deleted from the app. "
-            'Contact another administrator.';
+        return (kind: AuthFailure.adminAccount, serverMessage: null);
       }
-      return "Couldn't delete your account. Please try again.";
+      return (kind: AuthFailure.deleteFailed, serverMessage: null);
     } catch (_) {
       // No response. The server may still have deleted the account (reply
       // lost), so ask it: if the user no longer exists, deletion succeeded.
@@ -72,7 +112,7 @@ class AuthService {
         await _signOutLocally();
         return null;
       }
-      return "Couldn't reach the server. Check your connection and try again.";
+      return (kind: AuthFailure.network, serverMessage: null);
     }
   }
 

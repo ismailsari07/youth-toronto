@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/auth_service.dart';
 import '../../../core/notification_service.dart';
 import '../../../core/reminder_sync.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -13,6 +14,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../widgets/language_sheet.dart';
 
 /// Spec §7.10. Only the reminder toggle that actually works is shown: the
 /// spec's Jumu'ah and "events and announcements" switches have no
@@ -49,6 +51,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
+    final l = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColor.ground,
@@ -56,11 +59,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           PlainNavBar(
-            eyebrow: 'ACCOUNT',
-            title: 'Settings',
+            eyebrow: l.accountEyebrow,
+            title: l.settings,
             subtitle: user == null
-                ? 'Not signed in'
-                : 'Signed in as ${user.email ?? ''}',
+                ? l.notSignedInShort
+                : l.signedInAs(user.email ?? ''),
           ),
           Expanded(
             child: ListView(
@@ -71,14 +74,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 40,
               ),
               children: [
-                const SectionHeader(title: 'Notifications'),
+                SectionHeader(title: l.notifications),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 GroupedRows(
                   rows: [
                     AppListRow(
                       icon: AppIcons.bell,
-                      title: 'Prayer reminders',
-                      subtitle: '5 minutes before each iqamah',
+                      title: l.prayerReminders,
+                      subtitle: l.prayerRemindersDetail,
                       trailing: AppSwitch(
                         value: _remindersOn ?? true,
                         onChanged: _remindersOn == null ? null : _setReminders,
@@ -87,52 +90,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
-                const SectionHeader(title: 'App'),
+                SectionHeader(title: l.app),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 GroupedRows(
                   rows: [
-                    AppListRow(
-                      icon: AppIcons.globe,
-                      title: 'Language',
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'EN',
-                            style: const TextStyle(fontSize: 13.5)
-                                .c(AppColor.ink3),
-                          ),
-                          const SizedBox(width: 6),
-                          const RowChevron(),
-                        ],
-                      ),
-                    ),
+                    const LanguageRow(),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.pin,
-                      title: 'Mosque & contact',
+                      title: l.mosqueAndContact,
                       trailing: const RowChevron(),
                       onTap: () => context.push('/profile/mosque'),
                     ),
-                    const AppListRow(
+                    AppListRow(
                       divided: true,
                       icon: AppIcons.info,
-                      title: 'About this app',
-                      subtitle: 'Version 1.0',
-                      trailing: RowChevron(),
+                      title: l.aboutThisApp,
+                      subtitle: l.versionLabel('1.0'),
+                      trailing: const RowChevron(),
                     ),
                   ],
                 ),
                 if (user != null) ...[
                   const SizedBox(height: AppSpace.cardGapWide),
-                  const SectionHeader(title: 'Account'),
+                  SectionHeader(title: l.account),
                   const SizedBox(height: AppSpace.sectionHeaderGap),
                   GroupedRows(
                     rows: [
                       AppListRow(
                         icon: AppIcons.signOut,
                         tone: RowTone.neutral,
-                        title: 'Sign out',
+                        title: l.signOut,
                         onTap: () async {
                           await AuthService.signOut();
                           if (context.mounted) context.pop();
@@ -159,7 +147,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           const SizedBox(width: AppSpace.rowGap),
                           Expanded(
                             child: Text(
-                              'Delete account',
+                              l.deleteAccount,
                               style: AppText.rowTitle.c(AppColor.danger),
                             ),
                           ),

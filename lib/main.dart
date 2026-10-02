@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/mosque_time.dart';
@@ -7,6 +8,8 @@ import 'core/notification_service.dart';
 import 'core/prayer_service.dart';
 import 'core/reminder_sync.dart';
 import 'core/router.dart';
+import 'l10n/l10n.dart';
+import 'l10n/locale_provider.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -31,7 +34,13 @@ void main() async {
     // Reminders are optional — never let them stop the app from opening.
     debugPrint('Notification init failed: $e');
   }
-  runApp(const ProviderScope(child: MytApp()));
+  final savedLocale = await LocaleStore.load();
+  runApp(
+    ProviderScope(
+      overrides: [savedLocaleProvider.overrideWithValue(savedLocale)],
+      child: const MytApp(),
+    ),
+  );
 }
 
 /// pdfrx reports every PDF it opens through `debugPrint` — in release builds
@@ -51,14 +60,14 @@ void _silencePdfViewerLogs() {
   };
 }
 
-class MytApp extends StatefulWidget {
+class MytApp extends ConsumerStatefulWidget {
   const MytApp({super.key});
 
   @override
-  State<MytApp> createState() => _MytAppState();
+  ConsumerState<MytApp> createState() => _MytAppState();
 }
 
-class _MytAppState extends State<MytApp> {
+class _MytAppState extends ConsumerState<MytApp> {
   late final AppLifecycleListener _lifecycle;
 
   @override
@@ -80,7 +89,17 @@ class _MytAppState extends State<MytApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Pape Mosque',
+      onGenerateTitle: (context) => context.l10n.appTitle,
+      locale: ref.watch(localeOverrideProvider),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      localeListResolutionCallback: (device, _) =>
+          resolveAppLocale(null, device ?? const []),
       theme: appTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

@@ -1,0 +1,540 @@
+{
+  "@@locale": "en",
+  "appTitle": "Pape Mosque",
+  "tabPrayer": "Prayer",
+  "tabCommunity": "Community",
+  "tabProfile": "Profile",
+  "prayer": "{prayer, select, fajr{Fajr} sunrise{Sunrise} dhuhr{Dhuhr} asr{Asr} maghrib{Maghrib} isha{Isha} other{{prayer}}}",
+  "@prayer": {
+    "description": "A prayer time as the timetable names it. [prayer] is the lower-case English key.",
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "prayerSalah": "{prayer, select, fajr{Fajr} sunrise{Sunrise} dhuhr{Dhuhr} asr{Asr} maghrib{Maghrib} isha{Isha} other{{prayer}}}",
+  "@prayerSalah": {
+    "description": "The prayer itself (the salah), as a reminder title. Turkish uses the namaz form: İmsak is a time, the prayer is the sabah namazı.",
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "afterPrayer": "{prayer, select, fajr{After Fajr} sunrise{After sunrise} dhuhr{After Dhuhr} asr{After Asr} maghrib{After Maghrib} isha{After Isha} other{After {prayer}}}",
+  "@afterPrayer": {
+    "description": "Start of an event card's when line.",
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "afterPrayerInline": "{prayer, select, fajr{after Fajr} sunrise{after sunrise} dhuhr{after Dhuhr} asr{after Asr} maghrib{after Maghrib} isha{after Isha} other{after {prayer}}}",
+  "@afterPrayerInline": {
+    "description": "Mid-line, after the cadence: 'Every Friday · after Maghrib'.",
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "afterPrayerTitle": "{prayer, select, fajr{After Fajr prayer} sunrise{After sunrise} dhuhr{After Dhuhr prayer} asr{After Asr prayer} maghrib{After Maghrib prayer} isha{After Isha prayer} other{After {prayer} prayer}}",
+  "@afterPrayerTitle": {
+    "description": "Event detail row title.",
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "mosqueEyebrow": "PAPE MOSQUE",
+  "nextPrayer": "NEXT PRAYER",
+  "city": "Toronto",
+  "todayAtTheMosque": "Today at the mosque",
+  "athanIqamah": "Athan · Iqamah",
+  "iqamah": "IQAMAH",
+  "athanAt": "Athan {time}",
+  "@athanAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "iqamahAt": "Iqamah {time}",
+  "@iqamahAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "prayerNow": "{prayer} · now",
+  "@prayerNow": {
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "fajrWindowCloses": "Fajr window closes",
+  "prayerReminders": "Prayer reminders",
+  "prayerRemindersDetail": "5 minutes before each iqamah",
+  "reminderBody": "Iqamah in 5 minutes",
+  "@reminderBody": {
+    "description": "Notification body, 5 minutes before the iqamah."
+  },
+  "timesUnavailable": "Times unavailable",
+  "pullToRefresh": "Pull to refresh",
+  "timesUnavailableTitle": "Today's times aren't available",
+  "timesUnavailableBody": "The mosque calendar could not be reached. Reminders already scheduled on this device still run.",
+  "tryAgain": "Try again",
+  "jumuahThisFriday": "Jumu'ah · this Friday",
+  "jumuahEveryFriday": "Every Friday at the mosque",
+  "everyFriday": "Every Friday",
+  "salahAt": "Salah {time}",
+  "@salahAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eidFitr": "Eid al-Fitr",
+  "eidAdha": "Eid al-Adha",
+  "eidTimes": "Salah {first} · Second jamaah {second}",
+  "@eidTimes": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "directions": "Directions",
+  "call": "Call",
+  "callOffice": "Call office",
+  "hijriMonth1": "Muharram",
+  "hijriMonth2": "Safar",
+  "hijriMonth3": "Rabi' al-Awwal",
+  "hijriMonth4": "Rabi' al-Thani",
+  "hijriMonth5": "Jumada al-Awwal",
+  "hijriMonth6": "Jumada al-Thani",
+  "hijriMonth7": "Rajab",
+  "hijriMonth8": "Sha'ban",
+  "hijriMonth9": "Ramadan",
+  "hijriMonth10": "Shawwal",
+  "hijriMonth11": "Dhu al-Qi'dah",
+  "hijriMonth12": "Dhu al-Hijjah",
+  "datePatternTitle": "EEEE, d MMMM",
+  "@datePatternTitle": {
+    "description": "intl pattern: 'Wednesday, 23 September'."
+  },
+  "datePatternLong": "EEEE d MMMM",
+  "@datePatternLong": {
+    "description": "intl pattern: 'Saturday 26 September'."
+  },
+  "datePatternShort": "EEE d MMM",
+  "@datePatternShort": {
+    "description": "intl pattern: 'Wed 30 Sep'. Turkish spells both out: abbreviations like 'Eki Cum' read badly."
+  },
+  "datePatternDayMonth": "d MMMM",
+  "@datePatternDayMonth": {
+    "description": "intl pattern: '30 September'."
+  },
+  "datePatternMonthYear": "MMMM y",
+  "@datePatternMonthYear": {
+    "description": "intl pattern: 'March 2024'."
+  },
+  "datePatternCard": "MMM d",
+  "@datePatternCard": {
+    "description": "intl pattern for the event card: 'MAY 8'."
+  },
+  "minutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weeksAgo": "{count, plural, =1{1 week ago} other{{count} weeks ago}}",
+  "@weeksAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monthsAgo": "{count, plural, =1{1 month ago} other{{count} months ago}}",
+  "@monthsAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "postedAgo": "Posted {ago}",
+  "@postedAgo": {
+    "description": "[ago] is e.g. '3 hours ago'.",
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "today": "Today",
+  "tomorrow": "Tomorrow",
+  "inDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@inDays": {
+    "description": "Badge: days until the next session.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repeatsWeekly": "Repeats weekly",
+  "repeatsBiweekly": "Repeats every 2 weeks",
+  "repeatsMonthly": "Repeats monthly",
+  "everyWeekday": "{weekday, select, mon{Every Monday} tue{Every Tuesday} wed{Every Wednesday} thu{Every Thursday} fri{Every Friday} sat{Every Saturday} sun{Every Sunday} other{Every Monday}}",
+  "@everyWeekday": {
+    "description": "[weekday] is mon…sun.",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "everyOtherWeekday": "{weekday, select, mon{Every other Monday} tue{Every other Tuesday} wed{Every other Wednesday} thu{Every other Thursday} fri{Every other Friday} sat{Every other Saturday} sun{Every other Sunday} other{Every other Monday}}",
+  "@everyOtherWeekday": {
+    "description": "[weekday] is mon…sun.",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "everyTwoWeeks": "Every 2 weeks",
+  "monthly": "Monthly",
+  "everyMonthOnDay": "Every month on the {day}",
+  "@everyMonthOnDay": {
+    "description": "[day] is the ordinal from Dart: '5th' (en), '5' or '1er' (fr), '5' (tr).",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "weeklyProgrammeEyebrow": "WEEKLY PROGRAMME",
+  "biweeklyProgrammeEyebrow": "BIWEEKLY PROGRAMME",
+  "monthlyProgrammeEyebrow": "MONTHLY PROGRAMME",
+  "eventEyebrow": "EVENT",
+  "weeklyProgramme": "Weekly programme",
+  "biweeklyProgramme": "Programme every 2 weeks",
+  "monthlyProgramme": "Monthly programme",
+  "nextOn": "next: {date}",
+  "@nextOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutTime": "about {time}",
+  "@aboutTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "beginsAboutOn": "{begins} — about {time} on {date}",
+  "@beginsAboutOn": {
+    "placeholders": {
+      "begins": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "registerAt": "Register: {url}",
+  "@registerAt": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "events": "Events",
+  "announcements": "Announcements",
+  "noEventsTitle": "No events scheduled",
+  "noEventsBody": "When the mosque publishes an event it will appear here. Jumu'ah runs every Friday as usual.",
+  "noAnnouncementsTitle": "No announcements",
+  "noAnnouncementsBody": "Notices from the mosque office will appear here.",
+  "notifyMe": "Tell me when something is posted",
+  "newBadge": "New",
+  "announcementEyebrow": "ANNOUNCEMENT",
+  "register": "Register",
+  "registerFree": "Register · free",
+  "aboutThisEvent": "About this event",
+  "shareThisEvent": "Share this event",
+  "shareThisAnnouncement": "Share this announcement",
+  "questions": "Questions?",
+  "callTheOffice": "Call the mosque office",
+  "mosqueOffice": "Mosque office",
+  "everyoneWelcome": "Everyone is welcome",
+  "freeToAttend": "Free to attend",
+  "ticketed": "Ticketed",
+  "map": "Map",
+  "dropIn": "Drop in — no registration needed",
+  "nextSession": "Next session",
+  "startTime": "Start time",
+  "date": "Date",
+  "beginsAfterJamaah": "Begins once the jama'ah finishes",
+  "notSignedIn": "You're not signed in",
+  "notSignedInBody": "Sign in to register for events and keep your reminders across devices.",
+  "signIn": "Sign in",
+  "signingIn": "Signing in…",
+  "createAccount": "Create an account",
+  "createAccountButton": "Create account",
+  "creatingAccount": "Creating…",
+  "signOut": "Sign out",
+  "settings": "Settings",
+  "settingsRowSubtitle": "Reminders, language, account",
+  "yourDetails": "Your details",
+  "notifications": "Notifications",
+  "app": "App",
+  "account": "Account",
+  "accountEyebrow": "ACCOUNT",
+  "signedInAs": "Signed in as {email}",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "notSignedInShort": "Not signed in",
+  "language": "Language",
+  "deviceLanguage": "Device language",
+  "deviceLanguageDetail": "Follows your phone's setting",
+  "languageAuto": "Auto",
+  "mosqueAndContact": "Mosque & contact",
+  "aboutThisApp": "About this app",
+  "versionLabel": "Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "worksWithoutAccount": "Prayer times, events and announcements work without an account.",
+  "member": "Member",
+  "memberSince": "Member since {date}",
+  "@memberSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "name": "Name",
+  "email": "Email",
+  "phone": "Phone",
+  "website": "Website",
+  "notAdded": "Not added",
+  "password": "Password",
+  "emailHint": "you@example.com",
+  "welcomeBack": "Welcome back",
+  "signInSubtitle": "Sign in to register for events",
+  "noAccountYet": "New to Pape Mosque?",
+  "accountOptional": "An account is optional. Prayer times, events and announcements work without one.",
+  "signUpSubtitle": "So the office knows who's coming",
+  "fullName": "Full name",
+  "yourName": "Your name",
+  "phoneOptional": "Phone (optional)",
+  "detailsSharedOnlyWithOffice": "Your details are shared only with the mosque office.",
+  "alreadyHaveAccount": "Already have an account? Sign in",
+  "enterName": "Please enter your name.",
+  "enterValidEmail": "Please enter a valid email.",
+  "passwordTooShort": "Password must be at least 6 characters.",
+  "chooseDob": "Please choose your date of birth.",
+  "errorUnexpected": "An unexpected error occurred.",
+  "errorInvalidCredentials": "Incorrect email or password.",
+  "errorEmailTaken": "An account with this email already exists.",
+  "errorWeakPassword": "This password is too weak. Please choose a stronger one.",
+  "errorEmailNotConfirmed": "Please confirm your email first, using the link we sent you.",
+  "errorRateLimited": "Too many attempts. Please wait a moment and try again.",
+  "errorNetwork": "Couldn't reach the server. Check your connection and try again.",
+  "errorSessionExpired": "Your session has expired. Sign in again, then retry.",
+  "errorAdminAccount": "Admin accounts can't be deleted from the app. Contact another administrator.",
+  "errorDeleteFailed": "Couldn't delete your account. Please try again.",
+  "deleteAccount": "Delete account",
+  "deleteMyAccount": "Delete my account",
+  "deleting": "Deleting…",
+  "keepMyAccount": "Keep my account",
+  "cannotBeUndone": "This cannot be undone",
+  "deleteAccountBody1": "Deleting your account removes your name, email, phone number and date of birth from the mosque's records, along with any document you shared with the marriage service.",
+  "@deleteAccountBody1": {
+    "description": "Shown to everyone, whether or not they applied, so it never reveals who used the marriage service."
+  },
+  "deleteAccountBody2": "The app keeps working without an account: prayer times, events and announcements are all available signed out.",
+  "whatStays": "What stays",
+  "remindersStay": "Kept on this device; they are not tied to your account",
+  "attendanceRecorded": "Attendance already recorded",
+  "attendanceStays": "Kept as a count, without your name",
+  "confirm": "Confirm",
+  "deleteConfirmWord": "DELETE",
+  "@deleteConfirmWord": {
+    "description": "The word the member types to confirm deletion."
+  },
+  "typeWordToConfirm": "Type {word} to confirm",
+  "@typeWordToConfirm": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "accountDeleted": "Your account has been deleted.",
+  "mosqueServices": "Mosque services",
+  "marriageService": "Marriage service",
+  "marriageServiceRow": "Confidential introductions",
+  "marriageEyebrow": "MARRIAGE SERVICE",
+  "underReview": "Under review",
+  "submittedOn": "Submitted {date}",
+  "@submittedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marriageGateTitle": "Confidential introductions",
+  "marriageGateSubtitle": "A service of Pape Mosque",
+  "marriageGateBody": "If you are looking to marry, you can share one document about yourself with the mosque's Imam. The Imam reads it in private and, if there is a suitable match, contacts you directly. Nothing is published and no one else sees it.",
+  "yourPrivacy": "Your privacy",
+  "privacyOnlyImam": "Only you and the Imam",
+  "privacyOnlyImamBody": "Your document is never shown to other members",
+  "privacyNoProfiles": "No profiles, no browsing",
+  "privacyNoProfilesBody": "There is no listing or directory of applicants",
+  "privacyWithdraw": "Withdraw at any time",
+  "privacyWithdrawBody": "Your document is deleted when you withdraw",
+  "marriageAgeNote": "Open to members aged 18 and over.",
+  "signInToContinue": "Sign in to continue",
+  "marriageGateCaption": "An account lets the Imam reach you privately.",
+  "dobTitle": "Your date of birth",
+  "dobSubtitle": "Needed once, kept private",
+  "dobBody": "The marriage service is open to members aged 18 and over. Your date of birth is saved to your account and cannot be changed afterwards, so please check it before you continue.",
+  "dobField": "Date of birth",
+  "dobHint": "Choose a date",
+  "dobContinue": "Save and continue",
+  "saving": "Saving…",
+  "dobSaveFailed": "Couldn't save your date of birth. Please try again.",
+  "notEligibleTitle": "Open to members aged 18 and over",
+  "notEligibleBody": "The marriage service is only available to adult members. Your account and everything else in the app are unaffected.",
+  "uploadTitle": "Share your document",
+  "uploadSubtitle": "One file, read only by the Imam",
+  "chooseOneFile": "Choose one file",
+  "fileRules": "PDF, JPG or PNG · up to 4 MB",
+  "files": "Files",
+  "photos": "Photos",
+  "whatToInclude": "What to include",
+  "whatToIncludeBody1": "There is no template. Write about yourself in your own words: your background, your family, your practice and what you are hoping for in a spouse. French, Turkish or English are all fine.",
+  "whatToIncludeBody2": "Only share what you are comfortable with. The Imam will ask you directly if anything more is needed.",
+  "privacyStrip": "Private to you and the mosque's Imam. Never shown to other members.",
+  "submit": "Submit",
+  "chooseFileToContinue": "Choose a file to continue.",
+  "uploadingPrivately": "Uploading privately…",
+  "uploading": "Uploading…",
+  "keepAppOpen": "Keep the app open until the upload finishes.",
+  "tooLarge": "too large",
+  "tooLargeBody": "Files must be under 4 MB. Try exporting the PDF at a smaller size, or choose a single photo instead of several.",
+  "unsupportedType": "not supported",
+  "unsupportedTypeBody": "Only PDF, JPG or PNG files can be shared.",
+  "unreadableFile": "Couldn't read this file. Try another one.",
+  "cantBeRead": "can't be read",
+  "preparingPrivately": "Preparing privately…",
+  "detailsUnavailable": "Couldn't load your account details. Please try again.",
+  "uploadFailed": "The upload didn't finish. Check your connection and try again.",
+  "receivedTitle": "Received, thank you",
+  "receivedBody": "Your document is stored privately. Only you and the Imam can open it.",
+  "whatHappensNext": "What happens next",
+  "nextImamReads": "The Imam reads it",
+  "nextImamReadsBody": "In private, when they are next available",
+  "nextContacted": "You're contacted privately",
+  "nextContactedBody": "Only if there is a suitable match",
+  "nextYouDecide": "You decide",
+  "nextYouDecideBody": "Nothing happens without your agreement",
+  "done": "Done",
+  "yourApplication": "Your application",
+  "underReviewBody": "The Imam has your document and will contact you privately if there is a suitable match. There's nothing more you need to do.",
+  "yourDocument": "Your document",
+  "view": "View",
+  "replace": "Replace",
+  "withdrawTitle": "Withdraw my application",
+  "withdrawCaption": "Deletes your document from the mosque's records",
+  "openFailed": "Couldn't open your document. Please try again.",
+  "openingPrivately": "Opening privately…",
+  "replaceSubtitle": "Your current document stays until the new one is uploaded",
+  "applicationUnavailable": "Couldn't load your application. Please try again.",
+  "withdrawSheetTitle": "Withdraw your application?",
+  "withdrawSheetBody": "Your document will be permanently deleted and the Imam will no longer see it. You can apply again at any time.",
+  "withdrawConfirm": "Withdraw and delete",
+  "withdrawing": "Deleting…",
+  "withdrawKeep": "Keep my application",
+  "withdrawFailed": "Couldn't withdraw your application. Please try again.",
+  "withdrawn": "Your application has been withdrawn.",
+  "theMosque": "THE MOSQUE",
+  "openingHours": "Opening hours",
+  "dailyPrayers": "Daily prayers",
+  "dailyPrayersBody": "Open for every prayer, Fajr through Isha",
+  "jumuah": "Jumu'ah",
+  "fridays": "Fridays",
+  "office": "Office",
+  "callForHours": "Call for current hours",
+  "getInTouch": "Get in touch",
+  "sizeMegabytes": "{size} MB",
+  "@sizeMegabytes": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sizeKilobytes": "{size} KB",
+  "@sizeKilobytes": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/mosque_info.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -25,12 +26,13 @@ class MosqueInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PlainNavBar(eyebrow: 'THE MOSQUE', title: 'Mosque & contact'),
+          PlainNavBar(eyebrow: l.theMosque, title: l.mosqueAndContact),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(
@@ -77,7 +79,7 @@ class MosqueInfoScreen extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: PrimaryButton(
-                                    label: 'Directions',
+                                    label: l.directions,
                                     height: 46,
                                     icon: AppIcons.navigate,
                                     onTap: () => _open(MosqueInfo.mapsUri),
@@ -86,7 +88,7 @@ class MosqueInfoScreen extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: GhostButton(
-                                    label: 'Call',
+                                    label: l.call,
                                     height: 46,
                                     icon: AppIcons.phone,
                                     onTap: () => _open(MosqueInfo.phoneUri),
@@ -101,38 +103,38 @@ class MosqueInfoScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
-                const SectionHeader(title: 'Opening hours'),
+                SectionHeader(title: l.openingHours),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
-                const GroupedRows(
+                GroupedRows(
                   rows: [
                     AppListRow(
                       icon: AppIcons.clock,
-                      title: 'Daily prayers',
-                      subtitle: 'Open for every prayer, Fajr through Isha',
+                      title: l.dailyPrayers,
+                      subtitle: l.dailyPrayersBody,
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.mosque,
-                      title: "Jumu'ah",
-                      subtitle: 'Fridays',
+                      title: l.jumuah,
+                      subtitle: l.fridays,
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.person,
-                      title: 'Office',
-                      subtitle: 'Call for current hours',
+                      title: l.office,
+                      subtitle: l.callForHours,
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
-                const SectionHeader(title: 'Get in touch'),
+                SectionHeader(title: l.getInTouch),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 GroupedRows(
                   rows: [
                     AppListRow(
                       icon: AppIcons.phone,
                       title: MosqueInfo.phone,
-                      subtitle: 'Phone',
+                      subtitle: l.phone,
                       trailing: const RowChevron(),
                       onTap: () => _open(MosqueInfo.phoneUri),
                     ),
@@ -140,7 +142,7 @@ class MosqueInfoScreen extends StatelessWidget {
                       divided: true,
                       icon: AppIcons.mail,
                       title: MosqueInfo.email,
-                      subtitle: 'Email',
+                      subtitle: l.email,
                       trailing: const RowChevron(),
                       onTap: () => _open('mailto:${MosqueInfo.email}'),
                     ),
@@ -148,7 +150,7 @@ class MosqueInfoScreen extends StatelessWidget {
                       divided: true,
                       icon: AppIcons.globe,
                       title: MosqueInfo.website,
-                      subtitle: 'Website',
+                      subtitle: l.website,
                       trailing: const RowChevron(),
                       onTap: () => _open(MosqueInfo.websiteUri),
                     ),

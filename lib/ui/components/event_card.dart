@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/event_schedule.dart';
+import '../../l10n/l10n.dart';
 import '../../shared/formatters.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
@@ -37,15 +38,20 @@ class EventCard extends StatelessWidget {
   bool get _hasActions => upcoming.event.registrationUri != null;
   bool get _recurring => upcoming.event.repeats.isRecurring;
 
-  RecurringBadge _recurringBadge({bool onPhoto = false}) => RecurringBadge(
+  RecurringBadge _recurringBadge(
+    AppLocalizations l, {
+    bool onPhoto = false,
+  }) =>
+      RecurringBadge(
         icon: AppIcons.forEventCategory(upcoming.event.category),
-        spokenLabel: recurrenceSpoken(upcoming.event.repeats),
+        spokenLabel: recurrenceSpoken(l, upcoming.event.repeats),
         onPhoto: onPhoto,
       );
 
   @override
   Widget build(BuildContext context) {
     final imageUrl = upcoming.event.imageUrl;
+    final l = context.l10n;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -58,14 +64,14 @@ class EventCard extends StatelessWidget {
               PhotoBand(
                 url: imageUrl,
                 topLeft: _recurring
-                    ? _recurringBadge(onPhoto: true)
+                    ? _recurringBadge(l, onPhoto: true)
                     : DateBadgeOnPhoto(date: upcoming.startsAt),
               ),
             Padding(
               padding: imageUrl != null
                   ? const EdgeInsets.fromLTRB(18, 16, 18, 18)
                   : const EdgeInsets.all(AppSpace.cardPadding),
-              child: imageUrl != null ? _body() : _bodyWithBadge(),
+              child: imageUrl != null ? _body() : _bodyWithBadge(l),
             ),
             if (_hasActions) ...[
               const Divider(height: 1, thickness: 1, color: AppColor.hairline),
@@ -74,7 +80,7 @@ class EventCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: PrimaryButton(label: 'Register', onTap: onRegister),
+                      child: PrimaryButton(label: l.register, onTap: onRegister),
                     ),
                     const SizedBox(width: 10),
                     CircleIconButton(icon: AppIcons.share, onTap: onShare),
@@ -88,12 +94,12 @@ class EventCard extends StatelessWidget {
     );
   }
 
-  Widget _bodyWithBadge() {
+  Widget _bodyWithBadge(AppLocalizations l) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _recurring
-            ? _recurringBadge()
+            ? _recurringBadge(l)
             : DateBadge(date: upcoming.startsAt),
         const SizedBox(width: 14),
         Expanded(child: _body()),

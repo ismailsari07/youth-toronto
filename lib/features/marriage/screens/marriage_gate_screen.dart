@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -54,15 +54,16 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PlainNavBar(
-            eyebrow: AppStrings.marriageEyebrow,
-            title: AppStrings.marriageGateTitle,
-            subtitle: AppStrings.marriageGateSubtitle,
+          PlainNavBar(
+            eyebrow: l.marriageEyebrow,
+            title: l.marriageGateTitle,
+            subtitle: l.marriageGateSubtitle,
           ),
           Expanded(
             child: ListView(
@@ -76,37 +77,37 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
                 AppCard(
                   padding: const EdgeInsets.all(AppSpace.cardPadding),
                   child: Text(
-                    AppStrings.marriageGateBody,
+                    l.marriageGateBody,
                     style: AppText.body.c(AppColor.ink2),
                   ),
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
-                const SectionHeader(title: AppStrings.yourPrivacy),
+                SectionHeader(title: l.yourPrivacy),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
-                const GroupedRows(
+                GroupedRows(
                   rows: [
                     AppListRow(
                       icon: AppIcons.shieldCheck,
-                      title: AppStrings.privacyOnlyImam,
-                      subtitle: AppStrings.privacyOnlyImamBody,
+                      title: l.privacyOnlyImam,
+                      subtitle: l.privacyOnlyImamBody,
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.close,
-                      title: AppStrings.privacyNoProfiles,
-                      subtitle: AppStrings.privacyNoProfilesBody,
+                      title: l.privacyNoProfiles,
+                      subtitle: l.privacyNoProfilesBody,
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.trash,
-                      title: AppStrings.privacyWithdraw,
-                      subtitle: AppStrings.privacyWithdrawBody,
+                      title: l.privacyWithdraw,
+                      subtitle: l.privacyWithdrawBody,
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  AppStrings.marriageAgeNote,
+                  l.marriageAgeNote,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 12.5).c(AppColor.ink3),
                 ),
@@ -120,14 +121,14 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             PrimaryButton(
-              label: AppStrings.signInToContinue,
+              label: l.signInToContinue,
               onTap: _continuing
                   ? null
                   : () => _authThenContinue('/profile/sign-in'),
             ),
             const SizedBox(height: 8),
             GhostButton(
-              label: AppStrings.createAccount,
+              label: l.createAccount,
               height: 46,
               onTap: _continuing
                   ? null
@@ -135,7 +136,7 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              AppStrings.marriageGateCaption,
+              l.marriageGateCaption,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 12.5).c(AppColor.ink3),
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -31,7 +31,7 @@ class _WithdrawSheet extends StatefulWidget {
 
 class _WithdrawSheetState extends State<_WithdrawSheet> {
   bool _busy = false;
-  String? _error;
+  MarriageFailure? _error;
 
   Future<void> _withdraw() async {
     setState(() {
@@ -45,7 +45,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
       if (mounted) {
         setState(() {
           _busy = false;
-          _error = e.message;
+          _error = e.failure;
         });
       }
     }
@@ -53,6 +53,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     final error = _error;
     return PopScope(
       // Don't let a swipe dismiss the sheet halfway through deleting.
@@ -93,14 +94,14 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
               ),
               const SizedBox(height: 14),
               Text(
-                AppStrings.withdrawSheetTitle,
+                l.withdrawSheetTitle,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)
                     .c(AppColor.ink),
               ),
               const SizedBox(height: 8),
               Text(
-                AppStrings.withdrawSheetBody,
+                l.withdrawSheetBody,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14.5, height: 1.45)
                     .c(AppColor.ink2),
@@ -108,7 +109,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
               if (error != null) ...[
                 const SizedBox(height: 12),
                 Text(
-                  error,
+                  error.message(l),
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
                 ),
@@ -117,13 +118,13 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
               Opacity(
                 opacity: _busy ? 0.55 : 1,
                 child: DestructiveButton(
-                  label: _busy ? AppStrings.withdrawing : AppStrings.withdrawConfirm,
+                  label: _busy ? l.withdrawing : l.withdrawConfirm,
                   onTap: _busy ? null : _withdraw,
                 ),
               ),
               const SizedBox(height: 10),
               GhostButton(
-                label: AppStrings.withdrawKeep,
+                label: l.withdrawKeep,
                 height: 46,
                 onTap: _busy ? null : () => Navigator.of(context).pop(false),
               ),

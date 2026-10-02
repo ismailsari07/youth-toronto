@@ -5,20 +5,34 @@ import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/prayer_service.dart';
-import '../../../l10n/app_strings.dart';
+import '../../../l10n/l10n.dart';
 import 'document_check.dart';
 import 'document_upload.dart';
 import 'marriage_application.dart';
 
-/// A failure with a fixed, user-facing [message]. It never carries a path,
-/// URL, row or server error text, so it is safe to show and safe if logged.
-class MarriageException implements Exception {
-  const MarriageException(this.message);
+/// What went wrong, as a fixed reason. It never carries a path, URL, row
+/// or server error text, so it is safe to show and safe if logged.
+enum MarriageFailure { uploadFailed, withdrawFailed, openFailed, dobSaveFailed }
 
-  final String message;
+class MarriageException implements Exception {
+  const MarriageException(this.failure);
+
+  final MarriageFailure failure;
+
+  /// The sentence to show, in the app's language.
+  String message(AppLocalizations l) => failure.message(l);
 
   @override
-  String toString() => message;
+  String toString() => 'MarriageException(${failure.name})';
+}
+
+extension MarriageFailureText on MarriageFailure {
+  String message(AppLocalizations l) => switch (this) {
+        MarriageFailure.uploadFailed => l.uploadFailed,
+        MarriageFailure.withdrawFailed => l.withdrawFailed,
+        MarriageFailure.openFailed => l.openFailed,
+        MarriageFailure.dobSaveFailed => l.dobSaveFailed,
+      };
 }
 
 /// Spec §8a, client side. Row-level security and the storage policies are
@@ -36,7 +50,7 @@ abstract final class MarriageService {
 
   static String get _uid {
     final user = _client.auth.currentUser;
-    if (user == null) throw const MarriageException(AppStrings.uploadFailed);
+    if (user == null) throw const MarriageException(MarriageFailure.uploadFailed);
     return user.id;
   }
 
@@ -104,7 +118,7 @@ abstract final class MarriageService {
       }
     } catch (_) {
       await discard(path);
-      throw const MarriageException(AppStrings.uploadFailed);
+      throw const MarriageException(MarriageFailure.uploadFailed);
     }
     // The old object and any leftovers from cancelled uploads. Best effort:
     // whatever survives is swept next time, on withdraw, or on account
@@ -132,7 +146,7 @@ abstract final class MarriageService {
       await _sweep(uid);
       await _client.from('marriage_applications').delete().eq('user_id', uid);
     } catch (_) {
-      throw const MarriageException(AppStrings.withdrawFailed);
+      throw const MarriageException(MarriageFailure.withdrawFailed);
     }
   }
 
@@ -149,13 +163,13 @@ abstract final class MarriageService {
       final response = await request.close();
       if (response.statusCode != HttpStatus.ok) {
         await response.drain<void>();
-        throw const MarriageException(AppStrings.openFailed);
+        throw const MarriageException(MarriageFailure.openFailed);
       }
       final builder = BytesBuilder(copy: false);
       await response.forEach(builder.add);
       return builder.takeBytes();
     } catch (_) {
-      throw const MarriageException(AppStrings.openFailed);
+      throw const MarriageException(MarriageFailure.openFailed);
     } finally {
       client.close(force: true);
     }
@@ -175,7 +189,7 @@ abstract final class MarriageService {
           .select('id')
           .single();
     } catch (_) {
-      throw const MarriageException(AppStrings.dobSaveFailed);
+      throw const MarriageException(MarriageFailure.dobSaveFailed);
     }
   }
 
@@ -212,7 +226,7 @@ abstract final class MarriageService {
       }
     }
     final token = session?.accessToken;
-    if (token == null) throw const MarriageException(AppStrings.uploadFailed);
+    if (token == null) throw const MarriageException(MarriageFailure.uploadFailed);
     return token;
   }
 }

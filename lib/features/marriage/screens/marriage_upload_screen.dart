@@ -14,6 +14,7 @@ import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/motion.dart';
 import '../data/document_check.dart';
 import '../data/document_picker.dart';
 import '../data/document_upload.dart';
@@ -244,34 +245,42 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
           : l.uploadSubtitle,
       onBack: () => context.pop(),
       body: [
-        switch (stage) {
-          _Choosing(:final error) => _ChooseCard(
-              error: error?.message(l),
-              onFiles: () => _pick(DocumentPicker.pickFile),
-              onPhotos: () => _pick(DocumentPicker.pickPhoto),
-            ),
-          _Preparing(:final rawSize) => _ProgressCard(
-              caption: fileSize(l, rawSize),
-              label: l.preparingPrivately,
-              progress: null,
-            ),
-          _Uploading(:final upload, :final document) =>
-            ValueListenableBuilder<double>(
-              valueListenable: upload.progress,
-              builder: (_, value, _) => _ProgressCard(
-                typeLabel: document.kind.label,
-                caption: '${fileSize(l, document.size)} · ${document.kind.label}',
-                label: l.uploadingPrivately,
-                progress: value,
-                onCancel: value < 1 ? _cancel : null,
-              ),
-            ),
-          _Rejected() => _RejectedCard(
-              rejected: stage,
-              onFiles: () => _pick(DocumentPicker.pickFile),
-              onPhotos: () => _pick(DocumentPicker.pickPhoto),
-            ),
-        },
+        // Choose → preparing → uploading → rejected cross-fade, and the card
+        // eases to each stage's height.
+        FadeSwitch(
+          animateSize: true,
+          child: KeyedSubtree(
+            key: ValueKey(stage.runtimeType),
+            child: switch (stage) {
+              _Choosing(:final error) => _ChooseCard(
+                  error: error?.message(l),
+                  onFiles: () => _pick(DocumentPicker.pickFile),
+                  onPhotos: () => _pick(DocumentPicker.pickPhoto),
+                ),
+              _Preparing(:final rawSize) => _ProgressCard(
+                  caption: fileSize(l, rawSize),
+                  label: l.preparingPrivately,
+                  progress: null,
+                ),
+              _Uploading(:final upload, :final document) =>
+                ValueListenableBuilder<double>(
+                  valueListenable: upload.progress,
+                  builder: (_, value, _) => _ProgressCard(
+                    typeLabel: document.kind.label,
+                    caption: '${fileSize(l, document.size)} · ${document.kind.label}',
+                    label: l.uploadingPrivately,
+                    progress: value,
+                    onCancel: value < 1 ? _cancel : null,
+                  ),
+                ),
+              _Rejected() => _RejectedCard(
+                  rejected: stage,
+                  onFiles: () => _pick(DocumentPicker.pickFile),
+                  onPhotos: () => _pick(DocumentPicker.pickPhoto),
+                ),
+            },
+          ),
+        ),
         const SizedBox(height: AppSpace.cardGapWide),
         SectionHeader(title: l.whatToInclude),
         const SizedBox(height: AppSpace.sectionHeaderGap),
@@ -295,24 +304,29 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
         const SizedBox(height: AppSpace.cardGapWide),
         const PrivacyStrip(),
       ],
-      bottom: _busy
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Opacity(
-                  opacity: 0.55,
-                  child: PrimaryButton(label: l.uploading),
-                ),
-                StickyCaption(l.keepAppOpen),
-              ],
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DisabledSubmitButton(),
-                StickyCaption(l.chooseFileToContinue),
-              ],
-            ),
+      bottom: FadeSwitch(
+        alignment: AlignmentDirectional.bottomCenter,
+        child: _busy
+            ? Column(
+                key: const ValueKey('busy'),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Opacity(
+                    opacity: 0.55,
+                    child: PrimaryButton(label: l.uploading),
+                  ),
+                  StickyCaption(l.keepAppOpen),
+                ],
+              )
+            : Column(
+                key: const ValueKey('idle'),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DisabledSubmitButton(),
+                  StickyCaption(l.chooseFileToContinue),
+                ],
+              ),
+      ),
     );
   }
 }

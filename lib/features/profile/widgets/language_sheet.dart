@@ -7,6 +7,7 @@ import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_row.dart';
+import '../../../ui/components/app_sheet.dart';
 
 /// The Language row, on Profile and in Settings. Trailing text is the
 /// member's choice in its own language, or "Auto" while following the
@@ -45,12 +46,8 @@ class LanguageRow extends ConsumerWidget {
 /// Device language, then English / Français / Türkçe. Picking one saves it
 /// and the whole app switches at once.
 Future<void> showLanguageSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: const Color(0x6B0F1C17), // rgba(15,28,23,.42)
     builder: (_) => const _LanguageSheet(),
   );
 }

@@ -10,6 +10,7 @@ import 'app_buttons.dart';
 import 'app_card.dart';
 import 'app_controls.dart';
 import 'event_when_line.dart';
+import 'motion.dart';
 
 /// Spec §7.3. Two finished variants of the same card: with a photo band, and
 /// starting at the left element when there is no photo. A photo is a layer,
@@ -52,9 +53,9 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = upcoming.event.imageUrl;
     final l = context.l10n;
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      pressedOpacity: 0.85,
       child: AppCard(
         grouped: true,
         child: Column(

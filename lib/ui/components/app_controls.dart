@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/l10n.dart';
 import '../../shared/formatters.dart';
 import '../../theme/app_icon.dart';
+import '../../theme/app_motion.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
 
@@ -27,8 +28,8 @@ class AppSwitch extends StatelessWidget {
         height: 44,
         child: Center(
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeInOut,
+            duration: const Duration(milliseconds: 200),
+            curve: AppMotion.standard,
             width: 51,
             height: 31,
             padding: const EdgeInsets.all(2),
@@ -37,8 +38,8 @@ class AppSwitch extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
             child: AnimatedAlign(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeInOut,
+              duration: const Duration(milliseconds: 200),
+              curve: AppMotion.standard,
               alignment: value ? Alignment.centerRight : Alignment.centerLeft,
               child: Container(
                 width: 27,

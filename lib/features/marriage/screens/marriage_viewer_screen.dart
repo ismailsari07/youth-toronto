@@ -9,6 +9,7 @@ import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/motion.dart';
 import '../data/document_check.dart';
 import '../data/marriage_application.dart';
 import '../data/marriage_service.dart';
@@ -87,28 +88,39 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
                 AppSpace.pageGutter,
                 AppSpace.pageGutter,
               ),
-              child: error != null
-                  ? _Message(text: error.message(l), onRetry: _load)
-                  : bytes == null
-                      ? _Message(text: l.openingPrivately)
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(AppRadius.card),
-                          child: ColoredBox(
-                            color: AppColor.card,
-                            child: kind == DocumentKind.pdf
-                                ? _pdf(bytes)
-                                : InteractiveViewer(
-                                    maxScale: 5,
-                                    child: Center(
-                                      child: Image.memory(
-                                        bytes,
-                                        fit: BoxFit.contain,
-                                        gaplessPlayback: true,
-                                      ),
+              // "Opening privately…" gives way to the document with a fade.
+              child: FadeSwitch(
+                child: error != null
+                    ? _Message(
+                        key: const ValueKey('error'),
+                        text: error.message(l),
+                        onRetry: _load,
+                      )
+                    : bytes == null
+                    ? _Message(
+                        key: const ValueKey('opening'),
+                        text: l.openingPrivately,
+                      )
+                    : ClipRRect(
+                        key: const ValueKey('document'),
+                        borderRadius: BorderRadius.circular(AppRadius.card),
+                        child: ColoredBox(
+                          color: AppColor.card,
+                          child: kind == DocumentKind.pdf
+                              ? _pdf(bytes)
+                              : InteractiveViewer(
+                                  maxScale: 5,
+                                  child: Center(
+                                    child: Image.memory(
+                                      bytes,
+                                      fit: BoxFit.contain,
+                                      gaplessPlayback: true,
                                     ),
                                   ),
-                          ),
+                                ),
                         ),
+                      ),
+              ),
             ),
           ),
           const Padding(
@@ -143,7 +155,7 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
 }
 
 class _Message extends StatelessWidget {
-  const _Message({required this.text, this.onRetry});
+  const _Message({super.key, required this.text, this.onRetry});
 
   final String text;
   final VoidCallback? onRetry;

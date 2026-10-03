@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_icon.dart';
+import '../../../theme/app_motion.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_controls.dart';
@@ -229,9 +230,19 @@ class UploadProgressBar extends StatelessWidget {
             const Positioned.fill(
               child: ColoredBox(color: AppColor.segmentTrack),
             ),
-            FractionallySizedBox(
-              widthFactor: value.clamp(0, 1),
-              heightFactor: 1,
+            // Glides between progress reports instead of jumping per chunk.
+            TweenAnimationBuilder<double>(
+              tween: Tween(end: value.clamp(0, 1).toDouble()),
+              duration: AppMotion.move(
+                context,
+                const Duration(milliseconds: 200),
+              ),
+              curve: Curves.easeOut,
+              builder: (_, width, child) => FractionallySizedBox(
+                widthFactor: width,
+                heightFactor: 1,
+                child: child,
+              ),
               child: const ColoredBox(color: AppColor.green),
             ),
           ],

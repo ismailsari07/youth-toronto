@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app/app_shell.dart';
+import '../app/fading_branch_container.dart';
 import '../features/community/screens/announcement_detail_screen.dart';
 import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
@@ -33,9 +34,16 @@ final router = GoRouter(
   navigatorKey: _rootKey,
   initialLocation: '/prayer',
   routes: [
-    StatefulShellRoute.indexedStack(
+    StatefulShellRoute(
       builder: (context, state, navigationShell) =>
           AppShell(navigationShell: navigationShell),
+      // The indexed stack go_router builds by default, plus a short fade-in
+      // of the tab being shown.
+      navigatorContainerBuilder: (context, navigationShell, children) =>
+          FadingBranchContainer(
+        currentIndex: navigationShell.currentIndex,
+        children: children,
+      ),
       branches: [
         StatefulShellBranch(
           navigatorKey: _prayerKey,

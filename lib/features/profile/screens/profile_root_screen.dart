@@ -5,10 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/reminder_sync.dart';
 import '../../../l10n/l10n.dart';
-import '../../marriage/data/marriage_application.dart';
-import '../../marriage/marriage_provider.dart';
-import '../../marriage/marriage_routes.dart';
-import '../../marriage/widgets/marriage_widgets.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -19,7 +15,12 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
+import '../../marriage/data/marriage_application.dart';
+import '../../marriage/marriage_provider.dart';
+import '../../marriage/marriage_routes.dart';
+import '../../marriage/widgets/marriage_widgets.dart';
 import '../widgets/language_sheet.dart';
 
 /// Spec §7.9. Never empty: settings exist whether or not anyone is signed in.
@@ -68,7 +69,15 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       children: [
         GradientTabHeader(
           title: l.tabProfile,
-          row: user == null ? _signedOutRow(l) : _identityRow(l, user, profile),
+          // The name and "member since" fade in when the profile arrives.
+          row: FadeSwitch(
+            child: KeyedSubtree(
+              key: ValueKey((user?.id, profile == null)),
+              child: user == null
+                  ? _signedOutRow(l)
+                  : _identityRow(l, user, profile),
+            ),
+          ),
           footer: user != null
               ? null
               : Column(
@@ -161,7 +170,23 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   /// the application loads (or if it can't), the plain row shows — tapping
   /// it still resolves the right screen.
   Widget _marriageRow(AppLocalizations l, MarriageApplication? application) {
+    // The "Under review" state fades in once the application loads.
+    return FadeSwitch(
+      child: _marriageListRow(
+        l,
+        application,
+        key: ValueKey(application == null),
+      ),
+    );
+  }
+
+  Widget _marriageListRow(
+    AppLocalizations l,
+    MarriageApplication? application, {
+    Key? key,
+  }) {
     return AppListRow(
+      key: key,
       icon: AppIcons.documentLock,
       title: l.marriageService,
       subtitle: application == null
@@ -236,9 +261,8 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
             ],
           ),
         ),
-        GestureDetector(
+        Pressable(
           onTap: () => context.push('/profile/settings'),
-          behavior: HitTestBehavior.opaque,
           child: Container(
             width: 44,
             height: 44,
@@ -261,7 +285,21 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   ) {
     final phone = profile?['phone'] as String?;
     final dob = profile?['date_of_birth'] as String?;
+    // Placeholder dashes give way to the real details with a cross-fade.
+    return FadeSwitch(
+      child: _detailRows(l, user, profile, phone, dob),
+    );
+  }
+
+  Widget _detailRows(
+    AppLocalizations l,
+    User user,
+    Map<String, dynamic>? profile,
+    String? phone,
+    String? dob,
+  ) {
     return GroupedRows(
+      key: ValueKey(profile == null),
       rows: [
         AppListRow(
           icon: AppIcons.person,

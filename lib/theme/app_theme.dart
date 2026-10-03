@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_motion.dart';
 import 'app_tokens.dart';
 
 // Type on Apple devices resolves to SF Pro through these aliases;
@@ -25,6 +26,17 @@ final ThemeData appTheme = ThemeData(
   fontFamily: kFontText,
   fontFamilyFallback: kFontFallback,
   scaffoldBackgroundColor: AppColor.ground,
+  // The iOS slide everywhere, so a push feels the same on every device.
+  pageTransitionsTheme: const PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: AppPageTransitionsBuilder(),
+      TargetPlatform.iOS: AppPageTransitionsBuilder(),
+      TargetPlatform.macOS: AppPageTransitionsBuilder(),
+      TargetPlatform.linux: AppPageTransitionsBuilder(),
+      TargetPlatform.windows: AppPageTransitionsBuilder(),
+      TargetPlatform.fuchsia: AppPageTransitionsBuilder(),
+    },
+  ),
   colorScheme: const ColorScheme.light(
     primary: AppColor.green,
     onPrimary: Colors.white,

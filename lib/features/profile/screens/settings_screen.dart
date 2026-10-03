@@ -14,6 +14,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/motion.dart';
 import '../widgets/language_sheet.dart';
 
 /// Spec §7.10. Only the reminder toggle that actually works is shown: the
@@ -135,9 +136,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       vertical: 13,
                       horizontal: 18,
                     ),
-                    child: GestureDetector(
+                    child: Pressable(
                       onTap: () => context.push('/profile/delete'),
-                      behavior: HitTestBehavior.opaque,
                       child: Row(
                         children: [
                           const IconBubble(

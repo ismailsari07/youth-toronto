@@ -20,6 +20,7 @@ import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
+import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 
 /// Spec §7.3 / §7.4 — Events and Announcements behind one segmented control.
@@ -39,8 +40,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     final eventsAsync = ref.watch(eventsProvider);
     final events = eventsAsync.valueOrNull ?? const <UpcomingEvent>[];
     final eventsLoading = eventsAsync.isLoading && !eventsAsync.hasValue;
-    final news =
-        ref.watch(newsProvider).valueOrNull ?? const <Announcement>[];
+    final newsAsync = ref.watch(newsProvider);
+    final news = newsAsync.valueOrNull ?? const <Announcement>[];
+    final newsLoading = newsAsync.isLoading && !newsAsync.hasValue;
     final jumaa = ref.watch(prayerProvider).valueOrNull?.jumaaPrayerTime;
     final l = context.l10n;
 
@@ -62,7 +64,18 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       children: [
         GradientTabHeader(
           title: l.tabCommunity,
-          row: _headerRow(events, news, jumaa),
+          // Cross-fades when the segment, or what it leads with, changes.
+          row: FadeSwitch(
+            child: KeyedSubtree(
+              key: ValueKey((
+                _segment,
+                _segment == 0
+                    ? events.firstOrNull?.event.title
+                    : news.firstOrNull?.title,
+              )),
+              child: _headerRow(events, news, jumaa),
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         AppSegmented(
@@ -71,10 +84,25 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           onChanged: _onSegmentChanged,
         ),
         const SizedBox(height: 16),
-        if (_segment == 0)
-          ...(eventsLoading ? _loadingCards() : _events(events))
-        else
-          ..._announcements(news),
+        // Shimmer → list, and one segment → the other, cross-fade. No size
+        // animation: the lists can be long, and the fade covers the jump.
+        FadeSwitch(
+          child: Column(
+            key: ValueKey(
+              _segment == 0
+                  ? (eventsLoading ? 'events-loading' : 'events')
+                  : (newsLoading ? 'news-loading' : 'news'),
+            ),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: _segment == 0
+                ? (eventsLoading ? _loadingCards() : _events(events))
+                // Shimmer while announcements load, so "No announcements"
+                // never flashes before they arrive.
+                : (newsLoading
+                    ? _loadingCards(announcement: true)
+                    : _announcements(news)),
+          ),
+        ),
       ],
     );
   }
@@ -177,20 +205,31 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   }
 
   /// Spec §7.3b: three shimmer cards at the real radius, never a spinner.
-  List<Widget> _loadingCards() => [
+  /// [announcement] shapes them like announcement cards instead of events.
+  List<Widget> _loadingCards({bool announcement = false}) => [
         for (var i = 0; i < 3; i++) ...[
           Container(
-            height: 176,
+            height: announcement ? 104 : 176,
             decoration: BoxDecoration(
               color: AppColor.card,
-              borderRadius: BorderRadius.circular(AppRadius.card),
+              borderRadius: BorderRadius.circular(
+                announcement ? AppRadius.listCard : AppRadius.card,
+              ),
               boxShadow: AppShadow.card,
             ),
-            padding: const EdgeInsets.all(AppSpace.cardPadding),
+            padding: announcement
+                ? const EdgeInsets.symmetric(vertical: 16, horizontal: 18)
+                : const EdgeInsets.all(AppSpace.cardPadding),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Shimmer(width: 58, height: 64, radius: AppRadius.tile),
+                announcement
+                    ? const Shimmer(width: 38, height: 38, radius: 12)
+                    : const Shimmer(
+                        width: 58,
+                        height: 64,
+                        radius: AppRadius.tile,
+                      ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -257,9 +296,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   }
 
   Widget _announcementCard(Announcement item, {required bool unread}) {
-    return GestureDetector(
+    return Pressable(
       onTap: () => context.push('/community/announcement', extra: item),
-      behavior: HitTestBehavior.opaque,
+      pressedOpacity: 0.85,
       child: AppCard(
       radius: AppRadius.listCard,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),

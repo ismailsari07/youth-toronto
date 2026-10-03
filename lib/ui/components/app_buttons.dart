@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
+import 'motion.dart';
 
 /// Spec §4.3. All pill-shaped; heights come from the table.
 class PrimaryButton extends StatelessWidget {
@@ -253,34 +254,14 @@ class _LabelWithIcon extends StatelessWidget {
   }
 }
 
-/// Keeps every button at the 44px minimum target and gives a pressed state.
-class _Tappable extends StatefulWidget {
+/// Keeps every button at the 44px minimum target and gives the iOS pressed
+/// state: dims on touch, eases back on release.
+class _Tappable extends StatelessWidget {
   const _Tappable({required this.child, this.onTap});
 
   final Widget child;
   final VoidCallback? onTap;
 
   @override
-  State<_Tappable> createState() => _TappableState();
-}
-
-class _TappableState extends State<_Tappable> {
-  bool _down = false;
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.onTap == null) return widget.child;
-    return GestureDetector(
-      onTap: widget.onTap,
-      onTapDown: (_) => setState(() => _down = true),
-      onTapUp: (_) => setState(() => _down = false),
-      onTapCancel: () => setState(() => _down = false),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedOpacity(
-        opacity: _down ? 0.75 : 1,
-        duration: const Duration(milliseconds: 90),
-        child: widget.child,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Pressable(onTap: onTap, child: child);
 }

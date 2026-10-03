@@ -10,6 +10,7 @@ import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_field.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/motion.dart';
 
 /// Spec §7.12. The auth logic is unchanged: AuthService.signInWithEmail.
 class SignInScreen extends StatefulWidget {
@@ -121,9 +122,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                GestureDetector(
+                Pressable(
                   onTap: () => context.pushReplacement('/profile/sign-up'),
-                  behavior: HitTestBehavior.opaque,
                   child: AppCard(
                     radius: AppRadius.pill,
                     padding: const EdgeInsets.symmetric(vertical: 15),

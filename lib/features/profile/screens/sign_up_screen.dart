@@ -10,6 +10,7 @@ import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_field.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/motion.dart';
 
 /// Spec §7.13. Collects what the office needs; the call itself is the existing
 /// AuthService.signUpWithEmail.
@@ -174,9 +175,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 20),
                 Center(
-                  child: GestureDetector(
+                  child: Pressable(
                     onTap: () => context.pushReplacement('/profile/sign-in'),
-                    behavior: HitTestBehavior.opaque,
                     child: Padding(
                       padding: const EdgeInsets.all(8),
                       child: Text(

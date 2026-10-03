@@ -11,6 +11,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
 import 'app_scaffolding.dart';
 import 'moon_countdown.dart';
+import 'motion.dart';
 
 /// Spec §6 — the Prayer root's hero. A night-navy card around the moon, whose
 /// fill is the elapsed share of the current prayer window.
@@ -128,11 +129,27 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
             ),
           ),
           const SizedBox(height: 14),
-          if (loading) _loadingText() else _text(window),
+          // Data arriving, and each prayer rollover, cross-fade rather than
+          // snap; the per-second tick keeps its key and simply repaints.
+          FadeSwitch(
+            alignment: AlignmentDirectional.topCenter,
+            child: KeyedSubtree(
+              key: ValueKey(
+                loading ? 'loading' : window?.next.name ?? 'unavailable',
+              ),
+              child: loading ? _loadingText() : _text(window),
+            ),
+          ),
           const SizedBox(height: 16),
           const Divider(height: 1, thickness: 1, color: AppColor.nightDivider),
           const SizedBox(height: 14),
-          _bottomRow(window),
+          FadeSwitch(
+            alignment: AlignmentDirectional.topCenter,
+            child: KeyedSubtree(
+              key: ValueKey(window?.current.name),
+              child: _bottomRow(window),
+            ),
+          ),
         ],
       ),
     );

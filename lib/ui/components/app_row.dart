@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
+import 'motion.dart';
 
 /// The palette of a row's leading icon circle (spec §4.2).
 enum RowTone { green, neutral, blue, gold, danger }
@@ -145,21 +146,21 @@ class AppListRow extends StatelessWidget {
       ),
     );
 
-    final bordered = divided
+    // The iOS table-cell wash while pressed, under the hairline.
+    final pressable = Pressable(
+      onTap: onTap,
+      effect: PressEffect.highlight,
+      child: row,
+    );
+
+    return divided
         ? DecoratedBox(
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: AppColor.hairline)),
             ),
-            child: row,
+            child: pressable,
           )
-        : row;
-
-    if (onTap == null) return bordered;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: bordered,
-    );
+        : pressable;
   }
 }
 

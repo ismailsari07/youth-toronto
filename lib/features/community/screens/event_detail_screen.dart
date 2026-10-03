@@ -16,6 +16,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
+import '../../../ui/components/motion.dart';
 
 /// Spec §7.6. Pushed onto the root navigator, so the island is not shown and
 /// the sticky bar owns the bottom of the screen.
@@ -167,9 +168,8 @@ class EventDetailScreen extends ConsumerWidget {
                         icon: AppIcons.pin,
                         title: location,
                         subtitle: MosqueInfo.addressLine,
-                        trailing: GestureDetector(
+                        trailing: Pressable(
                           onTap: () => _open(MosqueInfo.mapsUri),
-                          behavior: HitTestBehavior.opaque,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 10,

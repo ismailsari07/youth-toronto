@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
+import 'motion.dart';
 
 /// Spec §4.1. A white card with the two-layer card shadow. [grouped] clips
 /// children so row backgrounds follow the corner radius.
@@ -65,9 +66,8 @@ class SectionHeader extends StatelessWidget {
         Text(title, style: AppText.sectionHeader.c(AppColor.ink)),
         if (trailing != null)
           if (onTrailingTap != null)
-            GestureDetector(
+            Pressable(
               onTap: onTrailingTap,
-              behavior: HitTestBehavior.opaque,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
                 child: Text(

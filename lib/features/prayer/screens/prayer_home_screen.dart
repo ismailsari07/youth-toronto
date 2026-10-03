@@ -21,6 +21,7 @@ import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/moon_countdown_card.dart';
+import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 
 /// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
@@ -90,7 +91,17 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           trailingText: l.athanIqamah,
         ),
         const SizedBox(height: AppSpace.sectionHeaderGap),
-        _timesCard(payload, loading),
+        // Shimmer rows, the real rows and the failure card cross-fade, and
+        // the card eases to its new height.
+        FadeSwitch(
+          animateSize: true,
+          child: KeyedSubtree(
+            key: ValueKey(
+              payload != null ? 'times' : loading ? 'loading' : 'failed',
+            ),
+            child: _timesCard(payload, loading),
+          ),
+        ),
         const SizedBox(height: AppSpace.cardGapWide),
         _occasionCard(payload),
         const SizedBox(height: AppSpace.cardGapWide),
@@ -123,13 +134,21 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   gregorianTitle(l, payload?.gregorianDate) ?? todayTitle(l),
                   style: AppText.dateTitle.c(AppColor.ink),
                 ),
-                if (loading)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4),
-                    child: Shimmer(width: 120, height: 12),
-                  )
-                else if (hijri != null)
-                  Text(hijri, style: AppText.caption.c(AppColor.ink3)),
+                FadeSwitch(
+                  child: loading
+                      ? const Padding(
+                          key: ValueKey('loading'),
+                          padding: EdgeInsets.only(top: 4),
+                          child: Shimmer(width: 120, height: 12),
+                        )
+                      : hijri != null
+                          ? Text(
+                              hijri,
+                              key: const ValueKey('hijri'),
+                              style: AppText.caption.c(AppColor.ink3),
+                            )
+                          : const SizedBox.shrink(key: ValueKey('none')),
+                ),
               ],
             ),
           ),

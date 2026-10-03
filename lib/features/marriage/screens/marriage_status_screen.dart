@@ -11,6 +11,8 @@ import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/motion.dart';
+import '../../../ui/components/refreshable.dart';
 import '../data/marriage_application.dart';
 import '../marriage_provider.dart';
 import '../marriage_routes.dart';
@@ -61,6 +63,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
     return switch (application) {
       AsyncData(value: final app?) => _body(app),
       AsyncError() => _frame(
+          state: 'error',
           subtitle: null,
           children: [
             AppCard(
@@ -82,11 +85,17 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
             ),
           ],
         ),
-      _ => _frame(subtitle: null, children: const []),
+      _ => _frame(state: 'loading', subtitle: null, children: const []),
     };
   }
 
-  Widget _frame({required String? subtitle, required List<Widget> children}) {
+  /// [state] keys the content, so it fades in when the application arrives
+  /// instead of snapping into the empty frame.
+  Widget _frame({
+    required String state,
+    required String? subtitle,
+    required List<Widget> children,
+  }) {
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
@@ -98,24 +107,29 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
             subtitle: subtitle,
           ),
           Expanded(
-            child: RefreshIndicator(
-              color: AppColor.green,
+            // The same iOS pull-to-refresh as the tab roots.
+            child: RefreshableList(
               onRefresh: () async {
                 ref.invalidate(myApplicationProvider);
                 await ref
                     .read(myApplicationProvider.future)
                     .then<void>((_) {}, onError: (_) {});
               },
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpace.pageGutter,
-                  18,
-                  AppSpace.pageGutter,
-                  40,
-                ),
-                children: children,
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.pageGutter,
+                18,
+                AppSpace.pageGutter,
+                40,
               ),
+              children: [
+                FadeSwitch(
+                  child: Column(
+                    key: ValueKey(state),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: children,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -125,6 +139,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
 
   Widget _body(MarriageApplication app) {
     return _frame(
+      state: 'application',
       subtitle: l.submittedOn(dayMonth(l, app.createdAt)),
       children: [
         AppCard(
@@ -184,9 +199,8 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
         AppCard(
           radius: AppRadius.listCard,
           padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 18),
-          child: GestureDetector(
+          child: Pressable(
             onTap: _withdraw,
-            behavior: HitTestBehavior.opaque,
             child: Row(
               children: [
                 const IconBubble(icon: AppIcons.trash, tone: RowTone.danger),

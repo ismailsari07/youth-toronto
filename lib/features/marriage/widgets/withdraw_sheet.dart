@@ -5,18 +5,15 @@ import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_buttons.dart';
+import '../../../ui/components/app_sheet.dart';
 import '../data/marriage_service.dart';
 
 /// Spec §8a screen 7. Shows the sheet and, if the member confirms, withdraws
 /// (files first, then the row). Resolves true once everything is deleted;
 /// false if they kept their application.
 Future<bool> showWithdrawSheet(BuildContext context) async {
-  final withdrawn = await showModalBottomSheet<bool>(
+  final withdrawn = await showAppSheet<bool>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: const Color(0x6B0F1C17), // rgba(15,28,23,.42)
     builder: (_) => const _WithdrawSheet(),
   );
   return withdrawn ?? false;

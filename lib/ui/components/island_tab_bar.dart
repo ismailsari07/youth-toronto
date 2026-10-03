@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../../theme/app_icon.dart';
+import '../../theme/app_motion.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
 
@@ -92,7 +93,16 @@ class _IslandItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? AppColor.green : AppColor.tabInactive;
+    // The tint eases between tabs instead of snapping.
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(end: active ? AppColor.green : AppColor.tabInactive),
+      duration: AppMotion.fast,
+      curve: Curves.easeOut,
+      builder: (context, color, _) => _item(color!),
+    );
+  }
+
+  Widget _item(Color color) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,

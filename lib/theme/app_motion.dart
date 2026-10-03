@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 /// its own runs past 350 ms. Page pushes keep the native iOS 500 ms slide.
 ///
 /// Reduce Motion (`MediaQuery.disableAnimations`): movement — slides, sizes,
-/// the tab fade, sheets — becomes instant; content cross-fades stay, shorter,
+/// the tab entrance, sheets — becomes instant; content cross-fades stay, shorter,
 /// because a fade is what iOS itself substitutes for motion.
 abstract final class AppMotion {
-  /// Tab switches, press release, small colour changes.
+  /// Press release, the tab bar's tint, small colour changes.
   static const Duration fast = Duration(milliseconds: 150);
 
   /// Content arriving: data replacing a shimmer, a stage changing.
@@ -15,6 +15,15 @@ abstract final class AppMotion {
 
   /// Bottom sheets rising; they leave in [base].
   static const Duration sheet = Duration(milliseconds: 350);
+
+  /// Tab entrance: each section fades in and rises [staggerRise] px over
+  /// [staggerItem], starting [staggerStep] after the one above it. Starts are
+  /// capped so the whole cascade fits in [staggerTotal]; sections past the
+  /// cap arrive together with the last staggered one.
+  static const Duration staggerItem = Duration(milliseconds: 250);
+  static const Duration staggerStep = Duration(milliseconds: 40);
+  static const Duration staggerTotal = Duration(milliseconds: 400);
+  static const double staggerRise = 10;
 
   /// The standard ease-out for anything arriving.
   static const Curve standard = Curves.easeOutCubic;

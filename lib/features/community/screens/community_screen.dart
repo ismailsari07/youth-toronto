@@ -22,6 +22,7 @@ import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
+import '../../../ui/components/stagger.dart';
 
 /// Spec §7.3 / §7.4 — Events and Announcements behind one segmented control.
 /// Phase B builds the structure; card detail work lands in phases D and E.
@@ -61,27 +62,34 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         AppSpace.pageGutter,
         AppSpace.scrollBottomInset,
       ),
+      // The tab's entrance cascade: header, segment, then each card.
       children: [
-        GradientTabHeader(
-          title: l.tabCommunity,
-          // Cross-fades when the segment, or what it leads with, changes.
-          row: FadeSwitch(
-            child: KeyedSubtree(
-              key: ValueKey((
-                _segment,
-                _segment == 0
-                    ? events.firstOrNull?.event.title
-                    : news.firstOrNull?.title,
-              )),
-              child: _headerRow(events, news, jumaa),
+        StaggerItem(
+          index: 0,
+          child: GradientTabHeader(
+            title: l.tabCommunity,
+            // Cross-fades when the segment, or what it leads with, changes.
+            row: FadeSwitch(
+              child: KeyedSubtree(
+                key: ValueKey((
+                  _segment,
+                  _segment == 0
+                      ? events.firstOrNull?.event.title
+                      : news.firstOrNull?.title,
+                )),
+                child: _headerRow(events, news, jumaa),
+              ),
             ),
           ),
         ),
         const SizedBox(height: 16),
-        AppSegmented(
-          labels: [l.events, l.announcements],
-          index: _segment,
-          onChanged: _onSegmentChanged,
+        StaggerItem(
+          index: 1,
+          child: AppSegmented(
+            labels: [l.events, l.announcements],
+            index: _segment,
+            onChanged: _onSegmentChanged,
+          ),
         ),
         const SizedBox(height: 16),
         // Shimmer → list, and one segment → the other, cross-fade. No size
@@ -99,8 +107,8 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 // Shimmer while announcements load, so "No announcements"
                 // never flashes before they arrive.
                 : (newsLoading
-                    ? _loadingCards(announcement: true)
-                    : _announcements(news)),
+                      ? _loadingCards(announcement: true)
+                      : _announcements(news)),
           ),
         ),
       ],
@@ -207,69 +215,78 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   /// Spec §7.3b: three shimmer cards at the real radius, never a spinner.
   /// [announcement] shapes them like announcement cards instead of events.
   List<Widget> _loadingCards({bool announcement = false}) => [
-        for (var i = 0; i < 3; i++) ...[
-          Container(
-            height: announcement ? 104 : 176,
-            decoration: BoxDecoration(
-              color: AppColor.card,
-              borderRadius: BorderRadius.circular(
-                announcement ? AppRadius.listCard : AppRadius.card,
-              ),
-              boxShadow: AppShadow.card,
+    for (var i = 0; i < 3; i++) ...[
+      StaggerItem(
+        index: 2 + i,
+        child: Container(
+          height: announcement ? 104 : 176,
+          decoration: BoxDecoration(
+            color: AppColor.card,
+            borderRadius: BorderRadius.circular(
+              announcement ? AppRadius.listCard : AppRadius.card,
             ),
-            padding: announcement
-                ? const EdgeInsets.symmetric(vertical: 16, horizontal: 18)
-                : const EdgeInsets.all(AppSpace.cardPadding),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                announcement
-                    ? const Shimmer(width: 38, height: 38, radius: 12)
-                    : const Shimmer(
-                        width: 58,
-                        height: 64,
-                        radius: AppRadius.tile,
-                      ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Shimmer(width: 180, height: 17),
-                      SizedBox(height: 8),
-                      Shimmer(width: 140, height: 13),
-                      SizedBox(height: 8),
-                      Shimmer(width: 110, height: 13),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            boxShadow: AppShadow.card,
           ),
-          const SizedBox(height: AppSpace.cardGap),
-        ],
-      ];
+          padding: announcement
+              ? const EdgeInsets.symmetric(vertical: 16, horizontal: 18)
+              : const EdgeInsets.all(AppSpace.cardPadding),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              announcement
+                  ? const Shimmer(width: 38, height: 38, radius: 12)
+                  : const Shimmer(
+                      width: 58,
+                      height: 64,
+                      radius: AppRadius.tile,
+                    ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Shimmer(width: 180, height: 17),
+                    SizedBox(height: 8),
+                    Shimmer(width: 140, height: 13),
+                    SizedBox(height: 8),
+                    Shimmer(width: 110, height: 13),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: AppSpace.cardGap),
+    ],
+  ];
 
   List<Widget> _events(List<UpcomingEvent> events) {
     if (events.isEmpty) {
       return [
-        EmptyStateCard(
-          icon: AppIcons.mosque,
-          title: context.l10n.noEventsTitle,
-          body: context.l10n.noEventsBody,
+        StaggerItem(
+          index: 2,
+          child: EmptyStateCard(
+            icon: AppIcons.mosque,
+            title: context.l10n.noEventsTitle,
+            body: context.l10n.noEventsBody,
+          ),
         ),
       ];
     }
     return [
-      for (final e in events) ...[
-        EventCard(
-          upcoming: e,
-          onTap: () => context.push('/community/event', extra: e),
-          onRegister: () {
-            final uri = e.event.registrationUri;
-            if (uri != null) _open(uri.toString());
-          },
-          onShare: () => _share(e),
+      for (final (i, e) in events.indexed) ...[
+        StaggerItem(
+          index: 2 + i,
+          child: EventCard(
+            upcoming: e,
+            onTap: () => context.push('/community/event', extra: e),
+            onRegister: () {
+              final uri = e.event.registrationUri;
+              if (uri != null) _open(uri.toString());
+            },
+            onShare: () => _share(e),
+          ),
         ),
         const SizedBox(height: AppSpace.cardGap),
       ],
@@ -279,17 +296,23 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   List<Widget> _announcements(List<Announcement> items) {
     if (items.isEmpty) {
       return [
-        EmptyStateCard(
-          icon: AppIcons.announcement,
-          title: context.l10n.noAnnouncementsTitle,
-          body: context.l10n.noAnnouncementsBody,
+        StaggerItem(
+          index: 2,
+          child: EmptyStateCard(
+            icon: AppIcons.announcement,
+            title: context.l10n.noAnnouncementsTitle,
+            body: context.l10n.noAnnouncementsBody,
+          ),
         ),
       ];
     }
     final unread = ref.watch(unreadAnnouncementsProvider).map((a) => a.id).toSet();
     return [
-      for (final a in items) ...[
-        _announcementCard(a, unread: unread.contains(a.id)),
+      for (final (i, a) in items.indexed) ...[
+        StaggerItem(
+          index: 2 + i,
+          child: _announcementCard(a, unread: unread.contains(a.id)),
+        ),
         const SizedBox(height: AppSpace.cardGap),
       ],
     ];
@@ -300,64 +323,64 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       onTap: () => context.push('/community/announcement', extra: item),
       pressedOpacity: 0.85,
       child: AppCard(
-      radius: AppRadius.listCard,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const IconBubble(
-            icon: AppIcons.announcement,
-            tone: RowTone.blue,
-            square: true,
-          ),
-          const SizedBox(width: AppSpace.rowGap),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        style: AppText.rowTitle
-                            .copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.2,
-                            )
-                            .c(AppColor.ink),
-                      ),
-                    ),
-                    if (unread)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.only(left: 4, top: 6),
-                        decoration: const BoxDecoration(
-                          color: AppColor.green,
-                          shape: BoxShape.circle,
+        radius: AppRadius.listCard,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const IconBubble(
+              icon: AppIcons.announcement,
+              tone: RowTone.blue,
+              square: true,
+            ),
+            const SizedBox(width: AppSpace.rowGap),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.title,
+                          style: AppText.rowTitle
+                              .copyWith(
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                              )
+                              .c(AppColor.ink),
                         ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, height: 1.45)
-                      .c(AppColor.ink2),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  context.l10n.postedAgo(timeAgo(context.l10n, item.date)),
-                  style: const TextStyle(fontSize: 12).c(AppColor.ink3),
-                ),
-              ],
+                      if (unread)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          margin: const EdgeInsets.only(left: 4, top: 6),
+                          decoration: const BoxDecoration(
+                            color: AppColor.green,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13, height: 1.45)
+                        .c(AppColor.ink2),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    context.l10n.postedAgo(timeAgo(context.l10n, item.date)),
+                    style: const TextStyle(fontSize: 12).c(AppColor.ink3),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );

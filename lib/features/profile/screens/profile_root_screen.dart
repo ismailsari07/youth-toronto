@@ -17,6 +17,7 @@ import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
+import '../../../ui/components/stagger.dart';
 import '../../marriage/data/marriage_application.dart';
 import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
@@ -66,100 +67,129 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
         AppSpace.pageGutter,
         AppSpace.scrollBottomInset,
       ),
+      // The tab's entrance cascade: header, mosque services, your
+      // details, settings, the mosque and about rows, the footnote.
       children: [
-        GradientTabHeader(
-          title: l.tabProfile,
-          // The name and "member since" fade in when the profile arrives.
-          row: FadeSwitch(
-            child: KeyedSubtree(
-              key: ValueKey((user?.id, profile == null)),
-              child: user == null
-                  ? _signedOutRow(l)
-                  : _identityRow(l, user, profile),
+        StaggerItem(
+          index: 0,
+          child: GradientTabHeader(
+            title: l.tabProfile,
+            // The name and "member since" fade in when the profile arrives.
+            row: FadeSwitch(
+              child: KeyedSubtree(
+                key: ValueKey((user?.id, profile == null)),
+                child: user == null
+                    ? _signedOutRow(l)
+                    : _identityRow(l, user, profile),
+              ),
             ),
+            footer: user != null
+                ? null
+                : Column(
+                    children: [
+                      PrimaryOnGradientButton(
+                        label: l.signIn,
+                        onTap: () => context.push('/profile/sign-in'),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedOnGradientButton(
+                        label: l.createAccount,
+                        onTap: () => context.push('/profile/sign-up'),
+                      ),
+                    ],
+                  ),
           ),
-          footer: user != null
-              ? null
-              : Column(
-                  children: [
-                    PrimaryOnGradientButton(
-                      label: l.signIn,
-                      onTap: () => context.push('/profile/sign-in'),
-                    ),
-                    const SizedBox(height: 8),
-                    OutlinedOnGradientButton(
-                      label: l.createAccount,
-                      onTap: () => context.push('/profile/sign-up'),
-                    ),
-                  ],
-                ),
         ),
         const SizedBox(height: AppSpace.cardGapWide),
-        SectionHeader(title: l.mosqueServices),
+        StaggerItem(
+          index: 1,
+          child: SectionHeader(title: l.mosqueServices),
+        ),
         const SizedBox(height: AppSpace.sectionHeaderGap),
-        GroupedRows(
-          rows: [
-            _marriageRow(
-              l,
-              user == null ? null : ref.watch(myApplicationProvider).valueOrNull,
-            ),
-          ],
+        StaggerItem(
+          index: 1,
+          child: GroupedRows(
+            rows: [
+              _marriageRow(
+                l,
+                user == null ? null : ref.watch(myApplicationProvider).valueOrNull,
+              ),
+            ],
+          ),
         ),
         if (user != null) ...[
           const SizedBox(height: AppSpace.cardGapWide),
-          SectionHeader(title: l.yourDetails),
+          StaggerItem(
+            index: 2,
+            child: SectionHeader(title: l.yourDetails),
+          ),
           const SizedBox(height: AppSpace.sectionHeaderGap),
-          _detailsCard(l, user, profile),
+          StaggerItem(
+            index: 2,
+            child: _detailsCard(l, user, profile),
+          ),
         ],
         const SizedBox(height: AppSpace.cardGapWide),
-        SectionHeader(title: l.settings),
+        StaggerItem(
+          index: 3,
+          child: SectionHeader(title: l.settings),
+        ),
         const SizedBox(height: AppSpace.sectionHeaderGap),
-        GroupedRows(
-          rows: [
-            AppListRow(
-              icon: AppIcons.bell,
-              title: l.prayerReminders,
-              subtitle: l.prayerRemindersDetail,
-              trailing: AppSwitch(
-                value: _remindersOn ?? true,
-                onChanged: _remindersOn == null ? null : _setReminders,
-              ),
-            ),
-            const LanguageRow(divided: true),
-            if (user != null)
+        StaggerItem(
+          index: 3,
+          child: GroupedRows(
+            rows: [
               AppListRow(
-                divided: true,
-                icon: AppIcons.person,
-                title: l.settings,
-                subtitle: l.settingsRowSubtitle,
-                trailing: const RowChevron(),
-                onTap: () => context.push('/profile/settings'),
+                icon: AppIcons.bell,
+                title: l.prayerReminders,
+                subtitle: l.prayerRemindersDetail,
+                trailing: AppSwitch(
+                  value: _remindersOn ?? true,
+                  onChanged: _remindersOn == null ? null : _setReminders,
+                ),
               ),
-          ],
+              const LanguageRow(divided: true),
+              if (user != null)
+                AppListRow(
+                  divided: true,
+                  icon: AppIcons.person,
+                  title: l.settings,
+                  subtitle: l.settingsRowSubtitle,
+                  trailing: const RowChevron(),
+                  onTap: () => context.push('/profile/settings'),
+                ),
+            ],
+          ),
         ),
         const SizedBox(height: AppSpace.cardGapWide),
-        GroupedRows(
-          rows: [
-            AppListRow(
-              icon: AppIcons.pin,
-              title: l.mosqueAndContact,
-              trailing: const RowChevron(),
-              onTap: () => context.push('/profile/mosque'),
-            ),
-            AppListRow(
-              divided: true,
-              icon: AppIcons.info,
-              title: l.aboutThisApp,
-              subtitle: l.versionLabel('1.0'),
-              trailing: const RowChevron(),
-            ),
-          ],
+        StaggerItem(
+          index: 4,
+          child: GroupedRows(
+            rows: [
+              AppListRow(
+                icon: AppIcons.pin,
+                title: l.mosqueAndContact,
+                trailing: const RowChevron(),
+                onTap: () => context.push('/profile/mosque'),
+              ),
+              AppListRow(
+                divided: true,
+                icon: AppIcons.info,
+                title: l.aboutThisApp,
+                subtitle: l.versionLabel('1.0'),
+                trailing: const RowChevron(),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 20),
-        Text(
-          l.worksWithoutAccount,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 12, height: 1.5).c(AppColor.ink3),
+        StaggerItem(
+          index: 5,
+          child: Text(
+            l.worksWithoutAccount,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, height: 1.5).c(AppColor.ink3),
+          ),
         ),
       ],
     );

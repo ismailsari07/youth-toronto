@@ -23,6 +23,7 @@ import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
+import '../../../ui/components/stagger.dart';
 
 /// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
 /// deliberately no separate "all times" screen (§7.2).
@@ -81,31 +82,49 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         AppSpace.pageGutter,
         AppSpace.scrollBottomInset,
       ),
+      // The tab's entrance cascade, top to bottom: date and moon, the
+      // times, the occasion card, the mosque card.
       children: [
-        _header(payload, loading),
-        const SizedBox(height: 14),
-        MoonCountdownCard(prayers: payload?.dailyPrayerTimes),
-        const SizedBox(height: AppSpace.cardGapWide),
-        SectionHeader(
-          title: l.todayAtTheMosque,
-          trailingText: l.athanIqamah,
-        ),
-        const SizedBox(height: AppSpace.sectionHeaderGap),
-        // Shimmer rows, the real rows and the failure card cross-fade, and
-        // the card eases to its new height.
-        FadeSwitch(
-          animateSize: true,
-          child: KeyedSubtree(
-            key: ValueKey(
-              payload != null ? 'times' : loading ? 'loading' : 'failed',
-            ),
-            child: _timesCard(payload, loading),
+        StaggerItem(
+          index: 0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _header(payload, loading),
+              const SizedBox(height: 14),
+              MoonCountdownCard(prayers: payload?.dailyPrayerTimes),
+            ],
           ),
         ),
         const SizedBox(height: AppSpace.cardGapWide),
-        _occasionCard(payload),
+        StaggerItem(
+          index: 1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SectionHeader(
+                title: l.todayAtTheMosque,
+                trailingText: l.athanIqamah,
+              ),
+              const SizedBox(height: AppSpace.sectionHeaderGap),
+              // Shimmer rows, the real rows and the failure card cross-fade,
+              // and the card eases to its new height.
+              FadeSwitch(
+                animateSize: true,
+                child: KeyedSubtree(
+                  key: ValueKey(
+                    payload != null ? 'times' : loading ? 'loading' : 'failed',
+                  ),
+                  child: _timesCard(payload, loading),
+                ),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: AppSpace.cardGapWide),
-        _mosqueCard(),
+        StaggerItem(index: 2, child: _occasionCard(payload)),
+        const SizedBox(height: AppSpace.cardGapWide),
+        StaggerItem(index: 3, child: _mosqueCard()),
       ],
     );
   }

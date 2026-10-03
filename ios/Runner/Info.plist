@@ -45,6 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Required because image_picker contains camera code; the app only
+	     picks from the library, so this is never shown. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Pape Mosque doesn't use the camera. Documents are chosen from your photo library or files.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Choose a photo of a document to share privately with the mosque. Only the photo you pick is used.</string>
 </dict>

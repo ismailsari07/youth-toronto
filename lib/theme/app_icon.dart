@@ -14,6 +14,7 @@ abstract final class AppIcons {
   static const calendar = 'calendar';
   static const person = 'person';
   static const bell = 'bell';
+  static const bellOff = 'bell-off';
   static const announcement = 'announcement';
   static const clock = 'clock';
   static const pin = 'pin';

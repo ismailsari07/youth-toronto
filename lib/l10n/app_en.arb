@@ -49,10 +49,11 @@
       }
     }
   },
-  "organisationEyebrow": "CANADIAN TURKISH ISLAMIC TRUST",
-  "@organisationEyebrow": {
-    "description": "Organisation name above the date on the Prayer home. Same name in English and French."
+  "organisationName": "Canadian Turkish Islamic Trust",
+  "@organisationName": {
+    "description": "Header of the Prayer home, next to the logo. Same name in English and French."
   },
+  "homeMosqueLine": "Pape Mosque · Toronto",
   "nextPrayer": "NEXT PRAYER",
   "city": "Toronto",
   "todayAtTheMosque": "Today at the mosque",
@@ -93,6 +94,8 @@
   "fajrWindowCloses": "Fajr window closes",
   "prayerReminders": "Prayer reminders",
   "prayerRemindersDetail": "5 minutes before each iqamah",
+  "remindersDeniedNote": "Notifications for Pape Mosque are turned off in iOS Settings, so reminders can't appear.",
+  "openSettings": "Open Settings",
   "reminderBody": "Iqamah in 5 minutes",
   "@reminderBody": {
     "description": "Notification body, 5 minutes before the iqamah."

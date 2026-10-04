@@ -91,7 +91,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get organisationEyebrow => 'CANADIAN TURKISH ISLAMIC TRUST';
+  String get organisationName => 'Canadian Turkish Islamic Trust';
+
+  @override
+  String get homeMosqueLine => 'Mosquée Pape · Toronto';
 
   @override
   String get nextPrayer => 'PROCHAINE PRIÈRE';
@@ -137,6 +140,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get prayerRemindersDetail => '5 minutes avant chaque iqama';
+
+  @override
+  String get remindersDeniedNote =>
+      'Les notifications de Pape Mosque sont désactivées dans les Réglages d\'iOS : les rappels ne peuvent pas s\'afficher.';
+
+  @override
+  String get openSettings => 'Ouvrir les Réglages';
 
   @override
   String get reminderBody => 'Iqama dans 5 minutes';

@@ -64,6 +64,23 @@ class NotificationService {
   /// [channelName] is what Android shows for these notifications in the
   /// system settings; re-creating the channel with the same id renames it
   /// when the app's language changes.
+  /// Whether iOS currently lets the app show notifications: false once the
+  /// member has said no (or turned them off in Settings), null where it
+  /// can't be told (other platforms, or before the plugin is ready).
+  static Future<bool?> notificationsAllowed() async {
+    try {
+      final ios = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      if (ios == null) return null;
+      final options = await ios.checkPermissions();
+      if (options == null) return null;
+      return options.isEnabled || options.isProvisionalEnabled;
+    } catch (e) {
+      debugPrint('NotificationService: permission check failed: $e');
+      return null;
+    }
+  }
+
   static Future<void> scheduleReminders(
     List<Reminder> reminders, {
     required String channelName,

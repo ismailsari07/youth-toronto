@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
-import '../../../core/notification_service.dart';
-import '../../../core/reminder_sync.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/providers/auth_provider.dart';
+import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -28,27 +27,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool? _remindersOn;
-
-  @override
-  void initState() {
-    super.initState();
-    ReminderSync.isEnabled().then((on) {
-      if (mounted) setState(() => _remindersOn = on);
-    });
-  }
-
-  Future<void> _setReminders(bool value) async {
-    setState(() => _remindersOn = value);
-    await ReminderSync.setEnabled(value);
-    if (value) {
-      await NotificationService.requestPermissions();
-    } else {
-      await NotificationService.cancelAll();
-    }
-    ReminderSync.sync();
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
@@ -84,8 +62,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       title: l.prayerReminders,
                       subtitle: l.prayerRemindersDetail,
                       trailing: AppSwitch(
-                        value: _remindersOn ?? true,
-                        onChanged: _remindersOn == null ? null : _setReminders,
+                        value: ref.watch(remindersEnabledProvider).valueOrNull ?? true,
+                        onChanged: ref.watch(remindersEnabledProvider).hasValue
+                            ? (on) => ref.read(remindersEnabledProvider.notifier).set(on)
+                            : null,
                       ),
                     ),
                   ],

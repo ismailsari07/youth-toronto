@@ -91,7 +91,10 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get organisationEyebrow => 'KANADA TÜRK İSLAM VAKFI';
+  String get organisationName => 'Kanada Türk İslam Vakfı';
+
+  @override
+  String get homeMosqueLine => 'Pape Camii · Toronto';
 
   @override
   String get nextPrayer => 'SIRADAKİ NAMAZ';
@@ -137,6 +140,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get prayerRemindersDetail => 'Her cemaat vaktinden 5 dakika önce';
+
+  @override
+  String get remindersDeniedNote =>
+      'Pape Mosque bildirimleri iOS Ayarları\'nda kapalı, bu yüzden hatırlatıcılar gösterilemiyor.';
+
+  @override
+  String get openSettings => 'Ayarları Aç';
 
   @override
   String get reminderBody => 'Cemaate 5 dakika kaldı';

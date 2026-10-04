@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/reminder_sync.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
+import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -33,22 +33,6 @@ class ProfileRootScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
-  bool? _remindersOn;
-
-  @override
-  void initState() {
-    super.initState();
-    ReminderSync.isEnabled().then((on) {
-      if (mounted) setState(() => _remindersOn = on);
-    });
-  }
-
-  Future<void> _setReminders(bool value) async {
-    setState(() => _remindersOn = value);
-    await ReminderSync.setEnabled(value);
-    ReminderSync.sync();
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
@@ -144,8 +128,10 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
                 title: l.prayerReminders,
                 subtitle: l.prayerRemindersDetail,
                 trailing: AppSwitch(
-                  value: _remindersOn ?? true,
-                  onChanged: _remindersOn == null ? null : _setReminders,
+                  value: ref.watch(remindersEnabledProvider).valueOrNull ?? true,
+                  onChanged: ref.watch(remindersEnabledProvider).hasValue
+                      ? (on) => ref.read(remindersEnabledProvider.notifier).set(on)
+                      : null,
                 ),
               ),
               const LanguageRow(divided: true),

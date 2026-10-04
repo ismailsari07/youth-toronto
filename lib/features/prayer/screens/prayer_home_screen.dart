@@ -6,13 +6,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_info.dart';
 import '../../../core/mosque_time.dart';
-import '../../../core/notification_service.dart';
 import '../../../core/prayer_utils.dart';
 import '../../../core/prayer_widget_sync.dart';
-import '../../../core/reminder_sync.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/prayer_provider.dart';
+import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -26,6 +25,7 @@ import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
 import '../widgets/community_section.dart';
+import '../widgets/reminders_sheet.dart';
 
 /// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
 /// deliberately no separate "all times" screen (§7.2).
@@ -37,27 +37,6 @@ class PrayerHomeScreen extends ConsumerStatefulWidget {
 }
 
 class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
-  bool? _remindersOn;
-
-  @override
-  void initState() {
-    super.initState();
-    ReminderSync.isEnabled().then((on) {
-      if (mounted) setState(() => _remindersOn = on);
-    });
-  }
-
-  Future<void> _setReminders(bool value) async {
-    setState(() => _remindersOn = value);
-    await ReminderSync.setEnabled(value);
-    if (value) {
-      await NotificationService.requestPermissions();
-    } else {
-      await NotificationService.cancelAll();
-    }
-    ReminderSync.sync();
-  }
-
   Future<void> _open(String url) async {
     try {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
@@ -136,70 +115,105 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     );
   }
 
-  /// Eyebrow, Gregorian date and the Hijri date beneath it (spec §0 note).
+  /// Who we are, then today. Row 1: the app icon's mosque on its green, the
+  /// organisation and the mosque, and the reminders bell. Row 2: the
+  /// Gregorian date and the Hijri date in a pill, on one line.
   Widget _header(PrayerCachePayload? payload, bool loading) {
     final l = context.l10n;
     final hijri = hijriTitle(l, payload?.hijriDate);
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 46),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // One line always: on a narrow phone the name scales down a
-                // touch rather than wrapping.
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    l.organisationEyebrow,
-                    maxLines: 1,
-                    style: AppText.eyebrow
-                        .copyWith(
-                          fontSize: 11.5,
-                          letterSpacing: 0.9,
-                          height: 1.2,
-                        )
-                        .c(AppColor.green),
+    final remindersOn = ref.watch(remindersEnabledProvider).valueOrNull ?? true;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const _BrandTile(),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // One line always: on a narrow phone the name scales down
+                  // a touch rather than wrapping.
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      l.organisationName,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.2,
+                        height: 1.25,
+                      ).c(AppColor.ink),
+                    ),
                   ),
-                ),
-                Text(
-                  gregorianTitle(l, payload?.gregorianDate) ?? todayTitle(l),
-                  style: AppText.dateTitle.c(AppColor.ink),
-                ),
-                FadeSwitch(
-                  child: loading
-                      ? const Padding(
-                          key: ValueKey('loading'),
-                          padding: EdgeInsets.only(top: 4),
-                          child: Shimmer(width: 120, height: 12),
-                        )
-                      : hijri != null
-                          ? Text(
-                              hijri,
-                              key: const ValueKey('hijri'),
-                              style: AppText.caption.c(AppColor.ink3),
-                            )
-                          : const SizedBox.shrink(key: ValueKey('none')),
-                ),
-              ],
+                  const SizedBox(height: 1),
+                  Text(
+                    l.homeMosqueLine,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13, height: 1.3)
+                        .c(AppColor.ink3),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          CircleIconButton(
-            icon: AppIcons.bell,
-            size: 44,
-            iconSize: 21,
-            bordered: false,
-            shadow: AppShadow.floatingButton,
-            onTap: () {},
-          ),
-        ],
-      ),
+            const SizedBox(width: 12),
+            Semantics(
+              label: l.prayerReminders,
+              button: true,
+              child: CircleIconButton(
+                icon: remindersOn ? AppIcons.bell : AppIcons.bellOff,
+                size: 44,
+                iconSize: 21,
+                bordered: false,
+                shadow: AppShadow.floatingButton,
+                onTap: () => showRemindersSheet(context),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Always one line, so the moon card sits at the same height in every
+        // language: the date keeps 20pt when it fits and only shrinks (to
+        // about 17-18pt for French or long English dates) when it doesn't.
+        Row(
+          children: [
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  gregorianTitle(l, payload?.gregorianDate) ?? todayTitle(l),
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.3,
+                  ).c(AppColor.ink),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            FadeSwitch(
+              alignment: AlignmentDirectional.centerEnd,
+              child: loading
+                  ? const Shimmer(
+                      key: ValueKey('loading'),
+                      width: 120,
+                      height: 26,
+                      radius: AppRadius.pill,
+                    )
+                  : hijri != null
+                      ? _HijriPill(hijri, key: const ValueKey('hijri'))
+                      : const SizedBox.shrink(key: ValueKey('none')),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -292,8 +306,10 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         title: context.l10n.prayerReminders,
         subtitle: context.l10n.prayerRemindersDetail,
         trailing: AppSwitch(
-          value: _remindersOn ?? true,
-          onChanged: _remindersOn == null ? null : _setReminders,
+          value: ref.watch(remindersEnabledProvider).valueOrNull ?? true,
+          onChanged: ref.watch(remindersEnabledProvider).hasValue
+              ? (on) => ref.read(remindersEnabledProvider.notifier).set(on)
+              : null,
         ),
       );
 
@@ -487,6 +503,61 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The app icon's mosque, cream on the icon's green, as a small tile.
+class _BrandTile extends StatelessWidget {
+  const _BrandTile();
+
+  static const _iconGreen = Color(0xFF0F4D3A);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: _iconGreen,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Image.asset(
+        'assets/brand/mosque-mark.png',
+        width: 24,
+        height: 24,
+        excludeFromSemantics: true,
+      ),
+    );
+  }
+}
+
+class _HijriPill extends StatelessWidget {
+  const _HijriPill(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 26,
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: BoxDecoration(
+        color: AppColor.greenTint,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: AppColor.greenTintStrong),
+      ),
+      // Hugs the text: centred vertically without taking the full width.
+      child: Center(
+        widthFactor: 1,
+        child: Text(
+          text,
+          maxLines: 1,
+          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)
+              .c(AppColor.greenDeep),
+        ),
       ),
     );
   }

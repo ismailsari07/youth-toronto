@@ -154,11 +154,17 @@ abstract class AppLocalizations {
   /// **'{prayer, select, fajr{After Fajr prayer} sunrise{After sunrise} dhuhr{After Dhuhr prayer} asr{After Asr prayer} maghrib{After Maghrib prayer} isha{After Isha prayer} other{After {prayer} prayer}}'**
   String afterPrayerTitle(String prayer);
 
-  /// Organisation name above the date on the Prayer home. Same name in English and French.
+  /// Header of the Prayer home, next to the logo. Same name in English and French.
   ///
   /// In en, this message translates to:
-  /// **'CANADIAN TURKISH ISLAMIC TRUST'**
-  String get organisationEyebrow;
+  /// **'Canadian Turkish Islamic Trust'**
+  String get organisationName;
+
+  /// No description provided for @homeMosqueLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Pape Mosque · Toronto'**
+  String get homeMosqueLine;
 
   /// No description provided for @nextPrayer.
   ///
@@ -237,6 +243,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'5 minutes before each iqamah'**
   String get prayerRemindersDetail;
+
+  /// No description provided for @remindersDeniedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications for Pape Mosque are turned off in iOS Settings, so reminders can\'t appear.'**
+  String get remindersDeniedNote;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
 
   /// Notification body, 5 minutes before the iqamah.
   ///

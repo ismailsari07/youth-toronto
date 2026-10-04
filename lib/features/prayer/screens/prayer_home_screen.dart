@@ -8,6 +8,7 @@ import '../../../core/mosque_info.dart';
 import '../../../core/mosque_time.dart';
 import '../../../core/notification_service.dart';
 import '../../../core/prayer_utils.dart';
+import '../../../core/prayer_widget_sync.dart';
 import '../../../core/reminder_sync.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
@@ -76,6 +77,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       onRefresh: () async {
         ref.invalidate(prayerProvider);
         await ref.read(prayerProvider.future);
+        // The home-screen widget picks up any corrected times too.
+        PrayerWidgetSync.sync();
       },
       padding: EdgeInsets.fromLTRB(
         AppSpace.pageGutter,

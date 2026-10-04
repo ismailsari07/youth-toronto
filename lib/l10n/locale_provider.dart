@@ -2,6 +2,7 @@ import 'dart:ui' show Locale;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/prayer_widget_sync.dart';
 import '../core/reminder_sync.dart';
 import 'l10n.dart';
 
@@ -21,8 +22,9 @@ class LocaleOverride extends Notifier<Locale?> {
   Future<void> set(Locale? locale) async {
     state = locale;
     await LocaleStore.save(locale);
-    // Reminders already scheduled carry their text; re-create them in the
-    // new language.
+    // Reminders already scheduled carry their text, and the widget its
+    // prayer names; re-create both in the new language.
     ReminderSync.sync();
+    PrayerWidgetSync.sync();
   }
 }

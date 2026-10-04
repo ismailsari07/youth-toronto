@@ -1,0 +1,6 @@
+// Flutter's generated settings, for FLUTTER_BUILD_NAME / FLUTTER_BUILD_NUMBER
+// only, so the widget always carries the app's version and build number
+// (including Codemagic's --build-number). Deliberately not the Runner
+// xcconfigs: those pull in the CocoaPods settings, and the widget must not
+// link Flutter or any plugin.
+#include "../Flutter/Generated.xcconfig"

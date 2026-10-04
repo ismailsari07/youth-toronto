@@ -12,6 +12,22 @@
 	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Pape Mosque</string>
+	<!-- papemosque:///prayer opens the Prayer tab; used by the home-screen
+	     and lock-screen widgets. Flutter's deep linking hands the path to
+	     go_router. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>ca.papemosque.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>papemosque</string>
+			</array>
+		</dict>
+	</array>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

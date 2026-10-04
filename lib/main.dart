@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/mosque_time.dart';
 import 'core/notification_service.dart';
 import 'core/prayer_service.dart';
+import 'core/prayer_widget_sync.dart';
 import 'core/reminder_sync.dart';
 import 'core/router.dart';
 import 'l10n/l10n.dart';
@@ -73,11 +74,18 @@ class _MytAppState extends ConsumerState<MytApp> {
   @override
   void initState() {
     super.initState();
-    // Keep the 7-day reminder window fresh: once the first frame is up (so
-    // the permission prompt never blocks launch) and on every resume.
-    // Fire-and-forget: ReminderSync never throws and never blocks the UI.
-    WidgetsBinding.instance.addPostFrameCallback((_) => ReminderSync.sync());
-    _lifecycle = AppLifecycleListener(onResume: ReminderSync.sync);
+    // Keep the 7-day reminder window and the iOS widget's week of times
+    // fresh: once the first frame is up (so the permission prompt never
+    // blocks launch) and on every resume. Fire-and-forget: neither sync
+    // throws or blocks the UI, and the widget's doesn't wait on the
+    // reminders' permission prompt.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncSchedules());
+    _lifecycle = AppLifecycleListener(onResume: _syncSchedules);
+  }
+
+  void _syncSchedules() {
+    ReminderSync.sync();
+    PrayerWidgetSync.sync();
   }
 
   @override

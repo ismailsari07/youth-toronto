@@ -2,12 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
-import 'models.dart';
 import 'mosque_time.dart';
 import 'notification_service.dart';
+import 'prayer_days.dart';
 import 'prayer_service.dart';
-
-typedef _Day = ({String date, PrayerCachePayload payload});
 
 /// Keeps this device's prayer reminders in step with the mosque schedule:
 /// 5 minutes before each iqamah, 7 days ahead, in Toronto time.
@@ -69,7 +67,7 @@ class ReminderSync {
       }
       await NotificationService.requestPermissions();
 
-      final List<_Day> days;
+      final List<PrayerDay> days;
       try {
         days = await PrayerService.fetchRecentDays();
       } catch (e) {
@@ -92,21 +90,17 @@ class ReminderSync {
   }
 
   static List<Reminder> _buildReminders(
-    List<_Day> days,
+    List<PrayerDay> days,
     AppLocalizations l,
   ) {
-    final byDate = {for (final d in days) d.date: d.payload};
     final now = mosqueNow();
     final reminders = <Reminder>[];
 
-    for (var i = 0; i < _daysAhead; i++) {
-      final day = DateTime(now.year, now.month, now.day + i);
-      final key = mosqueDateKey(day);
-      // No row yet for future days (prayer_cache only holds up to today):
-      // use the latest known day's times, refreshed on every open/resume.
-      final payload = byDate[key] ?? _latestOnOrBefore(days, key);
-      if (payload == null) continue;
-
+    // No row yet for future days (prayer_cache only holds up to today):
+    // scheduleDays uses the latest known day's times, refreshed on every
+    // open/resume.
+    for (final (offset: i, :day, :payload)
+        in scheduleDays(days, now, count: _daysAhead)) {
       for (final item in payload.dailyPrayerTimes) {
         final index = _prayers.indexOf(item.name);
         final iqamah = item.iqamah;
@@ -124,14 +118,5 @@ class ReminderSync {
       }
     }
     return reminders;
-  }
-
-  static PrayerCachePayload? _latestOnOrBefore(List<_Day> days, String key) {
-    PrayerCachePayload? latest;
-    for (final d in days) {
-      // yyyy-MM-dd strings compare in date order.
-      if (d.date.compareTo(key) <= 0) latest = d.payload;
-    }
-    return latest;
   }
 }

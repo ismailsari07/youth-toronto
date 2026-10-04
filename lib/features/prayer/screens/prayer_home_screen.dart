@@ -24,6 +24,7 @@ import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
+import '../widgets/community_section.dart';
 
 /// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
 /// deliberately no separate "all times" screen (§7.2).
@@ -83,7 +84,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         AppSpace.scrollBottomInset,
       ),
       // The tab's entrance cascade, top to bottom: date and moon, the
-      // times, the occasion card, the mosque card.
+      // Community section, the times, the occasion card, the mosque card.
       children: [
         StaggerItem(
           index: 0,
@@ -96,9 +97,12 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
             ],
           ),
         ),
+        // Next event and latest announcement; brings its own top gap and
+        // hides entirely when there is nothing to show.
+        const StaggerItem(index: 1, child: CommunitySection()),
         const SizedBox(height: AppSpace.cardGapWide),
         StaggerItem(
-          index: 1,
+          index: 2,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -122,9 +126,9 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           ),
         ),
         const SizedBox(height: AppSpace.cardGapWide),
-        StaggerItem(index: 2, child: _occasionCard(payload)),
+        StaggerItem(index: 3, child: _occasionCard(payload)),
         const SizedBox(height: AppSpace.cardGapWide),
-        StaggerItem(index: 3, child: _mosqueCard()),
+        StaggerItem(index: 4, child: _mosqueCard()),
       ],
     );
   }
@@ -143,11 +147,22 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  l.mosqueEyebrow,
-                  style: AppText.eyebrow
-                      .copyWith(fontSize: 11.5, letterSpacing: 0.9, height: 1.2)
-                      .c(AppColor.green),
+                // One line always: on a narrow phone the name scales down a
+                // touch rather than wrapping.
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    l.organisationEyebrow,
+                    maxLines: 1,
+                    style: AppText.eyebrow
+                        .copyWith(
+                          fontSize: 11.5,
+                          letterSpacing: 0.9,
+                          height: 1.2,
+                        )
+                        .c(AppColor.green),
+                  ),
                 ),
                 Text(
                   gregorianTitle(l, payload?.gregorianDate) ?? todayTitle(l),

@@ -15,9 +15,8 @@ import '../../../shared/providers/unread_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
-import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_controls.dart';
-import '../../../ui/components/app_row.dart';
+import '../../../ui/components/announcement_card.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
 import '../../../ui/components/motion.dart';
@@ -311,78 +310,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       for (final (i, a) in items.indexed) ...[
         StaggerItem(
           index: 2 + i,
-          child: _announcementCard(a, unread: unread.contains(a.id)),
+          child: AnnouncementCard(
+            item: a,
+            unread: unread.contains(a.id),
+            onTap: () => context.push('/community/announcement', extra: a),
+          ),
         ),
         const SizedBox(height: AppSpace.cardGap),
       ],
     ];
-  }
-
-  Widget _announcementCard(Announcement item, {required bool unread}) {
-    return Pressable(
-      onTap: () => context.push('/community/announcement', extra: item),
-      pressedOpacity: 0.85,
-      child: AppCard(
-        radius: AppRadius.listCard,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const IconBubble(
-              icon: AppIcons.announcement,
-              tone: RowTone.blue,
-              square: true,
-            ),
-            const SizedBox(width: AppSpace.rowGap),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item.title,
-                          style: AppText.rowTitle
-                              .copyWith(
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.2,
-                              )
-                              .c(AppColor.ink),
-                        ),
-                      ),
-                      if (unread)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.only(left: 4, top: 6),
-                          decoration: const BoxDecoration(
-                            color: AppColor.green,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    item.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13, height: 1.45)
-                        .c(AppColor.ink2),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    context.l10n.postedAgo(timeAgo(context.l10n, item.date)),
-                    style: const TextStyle(fontSize: 12).c(AppColor.ink3),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

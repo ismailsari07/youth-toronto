@@ -29,6 +29,7 @@ class EventCard extends StatelessWidget {
     this.onTap,
     this.onRegister,
     this.onShare,
+    this.compact = false,
   });
 
   final UpcomingEvent upcoming;
@@ -36,7 +37,12 @@ class EventCard extends StatelessWidget {
   final VoidCallback? onRegister;
   final VoidCallback? onShare;
 
-  bool get _hasActions => upcoming.event.registrationUri != null;
+  /// The summary used outside the Events list (the Prayer home): no photo
+  /// band and no actions, just the date tile or repeat badge, title, when
+  /// line and place. The detail screen is a tap away.
+  final bool compact;
+
+  bool get _hasActions => !compact && upcoming.event.registrationUri != null;
   bool get _recurring => upcoming.event.repeats.isRecurring;
 
   RecurringBadge _recurringBadge(
@@ -51,7 +57,7 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = upcoming.event.imageUrl;
+    final imageUrl = compact ? null : upcoming.event.imageUrl;
     final l = context.l10n;
     return Pressable(
       onTap: onTap,

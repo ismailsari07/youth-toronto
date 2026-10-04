@@ -91,7 +91,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get mosqueEyebrow => 'PAPE CAMİİ';
+  String get organisationEyebrow => 'KANADA TÜRK İSLAM VAKFI';
 
   @override
   String get nextPrayer => 'SIRADAKİ NAMAZ';
@@ -101,6 +101,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get todayAtTheMosque => 'Bugün camide';
+
+  @override
+  String get homeCommunitySection => 'Topluluk';
+
+  @override
+  String get seeAll => 'Tümünü gör';
 
   @override
   String get athanIqamah => 'Ezan · Cemaat';

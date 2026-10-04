@@ -154,11 +154,11 @@ abstract class AppLocalizations {
   /// **'{prayer, select, fajr{After Fajr prayer} sunrise{After sunrise} dhuhr{After Dhuhr prayer} asr{After Asr prayer} maghrib{After Maghrib prayer} isha{After Isha prayer} other{After {prayer} prayer}}'**
   String afterPrayerTitle(String prayer);
 
-  /// No description provided for @mosqueEyebrow.
+  /// Organisation name above the date on the Prayer home. Same name in English and French.
   ///
   /// In en, this message translates to:
-  /// **'PAPE MOSQUE'**
-  String get mosqueEyebrow;
+  /// **'CANADIAN TURKISH ISLAMIC TRUST'**
+  String get organisationEyebrow;
 
   /// No description provided for @nextPrayer.
   ///
@@ -177,6 +177,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Today at the mosque'**
   String get todayAtTheMosque;
+
+  /// Prayer home section with the next event and the latest announcement.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get homeCommunitySection;
+
+  /// Link from the Prayer home's Community section to the Community tab.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
 
   /// No description provided for @athanIqamah.
   ///

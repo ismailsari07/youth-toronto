@@ -49,10 +49,21 @@
       }
     }
   },
-  "mosqueEyebrow": "PAPE MOSQUE",
+  "organisationEyebrow": "CANADIAN TURKISH ISLAMIC TRUST",
+  "@organisationEyebrow": {
+    "description": "Organisation name above the date on the Prayer home. Same name in English and French."
+  },
   "nextPrayer": "NEXT PRAYER",
   "city": "Toronto",
   "todayAtTheMosque": "Today at the mosque",
+  "homeCommunitySection": "Community",
+  "@homeCommunitySection": {
+    "description": "Prayer home section with the next event and the latest announcement."
+  },
+  "seeAll": "See all",
+  "@seeAll": {
+    "description": "Link from the Prayer home's Community section to the Community tab."
+  },
   "athanIqamah": "Athan · Iqamah",
   "iqamah": "IQAMAH",
   "athanAt": "Athan {time}",

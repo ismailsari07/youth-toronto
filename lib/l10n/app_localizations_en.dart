@@ -91,7 +91,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get mosqueEyebrow => 'PAPE MOSQUE';
+  String get organisationEyebrow => 'CANADIAN TURKISH ISLAMIC TRUST';
 
   @override
   String get nextPrayer => 'NEXT PRAYER';
@@ -101,6 +101,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get todayAtTheMosque => 'Today at the mosque';
+
+  @override
+  String get homeCommunitySection => 'Community';
+
+  @override
+  String get seeAll => 'See all';
 
   @override
   String get athanIqamah => 'Athan · Iqamah';

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../../theme/app_tokens.dart';
 
@@ -25,34 +26,50 @@ class MoonCountdown extends StatefulWidget {
 
 class _MoonCountdownState extends State<MoonCountdown>
     with SingleTickerProviderStateMixin {
-  /// One full phase cycle. The two sines drift at different multiples of it,
-  /// so the surface never visibly repeats on this period.
-  late final AnimationController _phase = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 6),
-  );
+  /// The surface phase advances 2π every [_cycle], from continuously elapsed
+  /// time — never from a repeating 0..1 value. A repeating value wraps back
+  /// to its start every cycle, and any wave whose speed is not a whole
+  /// multiple of that cycle (the second one drifts at −1.5×) visibly jumps
+  /// at the wrap. Elapsed time has no wrap, so the ripple flows forever.
+  static const _cycle = Duration(seconds: 6);
+
+  late final Ticker _ticker = createTicker(_onTick);
+  final ValueNotifier<double> _phase = ValueNotifier(0);
+
+  /// Phase when the ticker last (re)started; a ticker's elapsed time starts
+  /// again from zero on every start.
+  double _phaseAtStart = 0;
 
   bool _rippling = false;
+
+  void _onTick(Duration elapsed) {
+    _phase.value =
+        _phaseAtStart +
+        2 * math.pi * elapsed.inMicroseconds / _cycle.inMicroseconds;
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Reduce Motion: hold the surface still. The fill level and the digits
-    // keep updating — only the ripple stops.
+    // keep updating — only the ripple stops. A hidden tab mutes the ticker
+    // through `TickerMode`, so no frames are spent while it is offscreen.
     final media = MediaQuery.of(context);
     final wantRipple = !media.disableAnimations && !media.accessibleNavigation;
     if (wantRipple == _rippling) return;
     _rippling = wantRipple;
     if (wantRipple) {
-      _phase.repeat();
+      _phaseAtStart = _phase.value;
+      _ticker.start();
     } else {
-      _phase.stop();
+      _ticker.stop();
       _phase.value = 0;
     }
   }
 
   @override
   void dispose() {
+    _ticker.dispose();
     _phase.dispose();
     super.dispose();
   }
@@ -63,14 +80,14 @@ class _MoonCountdownState extends State<MoonCountdown>
       child: SizedBox(
         width: AppMoon.box,
         height: AppMoon.box,
-        child: AnimatedBuilder(
-          animation: _phase,
-          builder: (_, _) => CustomPaint(
+        child: ValueListenableBuilder<double>(
+          valueListenable: _phase,
+          builder: (_, phase, _) => CustomPaint(
             size: const Size(AppMoon.box, AppMoon.box),
             isComplex: true,
             painter: _MoonPainter(
               fill: widget.fill.clamp(0.0, 1.0),
-              phase: _phase.value * 2 * math.pi,
+              phase: phase,
             ),
           ),
         ),
@@ -109,7 +126,7 @@ class _MoonPainter extends CustomPainter {
 
   // Surface ripple. The amplitude knob is a fraction of `_ampMax`, kept low on
   // purpose: a calm ripple, not a sloshing glass.
-  static const _amp = 0.10;
+  static const _amp = 0.05;
   static const _ampMax = 50.0;
   static const _wave1 = 132.0; // wavelength, px
   static const _wave2 = 87.0;

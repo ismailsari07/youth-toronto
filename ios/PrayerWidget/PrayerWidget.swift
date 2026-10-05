@@ -97,8 +97,11 @@ struct WidgetText {
 struct Snapshot {
   let label: String // "NEXT PRAYER"
   let next: StoredPrayer
-  let current: StoredPrayer? // the prayer whose window we are in
-  let day: [StoredPrayer] // the next prayer's day, Sunrise included
+  let current: StoredPrayer? // the prayer whose window we are in (progress)
+  /// The row to highlight: the last time that has come, Sunrise included,
+  /// as currentTimetableRow in lib/core/prayer_utils.dart.
+  let highlighted: StoredPrayer?
+  let day: [StoredPrayer] // the highlighted prayer's day, Sunrise included
 }
 
 enum EntryState {
@@ -120,11 +123,17 @@ struct PrayerEntry: TimelineEntry {
       return PrayerEntry(date: date, state: .missing(WidgetText.forLanguage(code)))
     }
     let current = data.prayers.last(where: { $0.isPrayer && $0.date <= date })
-    let day = data.prayers.filter { $0.day == next.day }
+    // The app's rule: Sunrise counts, so from sunrise until Dhuhr the
+    // Sunrise row is highlighted, not Fajr; before Fajr it is the previous
+    // night's Isha, shown with that day's list.
+    let highlighted = data.prayers.last(where: { $0.date <= date })
+    let listDay = highlighted?.day ?? next.day
+    let day = data.prayers.filter { $0.day == listDay }
     let snapshot = Snapshot(
       label: data.strings.nextPrayer,
       next: next,
       current: current,
+      highlighted: highlighted,
       day: day
     )
     return PrayerEntry(date: date, state: .ready(snapshot))
@@ -152,7 +161,9 @@ struct PrayerEntry: TimelineEntry {
       prayer("Maghrib", 14_000, "7:02 PM"),
       prayer("Isha", 18_000, "8:19 PM"),
     ]
-    let snapshot = Snapshot(label: "NEXT PRAYER", next: day[3], current: day[2], day: day)
+    let snapshot = Snapshot(
+      label: "NEXT PRAYER", next: day[3], current: day[2], highlighted: day[2], day: day
+    )
     return PrayerEntry(date: now, state: .ready(snapshot))
   }
 }
@@ -171,7 +182,8 @@ struct Provider: TimelineProvider {
     }
   }
 
-  /// One entry now and one at each coming prayer; the countdown text ticks
+  /// One entry now and one at each coming prayer time, Sunrise included
+  /// (its entry moves the highlight to the Sunrise row); the countdown text ticks
   /// on its own between them. After the last stored prayer the final entry
   /// shows the "open the app" message, and the app reloads the timelines
   /// whenever it writes new data.
@@ -179,7 +191,7 @@ struct Provider: TimelineProvider {
     let now = Date()
     let data = StoredData.load()
     var entries = [PrayerEntry.make(at: now, data: data)]
-    for prayer in data?.prayers ?? [] where prayer.isPrayer && prayer.date > now {
+    for prayer in data?.prayers ?? [] where prayer.date > now {
       entries.append(PrayerEntry.make(at: prayer.date, data: data))
     }
     let policy: TimelineReloadPolicy = entries.count > 1 ? .atEnd : .never
@@ -354,7 +366,7 @@ struct MediumView: View {
       NextPrayerView(snapshot: snapshot)
       VStack(spacing: 1) {
         ForEach(snapshot.day, id: \.self) { prayer in
-          PrayerRow(prayer: prayer, highlighted: prayer == snapshot.next)
+          PrayerRow(prayer: prayer, highlighted: prayer == snapshot.highlighted)
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)

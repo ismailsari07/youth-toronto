@@ -262,13 +262,13 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     }
 
     final prayers = payload.dailyPrayerTimes;
-    final window = currentPrayerWindow(prayers);
-    final next = window?.next.name ?? getNextPrayer(prayers).name;
+    // The prayer time we are in now (Sunrise from sunrise until Dhuhr).
+    final current = currentTimetableRow(prayers);
     final rows = <Widget>[];
 
     for (var i = 0; i < prayers.length; i++) {
       final p = prayers[i];
-      final isNext = p.name == next;
+      final isCurrent = p.name == current;
       final isSunrise = p.name == 'Sunrise';
       final past = _isPast(p);
 
@@ -277,11 +277,11 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           divided: i > 0,
           icon: AppIcons.forPrayer(p.name),
           tone: isSunrise ? RowTone.blue : RowTone.neutral,
-          iconFill: isNext ? AppColor.greenTintStrong : null,
-          iconGlyph: isNext ? AppColor.greenDark : null,
-          background: isNext ? AppColor.greenRowBg : null,
+          iconFill: isCurrent ? AppColor.greenTintStrong : null,
+          iconGlyph: isCurrent ? AppColor.greenDark : null,
+          background: isCurrent ? AppColor.greenRowBg : null,
           title: prayerLabel(l, p.name),
-          titleStyle: isNext
+          titleStyle: isCurrent
               ? AppText.prayerName
                   .copyWith(fontWeight: FontWeight.w700)
                   .c(AppColor.greenDeep)
@@ -290,7 +290,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               ? l.fajrWindowCloses
               : l.athanAt(prayerClock12(p.name, p.time)),
           subtitleStyle: AppText.caption.c(AppColor.ink3),
-          trailing: _trailing(p, isNext),
+          trailing: _trailing(p, isCurrent),
         ),
       );
     }
@@ -301,12 +301,16 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     return GroupedRows(rows: rows);
   }
 
-  Widget _trailing(DailyPrayerItem p, bool isNext) {
+  Widget _trailing(DailyPrayerItem p, bool isCurrent) {
     final iqamah = p.iqamah;
     if (iqamah == null) {
       return Text(
         prayerClock12(p.name, p.time),
-        style: AppText.iqamahValue.c(AppColor.ink2),
+        style: isCurrent
+            ? AppText.iqamahValue
+                .copyWith(fontWeight: FontWeight.w700)
+                .c(AppColor.greenDeep)
+            : AppText.iqamahValue.c(AppColor.ink2),
       );
     }
     return Column(
@@ -316,11 +320,11 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         Text(
           context.l10n.iqamah,
           style: AppText.iqamahLabel
-              .c(isNext ? const Color(0xFF5C7E6D) : AppColor.ink4),
+              .c(isCurrent ? const Color(0xFF5C7E6D) : AppColor.ink4),
         ),
         Text(
           prayerClock12(p.name, iqamah),
-          style: isNext
+          style: isCurrent
               ? AppText.iqamahValue
                   .copyWith(fontWeight: FontWeight.w700)
                   .c(AppColor.greenDeep)

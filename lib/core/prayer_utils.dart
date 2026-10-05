@@ -1,3 +1,5 @@
+import 'package:timezone/timezone.dart' as tz;
+
 import 'models.dart';
 import 'mosque_time.dart';
 
@@ -31,6 +33,28 @@ NextPrayer getNextPrayer(List<DailyPrayerItem> prayers) {
     iqamah: fajr.iqamah,
     minutesUntil: fajrTomorrow?.difference(now).inMinutes ?? 0,
   );
+}
+
+/// The timetable row to highlight: the prayer time we are in at [now]
+/// (default: the mosque's clock). The last row whose time has come, Sunrise
+/// included: Fajr's time ends at sunrise, so from Sunrise until Dhuhr the
+/// Sunrise row is highlighted, never Fajr. Before Fajr it is still the
+/// night's Isha (the last row). [prayers] is one day in timetable order.
+///
+/// Only the highlight follows this; the countdown and progress keep
+/// [currentPrayerWindow]. ios/PrayerWidget/PrayerWidget.swift mirrors it.
+String? currentTimetableRow(
+  List<DailyPrayerItem> prayers, {
+  tz.TZDateTime? now,
+}) {
+  final at = now ?? mosqueNow();
+  final today = DateTime(at.year, at.month, at.day);
+  String? current;
+  for (final p in prayers) {
+    final start = prayerMoment(today, p.name, p.time);
+    if (start != null && !start.isAfter(at)) current = p.name;
+  }
+  return current ?? (prayers.isEmpty ? null : prayers.last.name);
 }
 
 /// The prayer window the mosque is currently inside: from [current]'s athan to

@@ -87,6 +87,7 @@
   "aboutTime": "vers {time}",
   "beginsAboutOn": "{begins} — vers {time} le {date}",
   "registerAt": "Inscription : {url}",
+  "sharedFromApp": "Partagé depuis l'application Pape Mosque · {website}",
   "events": "Événements",
   "announcements": "Annonces",
   "noEventsTitle": "Aucun événement prévu",

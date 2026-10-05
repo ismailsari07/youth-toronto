@@ -421,6 +421,11 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String sharedFromApp(String website) {
+    return 'Pape Camii uygulamasından paylaşıldı · $website';
+  }
+
+  @override
   String get events => 'Etkinlikler';
 
   @override

@@ -87,6 +87,7 @@
   "aboutTime": "yaklaşık {time}",
   "beginsAboutOn": "{begins} — {date}, yaklaşık {time}",
   "registerAt": "Kayıt: {url}",
+  "sharedFromApp": "Pape Camii uygulamasından paylaşıldı · {website}",
   "events": "Etkinlikler",
   "announcements": "Duyurular",
   "noEventsTitle": "Planlanmış etkinlik yok",

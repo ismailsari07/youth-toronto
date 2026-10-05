@@ -421,6 +421,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String sharedFromApp(String website) {
+    return 'Partagé depuis l\'application Pape Mosque · $website';
+  }
+
+  @override
   String get events => 'Événements';
 
   @override

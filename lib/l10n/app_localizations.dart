@@ -622,6 +622,12 @@ abstract class AppLocalizations {
   /// **'Register: {url}'**
   String registerAt(String url);
 
+  /// Last line of a shared event, under its details.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared from the Pape Mosque app · {website}'**
+  String sharedFromApp(String website);
+
   /// No description provided for @events.
   ///
   /// In en, this message translates to:

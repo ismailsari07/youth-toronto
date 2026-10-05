@@ -304,6 +304,15 @@
       }
     }
   },
+  "sharedFromApp": "Shared from the Pape Mosque app · {website}",
+  "@sharedFromApp": {
+    "description": "Last line of a shared event, under its details.",
+    "placeholders": {
+      "website": {
+        "type": "String"
+      }
+    }
+  },
   "events": "Events",
   "announcements": "Announcements",
   "noEventsTitle": "No events scheduled",

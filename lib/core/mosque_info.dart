@@ -13,4 +13,8 @@ abstract final class MosqueInfo {
   static const websiteUri = 'https://papemosque.ca';
   static const mapsUri =
       'https://www.google.com/maps/search/?api=1&query=336+Pape+Avenue,+Toronto';
+
+  /// The app's App Store page, added to shared events once the app is
+  /// released. Empty until then, and nothing is shown for it.
+  static const appStoreUrl = '';
 }

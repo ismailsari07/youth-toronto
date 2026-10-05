@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 
 import '../core/event_schedule.dart';
 import '../core/models.dart';
+import '../core/mosque_info.dart';
 import '../core/mosque_time.dart';
 import '../l10n/l10n.dart';
 
@@ -248,7 +249,8 @@ String nextSessionLine(AppLocalizations l, UpcomingEvent u) {
       : '${shortDate(l, u.startsAt)} · ${l.afterPrayerInline(prayer)}';
 }
 
-/// Share text for an event: title, when, place, registration link.
+/// Share text for an event: title, when, place, registration link, then a
+/// line saying where it came from.
 String eventShareText(AppLocalizations l, UpcomingEvent u) {
   final e = u.event;
   final location = e.location?.trim();
@@ -259,5 +261,8 @@ String eventShareText(AppLocalizations l, UpcomingEvent u) {
         : nextSessionLine(l, u),
     if (location != null && location.isNotEmpty) location,
     if (e.registrationUri != null) l.registerAt('${e.registrationUri}'),
+    '',
+    l.sharedFromApp(MosqueInfo.website),
+    if (MosqueInfo.appStoreUrl.isNotEmpty) MosqueInfo.appStoreUrl,
   ].join('\n');
 }

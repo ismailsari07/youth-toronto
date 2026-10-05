@@ -146,7 +146,7 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
           FadeSwitch(
             alignment: AlignmentDirectional.topCenter,
             child: KeyedSubtree(
-              key: ValueKey(window?.current.name),
+              key: ValueKey('${window?.current.name}/${_sunriseRow()?.name}'),
               child: _bottomRow(window),
             ),
           ),
@@ -268,20 +268,36 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
   Widget _bottomRow(PrayerWindow? window) {
     if (window == null) return const SizedBox(height: 30);
     final l = context.l10n;
+    // Fajr's time ends at sunrise: until Dhuhr the left side shows Sunrise,
+    // as the times card highlights it. Countdown and progress keep the
+    // Fajr→Dhuhr window.
+    final sunrise = _sunriseRow();
     return SizedBox(
       height: 30,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _edge(
-            window.current,
-            l.prayerNow(prayerLabel(l, window.current.name)),
-            leading: true,
-          ),
+          sunrise != null
+              ? _edge(sunrise, prayerLabel(l, sunrise.name), leading: true)
+              : _edge(
+                  window.current,
+                  l.prayerNow(prayerLabel(l, window.current.name)),
+                  leading: true,
+                ),
           _edge(window.next, prayerLabel(l, window.next.name), leading: false),
         ],
       ),
     );
+  }
+
+  /// The Sunrise row while it is the current timetable row (between sunrise
+  /// and Dhuhr), by the times card's rule; otherwise null.
+  DailyPrayerItem? _sunriseRow() {
+    final prayers = widget.prayers;
+    if (prayers == null || currentTimetableRow(prayers) != 'Sunrise') {
+      return null;
+    }
+    return prayers.firstWhere((p) => p.name == 'Sunrise');
   }
 
   /// Circle on the outside: left edge leads with it, right edge trails.

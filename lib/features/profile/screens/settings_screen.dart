@@ -5,12 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../../../core/auth_service.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/providers/auth_provider.dart';
-import '../../../shared/providers/reminders_provider.dart';
+import '../../prayer/widgets/reminders_sheet.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_card.dart';
-import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
@@ -57,17 +56,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 GroupedRows(
                   rows: [
-                    AppListRow(
-                      icon: AppIcons.bell,
-                      title: l.prayerReminders,
-                      subtitle: l.prayerRemindersDetail,
-                      trailing: AppSwitch(
-                        value: ref.watch(remindersEnabledProvider).valueOrNull ?? true,
-                        onChanged: ref.watch(remindersEnabledProvider).hasValue
-                            ? (on) => ref.read(remindersEnabledProvider.notifier).set(on)
-                            : null,
-                      ),
-                    ),
+                    const RemindersRow(),
                   ],
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),

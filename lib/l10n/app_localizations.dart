@@ -130,12 +130,6 @@ abstract class AppLocalizations {
   /// **'{prayer, select, fajr{Fajr} sunrise{Sunrise} dhuhr{Dhuhr} asr{Asr} maghrib{Maghrib} isha{Isha} other{{prayer}}}'**
   String prayer(String prayer);
 
-  /// The prayer itself (the salah), as a reminder title. Turkish uses the namaz form: İmsak is a time, the prayer is the sabah namazı.
-  ///
-  /// In en, this message translates to:
-  /// **'{prayer, select, fajr{Fajr} sunrise{Sunrise} dhuhr{Dhuhr} asr{Asr} maghrib{Maghrib} isha{Isha} other{{prayer}}}'**
-  String prayerSalah(String prayer);
-
   /// Start of an event card's when line.
   ///
   /// In en, this message translates to:
@@ -238,11 +232,107 @@ abstract class AppLocalizations {
   /// **'Prayer reminders'**
   String get prayerReminders;
 
-  /// No description provided for @prayerRemindersDetail.
+  /// No description provided for @prayerNotifications.
   ///
   /// In en, this message translates to:
-  /// **'5 minutes before each iqamah'**
-  String get prayerRemindersDetail;
+  /// **'Prayer notifications'**
+  String get prayerNotifications;
+
+  /// No description provided for @remindersPrayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayers'**
+  String get remindersPrayers;
+
+  /// No description provided for @remindersNotifyMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify me'**
+  String get remindersNotifyMe;
+
+  /// No description provided for @notifyAtAthan.
+  ///
+  /// In en, this message translates to:
+  /// **'At athan time'**
+  String get notifyAtAthan;
+
+  /// No description provided for @notifyBeforeIqamah.
+  ///
+  /// In en, this message translates to:
+  /// **'5 minutes before iqamah'**
+  String get notifyBeforeIqamah;
+
+  /// No description provided for @notificationSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification sound'**
+  String get notificationSound;
+
+  /// Sound choice. Only shown once an athan recording is bundled with the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Athan'**
+  String get soundAthan;
+
+  /// No description provided for @soundStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard notification sound'**
+  String get soundStandard;
+
+  /// No description provided for @soundSilent.
+  ///
+  /// In en, this message translates to:
+  /// **'Silent'**
+  String get soundSilent;
+
+  /// No description provided for @playSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get playSound;
+
+  /// No description provided for @stopSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stopSound;
+
+  /// No description provided for @remindersSummaryOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get remindersSummaryOff;
+
+  /// No description provided for @remindersSummaryAthan.
+  ///
+  /// In en, this message translates to:
+  /// **'On · At athan time'**
+  String get remindersSummaryAthan;
+
+  /// No description provided for @remindersSummaryIqamah.
+  ///
+  /// In en, this message translates to:
+  /// **'On · 5 min before iqamah'**
+  String get remindersSummaryIqamah;
+
+  /// Body of the notification at athan time. [prayer] is the lower-case English key. Turkish uses the namaz form (Fajr: Sabah namazı).
+  ///
+  /// In en, this message translates to:
+  /// **'{prayer, select, fajr{It\'s time for Fajr prayer} dhuhr{It\'s time for Dhuhr prayer} asr{It\'s time for Asr prayer} maghrib{It\'s time for Maghrib prayer} isha{It\'s time for Isha prayer} other{It\'s time for {prayer} prayer}}'**
+  String reminderAthanBody(String prayer);
+
+  /// Appended to the athan-time body after ' · '. [time] is 12-hour in every language, e.g. 1:45 PM.
+  ///
+  /// In en, this message translates to:
+  /// **'Iqamah at {time}'**
+  String reminderIqamahAt(String time);
+
+  /// Body of the notification 5 minutes before the iqamah. [prayer] is the lower-case English key.
+  ///
+  /// In en, this message translates to:
+  /// **'{prayer, select, fajr{Fajr iqamah in 5 minutes} dhuhr{Dhuhr iqamah in 5 minutes} asr{Asr iqamah in 5 minutes} maghrib{Maghrib iqamah in 5 minutes} isha{Isha iqamah in 5 minutes} other{{prayer} iqamah in 5 minutes}}'**
+  String reminderIqamahSoon(String prayer);
 
   /// No description provided for @remindersDeniedNote.
   ///
@@ -255,12 +345,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open Settings'**
   String get openSettings;
-
-  /// Notification body, 5 minutes before the iqamah.
-  ///
-  /// In en, this message translates to:
-  /// **'Iqamah in 5 minutes'**
-  String get reminderBody;
 
   /// No description provided for @timesUnavailable.
   ///

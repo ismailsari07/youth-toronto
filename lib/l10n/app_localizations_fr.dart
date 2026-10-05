@@ -35,20 +35,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String prayerSalah(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Fajr',
-      'sunrise': 'Lever du soleil',
-      'dhuhr': 'Dhohr',
-      'asr': 'Asr',
-      'maghrib': 'Maghrib',
-      'isha': 'Icha',
-      'other': '$prayer',
-    });
-    return '$_temp0';
-  }
-
-  @override
   String afterPrayer(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'Après le Fajr',
@@ -139,7 +125,77 @@ class AppLocalizationsFr extends AppLocalizations {
   String get prayerReminders => 'Rappels de prière';
 
   @override
-  String get prayerRemindersDetail => '5 minutes avant chaque iqama';
+  String get prayerNotifications => 'Notifications de prière';
+
+  @override
+  String get remindersPrayers => 'Prières';
+
+  @override
+  String get remindersNotifyMe => 'Me prévenir';
+
+  @override
+  String get notifyAtAthan => 'À l\'heure de l\'adhan';
+
+  @override
+  String get notifyBeforeIqamah => '5 minutes avant l\'iqama';
+
+  @override
+  String get notificationSound => 'Son de la notification';
+
+  @override
+  String get soundAthan => 'Adhan';
+
+  @override
+  String get soundStandard => 'Son de notification standard';
+
+  @override
+  String get soundSilent => 'Silencieux';
+
+  @override
+  String get playSound => 'Écouter';
+
+  @override
+  String get stopSound => 'Arrêter';
+
+  @override
+  String get remindersSummaryOff => 'Désactivés';
+
+  @override
+  String get remindersSummaryAthan => 'Activés · À l\'heure de l\'adhan';
+
+  @override
+  String get remindersSummaryIqamah => 'Activés · 5 min avant l\'iqama';
+
+  @override
+  String reminderAthanBody(String prayer) {
+    String _temp0 = intl.Intl.selectLogic(prayer, {
+      'fajr': 'C\'est l\'heure de la prière du Fajr',
+      'dhuhr': 'C\'est l\'heure de la prière du Dhohr',
+      'asr': 'C\'est l\'heure de la prière de l\'Asr',
+      'maghrib': 'C\'est l\'heure de la prière du Maghrib',
+      'isha': 'C\'est l\'heure de la prière de l\'Icha',
+      'other': 'C\'est l\'heure de la prière ($prayer)',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String reminderIqamahAt(String time) {
+    return 'Iqama à $time';
+  }
+
+  @override
+  String reminderIqamahSoon(String prayer) {
+    String _temp0 = intl.Intl.selectLogic(prayer, {
+      'fajr': 'Iqama du Fajr dans 5 minutes',
+      'dhuhr': 'Iqama du Dhohr dans 5 minutes',
+      'asr': 'Iqama de l\'Asr dans 5 minutes',
+      'maghrib': 'Iqama du Maghrib dans 5 minutes',
+      'isha': 'Iqama de l\'Icha dans 5 minutes',
+      'other': 'Iqama ($prayer) dans 5 minutes',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get remindersDeniedNote =>
@@ -147,9 +203,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get openSettings => 'Ouvrir les Réglages';
-
-  @override
-  String get reminderBody => 'Iqama dans 5 minutes';
 
   @override
   String get timesUnavailable => 'Horaires indisponibles';

@@ -6,13 +6,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
-import '../../../shared/providers/reminders_provider.dart';
+import '../../prayer/widgets/reminders_sheet.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
-import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
@@ -131,17 +130,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           index: 3,
           child: GroupedRows(
             rows: [
-              AppListRow(
-                icon: AppIcons.bell,
-                title: l.prayerReminders,
-                subtitle: l.prayerRemindersDetail,
-                trailing: AppSwitch(
-                  value: ref.watch(remindersEnabledProvider).valueOrNull ?? true,
-                  onChanged: ref.watch(remindersEnabledProvider).hasValue
-                      ? (on) => ref.read(remindersEnabledProvider.notifier).set(on)
-                      : null,
-                ),
-              ),
+              const RemindersRow(),
               const LanguageRow(divided: true),
               if (user != null)
                 AppListRow(

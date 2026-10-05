@@ -13,15 +13,6 @@
       }
     }
   },
-  "prayerSalah": "{prayer, select, fajr{Fajr} sunrise{Sunrise} dhuhr{Dhuhr} asr{Asr} maghrib{Maghrib} isha{Isha} other{{prayer}}}",
-  "@prayerSalah": {
-    "description": "The prayer itself (the salah), as a reminder title. Turkish uses the namaz form: İmsak is a time, the prayer is the sabah namazı.",
-    "placeholders": {
-      "prayer": {
-        "type": "String"
-      }
-    }
-  },
   "afterPrayer": "{prayer, select, fajr{After Fajr} sunrise{After sunrise} dhuhr{After Dhuhr} asr{After Asr} maghrib{After Maghrib} isha{After Isha} other{After {prayer}}}",
   "@afterPrayer": {
     "description": "Start of an event card's when line.",
@@ -93,13 +84,52 @@
   },
   "fajrWindowCloses": "Fajr window closes",
   "prayerReminders": "Prayer reminders",
-  "prayerRemindersDetail": "5 minutes before each iqamah",
+  "prayerNotifications": "Prayer notifications",
+  "remindersPrayers": "Prayers",
+  "remindersNotifyMe": "Notify me",
+  "notifyAtAthan": "At athan time",
+  "notifyBeforeIqamah": "5 minutes before iqamah",
+  "notificationSound": "Notification sound",
+  "soundAthan": "Athan",
+  "@soundAthan": {
+    "description": "Sound choice. Only shown once an athan recording is bundled with the app."
+  },
+  "soundStandard": "Standard notification sound",
+  "soundSilent": "Silent",
+  "playSound": "Play",
+  "stopSound": "Stop",
+  "remindersSummaryOff": "Off",
+  "remindersSummaryAthan": "On · At athan time",
+  "remindersSummaryIqamah": "On · 5 min before iqamah",
+  "reminderAthanBody": "{prayer, select, fajr{It's time for Fajr prayer} dhuhr{It's time for Dhuhr prayer} asr{It's time for Asr prayer} maghrib{It's time for Maghrib prayer} isha{It's time for Isha prayer} other{It's time for {prayer} prayer}}",
+  "@reminderAthanBody": {
+    "description": "Body of the notification at athan time. [prayer] is the lower-case English key. Turkish uses the namaz form (Fajr: Sabah namazı).",
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderIqamahAt": "Iqamah at {time}",
+  "@reminderIqamahAt": {
+    "description": "Appended to the athan-time body after ' · '. [time] is 12-hour in every language, e.g. 1:45 PM.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderIqamahSoon": "{prayer, select, fajr{Fajr iqamah in 5 minutes} dhuhr{Dhuhr iqamah in 5 minutes} asr{Asr iqamah in 5 minutes} maghrib{Maghrib iqamah in 5 minutes} isha{Isha iqamah in 5 minutes} other{{prayer} iqamah in 5 minutes}}",
+  "@reminderIqamahSoon": {
+    "description": "Body of the notification 5 minutes before the iqamah. [prayer] is the lower-case English key.",
+    "placeholders": {
+      "prayer": {
+        "type": "String"
+      }
+    }
+  },
   "remindersDeniedNote": "Notifications for Pape Mosque are turned off in iOS Settings, so reminders can't appear.",
   "openSettings": "Open Settings",
-  "reminderBody": "Iqamah in 5 minutes",
-  "@reminderBody": {
-    "description": "Notification body, 5 minutes before the iqamah."
-  },
   "timesUnavailable": "Times unavailable",
   "pullToRefresh": "Pull to refresh",
   "timesUnavailableTitle": "Today's times aren't available",

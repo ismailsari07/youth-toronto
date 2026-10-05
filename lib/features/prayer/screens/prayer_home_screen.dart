@@ -17,7 +17,6 @@ import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
-import '../../../ui/components/app_controls.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/moon_countdown_card.dart';
@@ -121,7 +120,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   Widget _header(PrayerCachePayload? payload, bool loading) {
     final l = context.l10n;
     final hijri = hijriTitle(l, payload?.hijriDate);
-    final remindersOn = ref.watch(remindersEnabledProvider).valueOrNull ?? true;
+    final remindersOn =
+        ref.watch(reminderSettingsProvider).valueOrNull?.active ?? true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -256,7 +256,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               leading: const Shimmer(width: 38, height: 38, radius: 19),
               trailing: const Shimmer(width: 64, height: 18),
             ),
-          _remindersRow(),
+          const RemindersRow(divided: true, background: AppColor.cardMuted),
         ],
       );
     }
@@ -295,23 +295,11 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       );
     }
 
-    rows.add(_remindersRow());
+    rows.add(
+      const RemindersRow(divided: true, background: AppColor.cardMuted),
+    );
     return GroupedRows(rows: rows);
   }
-
-  Widget _remindersRow() => AppListRow(
-        divided: true,
-        icon: AppIcons.bell,
-        background: AppColor.cardMuted,
-        title: context.l10n.prayerReminders,
-        subtitle: context.l10n.prayerRemindersDetail,
-        trailing: AppSwitch(
-          value: ref.watch(remindersEnabledProvider).valueOrNull ?? true,
-          onChanged: ref.watch(remindersEnabledProvider).hasValue
-              ? (on) => ref.read(remindersEnabledProvider.notifier).set(on)
-              : null,
-        ),
-      );
 
   Widget _trailing(DailyPrayerItem p, bool isNext) {
     final iqamah = p.iqamah;

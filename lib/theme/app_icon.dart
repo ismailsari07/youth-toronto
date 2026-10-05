@@ -45,6 +45,10 @@ abstract final class AppIcons {
   // Recurring events (spec §7.3).
   static const repeat = 'repeat';
 
+  // Notification sound previews.
+  static const play = 'play';
+  static const stop = 'stop';
+
   /// Prayer row icon for a prayer name from `prayer_cache`.
   static String forPrayer(String name) => switch (name) {
         'Fajr' => fajr,

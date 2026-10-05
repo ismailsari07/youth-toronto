@@ -69,11 +69,6 @@ void main() {
       expect(prayerLabel(en, 'Dhuhr'), 'Dhuhr');
     });
 
-    test('Turkish reminders name the prayer, not the time', () {
-      expect(tr.prayerSalah('fajr'), 'Sabah namazı');
-      expect(tr.reminderBody, 'Cemaate 5 dakika kaldı');
-    });
-
     test('after a prayer', () {
       expect(tr.afterPrayer('maghrib'), 'Akşam namazından sonra');
       expect(fr.afterPrayerTitle('asr'), "Après la prière de l'Asr");

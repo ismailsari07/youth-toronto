@@ -35,20 +35,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String prayerSalah(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Fajr',
-      'sunrise': 'Sunrise',
-      'dhuhr': 'Dhuhr',
-      'asr': 'Asr',
-      'maghrib': 'Maghrib',
-      'isha': 'Isha',
-      'other': '$prayer',
-    });
-    return '$_temp0';
-  }
-
-  @override
   String afterPrayer(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'After Fajr',
@@ -139,7 +125,77 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prayerReminders => 'Prayer reminders';
 
   @override
-  String get prayerRemindersDetail => '5 minutes before each iqamah';
+  String get prayerNotifications => 'Prayer notifications';
+
+  @override
+  String get remindersPrayers => 'Prayers';
+
+  @override
+  String get remindersNotifyMe => 'Notify me';
+
+  @override
+  String get notifyAtAthan => 'At athan time';
+
+  @override
+  String get notifyBeforeIqamah => '5 minutes before iqamah';
+
+  @override
+  String get notificationSound => 'Notification sound';
+
+  @override
+  String get soundAthan => 'Athan';
+
+  @override
+  String get soundStandard => 'Standard notification sound';
+
+  @override
+  String get soundSilent => 'Silent';
+
+  @override
+  String get playSound => 'Play';
+
+  @override
+  String get stopSound => 'Stop';
+
+  @override
+  String get remindersSummaryOff => 'Off';
+
+  @override
+  String get remindersSummaryAthan => 'On · At athan time';
+
+  @override
+  String get remindersSummaryIqamah => 'On · 5 min before iqamah';
+
+  @override
+  String reminderAthanBody(String prayer) {
+    String _temp0 = intl.Intl.selectLogic(prayer, {
+      'fajr': 'It\'s time for Fajr prayer',
+      'dhuhr': 'It\'s time for Dhuhr prayer',
+      'asr': 'It\'s time for Asr prayer',
+      'maghrib': 'It\'s time for Maghrib prayer',
+      'isha': 'It\'s time for Isha prayer',
+      'other': 'It\'s time for $prayer prayer',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String reminderIqamahAt(String time) {
+    return 'Iqamah at $time';
+  }
+
+  @override
+  String reminderIqamahSoon(String prayer) {
+    String _temp0 = intl.Intl.selectLogic(prayer, {
+      'fajr': 'Fajr iqamah in 5 minutes',
+      'dhuhr': 'Dhuhr iqamah in 5 minutes',
+      'asr': 'Asr iqamah in 5 minutes',
+      'maghrib': 'Maghrib iqamah in 5 minutes',
+      'isha': 'Isha iqamah in 5 minutes',
+      'other': '$prayer iqamah in 5 minutes',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get remindersDeniedNote =>
@@ -147,9 +203,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openSettings => 'Open Settings';
-
-  @override
-  String get reminderBody => 'Iqamah in 5 minutes';
 
   @override
   String get timesUnavailable => 'Times unavailable';

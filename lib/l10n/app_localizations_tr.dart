@@ -35,20 +35,6 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String prayerSalah(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Sabah namazı',
-      'sunrise': 'Güneş',
-      'dhuhr': 'Öğle namazı',
-      'asr': 'İkindi namazı',
-      'maghrib': 'Akşam namazı',
-      'isha': 'Yatsı namazı',
-      'other': '$prayer',
-    });
-    return '$_temp0';
-  }
-
-  @override
   String afterPrayer(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'Sabah namazından sonra',
@@ -139,7 +125,77 @@ class AppLocalizationsTr extends AppLocalizations {
   String get prayerReminders => 'Namaz hatırlatıcıları';
 
   @override
-  String get prayerRemindersDetail => 'Her cemaat vaktinden 5 dakika önce';
+  String get prayerNotifications => 'Namaz bildirimleri';
+
+  @override
+  String get remindersPrayers => 'Vakitler';
+
+  @override
+  String get remindersNotifyMe => 'Bildirim zamanı';
+
+  @override
+  String get notifyAtAthan => 'Ezan vaktinde';
+
+  @override
+  String get notifyBeforeIqamah => 'Cemaatten 5 dakika önce';
+
+  @override
+  String get notificationSound => 'Bildirim sesi';
+
+  @override
+  String get soundAthan => 'Ezan';
+
+  @override
+  String get soundStandard => 'Standart bildirim sesi';
+
+  @override
+  String get soundSilent => 'Sessiz';
+
+  @override
+  String get playSound => 'Dinle';
+
+  @override
+  String get stopSound => 'Durdur';
+
+  @override
+  String get remindersSummaryOff => 'Kapalı';
+
+  @override
+  String get remindersSummaryAthan => 'Açık · Ezan vaktinde';
+
+  @override
+  String get remindersSummaryIqamah => 'Açık · Cemaatten 5 dk önce';
+
+  @override
+  String reminderAthanBody(String prayer) {
+    String _temp0 = intl.Intl.selectLogic(prayer, {
+      'fajr': 'Sabah namazı vakti girdi',
+      'dhuhr': 'Öğle namazı vakti girdi',
+      'asr': 'İkindi namazı vakti girdi',
+      'maghrib': 'Akşam namazı vakti girdi',
+      'isha': 'Yatsı namazı vakti girdi',
+      'other': '$prayer vakti girdi',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String reminderIqamahAt(String time) {
+    return 'Cemaat $time';
+  }
+
+  @override
+  String reminderIqamahSoon(String prayer) {
+    String _temp0 = intl.Intl.selectLogic(prayer, {
+      'fajr': 'Sabah namazı cemaatine 5 dakika kaldı',
+      'dhuhr': 'Öğle cemaatine 5 dakika kaldı',
+      'asr': 'İkindi cemaatine 5 dakika kaldı',
+      'maghrib': 'Akşam cemaatine 5 dakika kaldı',
+      'isha': 'Yatsı cemaatine 5 dakika kaldı',
+      'other': '$prayer cemaatine 5 dakika kaldı',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get remindersDeniedNote =>
@@ -147,9 +203,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get openSettings => 'Ayarları Aç';
-
-  @override
-  String get reminderBody => 'Cemaate 5 dakika kaldı';
 
   @override
   String get timesUnavailable => 'Vakitler alınamadı';

@@ -168,9 +168,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get tryAgain => 'Tekrar dene';
 
   @override
-  String get jumuahThisFriday => 'Cuma namazı · bu Cuma';
-
-  @override
   String get jumuahEveryFriday => 'Her Cuma camide';
 
   @override

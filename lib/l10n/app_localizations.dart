@@ -292,12 +292,6 @@ abstract class AppLocalizations {
   /// **'Try again'**
   String get tryAgain;
 
-  /// No description provided for @jumuahThisFriday.
-  ///
-  /// In en, this message translates to:
-  /// **'Jumu\'ah · this Friday'**
-  String get jumuahThisFriday;
-
   /// No description provided for @jumuahEveryFriday.
   ///
   /// In en, this message translates to:

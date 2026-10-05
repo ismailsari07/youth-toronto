@@ -363,7 +363,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     }
     final jumaa = payload?.jumaaPrayerTime;
     return _goldCard(
-      title: l.jumuahThisFriday,
+      title: l.jumuah,
       // Only what the data actually carries: there is no khutbah time in
       // prayer_cache, so none is shown.
       subtitle: jumaa == null

@@ -158,7 +158,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     }
     return HeroRow(
       icon: AppIcons.mosque,
-      title: l.jumuahThisFriday,
+      title: l.jumuah,
       subtitle: jumaa == null
           ? l.everyFriday
           : l.salahAt(prayerClock12('Dhuhr', jumaa)),

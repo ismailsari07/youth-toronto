@@ -168,9 +168,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tryAgain => 'Try again';
 
   @override
-  String get jumuahThisFriday => 'Jumu\'ah · this Friday';
-
-  @override
   String get jumuahEveryFriday => 'Every Friday at the mosque';
 
   @override

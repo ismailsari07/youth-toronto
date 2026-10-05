@@ -32,7 +32,6 @@
   "timesUnavailableTitle": "Les horaires du jour sont indisponibles",
   "timesUnavailableBody": "Le calendrier de la mosquée est inaccessible. Les rappels déjà programmés sur cet appareil restent actifs.",
   "tryAgain": "Réessayer",
-  "jumuahThisFriday": "Prière du vendredi · ce vendredi",
   "jumuahEveryFriday": "Chaque vendredi à la mosquée",
   "everyFriday": "Chaque vendredi",
   "salahAt": "Prière à {time}",

@@ -32,7 +32,6 @@
   "timesUnavailableTitle": "Bugünün vakitleri alınamadı",
   "timesUnavailableBody": "Caminin takvimine ulaşılamadı. Bu cihazda daha önce kurulan hatırlatıcılar çalışmaya devam eder.",
   "tryAgain": "Tekrar dene",
-  "jumuahThisFriday": "Cuma namazı · bu Cuma",
   "jumuahEveryFriday": "Her Cuma camide",
   "everyFriday": "Her Cuma",
   "salahAt": "Namaz {time}",

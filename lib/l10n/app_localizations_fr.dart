@@ -168,9 +168,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tryAgain => 'Réessayer';
 
   @override
-  String get jumuahThisFriday => 'Prière du vendredi · ce vendredi';
-
-  @override
   String get jumuahEveryFriday => 'Chaque vendredi à la mosquée';
 
   @override

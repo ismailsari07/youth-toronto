@@ -13,6 +13,7 @@ import '../features/marriage/screens/marriage_status_screen.dart';
 import '../features/marriage/screens/marriage_upload_screen.dart';
 import '../features/marriage/screens/marriage_viewer_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
+import '../features/profile/screens/burial_services_screen.dart';
 import '../features/profile/screens/delete_account_screen.dart';
 import '../features/profile/screens/mosque_info_screen.dart';
 import '../features/profile/screens/profile_root_screen.dart';
@@ -114,6 +115,11 @@ final router = GoRouter(
                   path: 'mosque',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const MosqueInfoScreen(),
+                ),
+                GoRoute(
+                  path: 'burial',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const BurialServicesScreen(),
                 ),
                 // Marriage service (spec §8a). Paths match MarriageRoutes.
                 GoRoute(

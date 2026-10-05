@@ -759,6 +759,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get marriageServiceRow => 'Mise en relation confidentielle';
 
   @override
+  String get burialServices => 'Services funéraires';
+
+  @override
+  String get burialServicesRow => 'Funérailles et inhumation';
+
+  @override
+  String get burialEyebrow => 'SERVICES DE LA MOSQUÉE';
+
+  @override
+  String get burialIntro =>
+      'Nos administrateurs ci-dessous accompagnent notre communauté dans toutes les démarches liées aux funérailles et à l\'inhumation. Tous les services sont assurés dans le respect des sensibilités religieuses.';
+
+  @override
+  String get burialCemetery => 'Cimetière';
+
+  @override
+  String get burialCemeteryHistory =>
+      'En mai 1993, le Canadian Turkish Islamic Trust a acquis 200 concessions au cimetière Pine Ridge Memorial Gardens, à Ajax (Ontario). Avec 120 concessions de plus acquises en septembre 2004, le total est passé à 320. Avec les concessions acquises par d\'autres communautés autour des nôtres, un cimetière musulman d\'environ 10 000 sépultures s\'est formé.';
+
+  @override
+  String get burialContacts => 'Personnes à contacter';
+
+  @override
   String get marriageEyebrow => 'SERVICE DU MARIAGE';
 
   @override

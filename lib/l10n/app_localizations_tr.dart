@@ -754,6 +754,29 @@ class AppLocalizationsTr extends AppLocalizations {
   String get marriageServiceRow => 'Gizlilik içinde aracılık';
 
   @override
+  String get burialServices => 'Defin Hizmetleri';
+
+  @override
+  String get burialServicesRow => 'Cenaze ve defin işlemleri';
+
+  @override
+  String get burialEyebrow => 'CAMİ HİZMETLERİ';
+
+  @override
+  String get burialIntro =>
+      'Cenaze ve defin işlemlerinde, aşağıda belirtilen yöneticilerimiz toplumumuza her konuda destek sağlamaktadır. Tüm hizmetler, dini hassasiyetler gözetilerek yerine getirilmektedir.';
+
+  @override
+  String get burialCemetery => 'Mezarlık';
+
+  @override
+  String get burialCemeteryHistory =>
+      'Kanada Türk İslam Vakfı Mayıs 1993\'de Pine Ridge Memorial Gardens\'ın Ajax, Ontario mezarlığından 200 adet mezar yeri aldı. Eylül 2004\'te alınan 120 mezar ile sayı 320 oldu. Mezarlığımızın etrafında diğer cemaatlerin aldıkları mezarlarla takriben 10,000 kişilik bir müslüman mezarlığı oluştu.';
+
+  @override
+  String get burialContacts => 'İrtibat';
+
+  @override
   String get marriageEyebrow => 'EVLİLİK HİZMETİ';
 
   @override

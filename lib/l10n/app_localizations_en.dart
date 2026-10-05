@@ -756,6 +756,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marriageServiceRow => 'Confidential introductions';
 
   @override
+  String get burialServices => 'Burial services';
+
+  @override
+  String get burialServicesRow => 'Funeral and burial support';
+
+  @override
+  String get burialEyebrow => 'MOSQUE SERVICES';
+
+  @override
+  String get burialIntro =>
+      'Our administrators below support our community in every aspect of funeral and burial arrangements. All services are carried out with respect for religious sensitivities.';
+
+  @override
+  String get burialCemetery => 'Cemetery';
+
+  @override
+  String get burialCemeteryHistory =>
+      'In May 1993 the Canadian Turkish Islamic Trust acquired 200 burial plots at Pine Ridge Memorial Gardens cemetery in Ajax, Ontario; with 120 more acquired in September 2004, the total reached 320. Together with plots acquired by other communities around ours, an approximately 10,000-person Muslim cemetery has formed.';
+
+  @override
+  String get burialContacts => 'Contacts';
+
+  @override
   String get marriageEyebrow => 'MARRIAGE SERVICE';
 
   @override

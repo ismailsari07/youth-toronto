@@ -197,6 +197,19 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
                           ),
                         ],
                       ),
+                      FadeSwitch(
+                        animateSize: true,
+                        child: blocked
+                            ? Padding(
+                                key: const ValueKey('blocked'),
+                                padding: const EdgeInsets.only(top: 14),
+                                child: _BlockedNote(onOpenSettings: _openSettings),
+                              )
+                            : const SizedBox(
+                                key: ValueKey('ok'),
+                                width: double.infinity,
+                              ),
+                      ),
                       const SizedBox(height: AppSpace.cardGapWide),
                       _Section(
                         title: l.remindersPrayers,
@@ -272,19 +285,6 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
                               )
                             : const SizedBox(
                                 key: ValueKey('no-sound'),
-                                width: double.infinity,
-                              ),
-                      ),
-                      FadeSwitch(
-                        animateSize: true,
-                        child: blocked
-                            ? Padding(
-                                key: const ValueKey('blocked'),
-                                padding: const EdgeInsets.only(top: AppSpace.cardGapWide),
-                                child: _BlockedNote(onOpenSettings: _openSettings),
-                              )
-                            : const SizedBox(
-                                key: ValueKey('ok'),
                                 width: double.infinity,
                               ),
                       ),

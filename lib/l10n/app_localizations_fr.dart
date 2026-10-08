@@ -1103,23 +1103,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openingHours => 'Heures d\'ouverture';
 
   @override
-  String get dailyPrayers => 'Prières quotidiennes';
-
-  @override
-  String get dailyPrayersBody =>
-      'Ouverte pour chaque prière, du Fajr à l\'Icha';
-
-  @override
   String get jumuah => 'Prière du vendredi';
-
-  @override
-  String get fridays => 'Le vendredi';
-
-  @override
-  String get office => 'Bureau';
-
-  @override
-  String get callForHours => 'Appelez pour connaître les horaires';
 
   @override
   String get getInTouch => 'Nous joindre';

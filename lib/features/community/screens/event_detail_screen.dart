@@ -4,9 +4,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/event_schedule.dart';
-import '../../../core/mosque_info.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -36,11 +36,11 @@ class EventDetailScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _share(AppLocalizations l) async {
+  Future<void> _share(AppLocalizations l, WidgetRef ref) async {
     try {
       await SharePlus.instance.share(
         ShareParams(
-          text: eventShareText(l, upcoming),
+          text: eventShareText(l, upcoming, ref.read(contentProvider)),
           subject: upcoming.event.title,
         ),
       );
@@ -125,6 +125,7 @@ class EventDetailScreen extends ConsumerWidget {
     final registration = event.registrationUri;
     final description = event.description;
     final location = event.location;
+    final mosque = ref.watch(contentProvider.select((c) => c.mosque));
     final l = context.l10n;
 
     return Scaffold(
@@ -167,9 +168,9 @@ class EventDetailScreen extends ConsumerWidget {
                         divided: true,
                         icon: AppIcons.pin,
                         title: location,
-                        subtitle: MosqueInfo.addressLine,
+                        subtitle: mosque.addressLine,
                         trailing: Pressable(
-                          onTap: () => _open(MosqueInfo.mapsUri),
+                          onTap: () => _open(mosque.mapsUri),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 10,
@@ -224,14 +225,14 @@ class EventDetailScreen extends ConsumerWidget {
                       title: l.questions,
                       subtitle: l.callTheOffice,
                       trailing: const RowChevron(),
-                      onTap: () => _open(MosqueInfo.phoneUri),
+                      onTap: () => _open(mosque.phoneUri),
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.share,
                       title: l.shareThisEvent,
                       trailing: const RowChevron(),
-                      onTap: () => _share(l),
+                      onTap: () => _share(l, ref),
                     ),
                   ],
                 ),

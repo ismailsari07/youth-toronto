@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/mosque_info.dart';
+import '../../../core/content/content_bundle.dart';
 import '../../../l10n/l10n.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -13,7 +15,7 @@ import '../../../ui/components/app_scaffolding.dart';
 
 /// Spec §7.14. The map band uses the placeholder illustration until a real
 /// map SDK is wired up; the pin marker and geometry are already in place.
-class MosqueInfoScreen extends StatelessWidget {
+class MosqueInfoScreen extends ConsumerWidget {
   const MosqueInfoScreen({super.key});
 
   Future<void> _open(String url) async {
@@ -25,8 +27,11 @@ class MosqueInfoScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
+    final mosque = ref.watch(contentProvider.select((c) => c.mosque));
+    final secondary = mosque.nameSecondary;
+    final website = mosque.website;
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
@@ -54,21 +59,23 @@ class MosqueInfoScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              MosqueInfo.name,
+                              mosque.name,
                               style: AppText.cardTitle.c(AppColor.ink),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              MosqueInfo.nameSecondary,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ).c(AppColor.ink3),
-                            ),
+                            if (secondary != null) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                secondary,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ).c(AppColor.ink3),
+                              ),
+                            ],
                             const SizedBox(height: 8),
                             Text(
-                              '${MosqueInfo.street}\n'
-                              '${MosqueInfo.city} ${MosqueInfo.postalCode}',
+                              '${mosque.street}\n'
+                              '${mosque.city} ${mosque.postalCode}',
                               style: const TextStyle(
                                 fontSize: 13.5,
                                 height: 1.45,
@@ -82,7 +89,7 @@ class MosqueInfoScreen extends StatelessWidget {
                                     label: l.directions,
                                     height: 46,
                                     icon: AppIcons.navigate,
-                                    onTap: () => _open(MosqueInfo.mapsUri),
+                                    onTap: () => _open(mosque.mapsUri),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -91,7 +98,7 @@ class MosqueInfoScreen extends StatelessWidget {
                                     label: l.call,
                                     height: 46,
                                     icon: AppIcons.phone,
-                                    onTap: () => _open(MosqueInfo.phoneUri),
+                                    onTap: () => _open(mosque.phoneUri),
                                   ),
                                 ),
                               ],
@@ -102,30 +109,22 @@ class MosqueInfoScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: AppSpace.cardGapWide),
-                SectionHeader(title: l.openingHours),
-                const SizedBox(height: AppSpace.sectionHeaderGap),
-                GroupedRows(
-                  rows: [
-                    AppListRow(
-                      icon: AppIcons.clock,
-                      title: l.dailyPrayers,
-                      subtitle: l.dailyPrayersBody,
-                    ),
-                    AppListRow(
-                      divided: true,
-                      icon: AppIcons.mosque,
-                      title: l.jumuah,
-                      subtitle: l.fridays,
-                    ),
-                    AppListRow(
-                      divided: true,
-                      icon: AppIcons.person,
-                      title: l.office,
-                      subtitle: l.callForHours,
-                    ),
-                  ],
-                ),
+                if (mosque.hours.isNotEmpty) ...[
+                  const SizedBox(height: AppSpace.cardGapWide),
+                  SectionHeader(title: l.openingHours),
+                  const SizedBox(height: AppSpace.sectionHeaderGap),
+                  GroupedRows(
+                    rows: [
+                      for (final (i, h) in mosque.hours.indexed)
+                        AppListRow(
+                          divided: i > 0,
+                          icon: _hoursIcon(i),
+                          title: h.label.resolve(l.localeName),
+                          subtitle: h.value.resolve(l.localeName),
+                        ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: AppSpace.cardGapWide),
                 SectionHeader(title: l.getInTouch),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
@@ -133,27 +132,28 @@ class MosqueInfoScreen extends StatelessWidget {
                   rows: [
                     AppListRow(
                       icon: AppIcons.phone,
-                      title: MosqueInfo.phone,
+                      title: mosque.phone,
                       subtitle: l.phone,
                       trailing: const RowChevron(),
-                      onTap: () => _open(MosqueInfo.phoneUri),
+                      onTap: () => _open(mosque.phoneUri),
                     ),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.mail,
-                      title: MosqueInfo.email,
+                      title: mosque.email,
                       subtitle: l.email,
                       trailing: const RowChevron(),
-                      onTap: () => _open('mailto:${MosqueInfo.email}'),
+                      onTap: () => _open('mailto:${mosque.email}'),
                     ),
-                    AppListRow(
-                      divided: true,
-                      icon: AppIcons.globe,
-                      title: MosqueInfo.website,
-                      subtitle: l.website,
-                      trailing: const RowChevron(),
-                      onTap: () => _open(MosqueInfo.websiteUri),
-                    ),
+                    if (website != null)
+                      AppListRow(
+                        divided: true,
+                        icon: AppIcons.globe,
+                        title: urlLabel(website),
+                        subtitle: l.website,
+                        trailing: const RowChevron(),
+                        onTap: () => _open(website),
+                      ),
                   ],
                 ),
               ],
@@ -163,6 +163,14 @@ class MosqueInfoScreen extends StatelessWidget {
       ),
     );
   }
+
+  /// The rows keep the icons they had when the hours were built in: prayers,
+  /// Jumu'ah, the office; any further row gets the clock.
+  static String _hoursIcon(int index) => switch (index) {
+        1 => AppIcons.mosque,
+        2 => AppIcons.person,
+        _ => AppIcons.clock,
+      };
 
   Widget _mapBand() {
     return SizedBox(

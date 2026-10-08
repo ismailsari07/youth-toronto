@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 
 import '../core/event_schedule.dart';
 import '../core/models.dart';
-import '../core/mosque_info.dart';
+import '../core/content/content_bundle.dart';
 import '../core/mosque_time.dart';
 import '../l10n/l10n.dart';
 
@@ -250,10 +250,16 @@ String nextSessionLine(AppLocalizations l, UpcomingEvent u) {
 }
 
 /// Share text for an event: title, when, place, registration link, then a
-/// line saying where it came from.
-String eventShareText(AppLocalizations l, UpcomingEvent u) {
+/// line saying where it came from and, once the app is released, its App
+/// Store link.
+String eventShareText(
+  AppLocalizations l,
+  UpcomingEvent u,
+  ContentBundle content,
+) {
   final e = u.event;
   final location = e.location?.trim();
+  final website = content.links.website ?? content.mosque.website;
   return [
     e.title,
     e.repeats.isRecurring
@@ -262,7 +268,7 @@ String eventShareText(AppLocalizations l, UpcomingEvent u) {
     if (location != null && location.isNotEmpty) location,
     if (e.registrationUri != null) l.registerAt('${e.registrationUri}'),
     '',
-    l.sharedFromApp(MosqueInfo.website),
-    if (MosqueInfo.appStoreUrl.isNotEmpty) MosqueInfo.appStoreUrl,
+    if (website != null) l.sharedFromApp(urlLabel(website)),
+    if (content.links.appStore != null) content.links.appStore!,
   ].join('\n');
 }

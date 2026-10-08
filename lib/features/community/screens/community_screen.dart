@@ -9,6 +9,7 @@ import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/events_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../shared/providers/unread_provider.dart';
@@ -202,7 +203,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     try {
       await SharePlus.instance.share(
         ShareParams(
-          text: eventShareText(context.l10n, u),
+          text: eventShareText(context.l10n, u, ref.read(contentProvider)),
           subject: u.event.title,
         ),
       );

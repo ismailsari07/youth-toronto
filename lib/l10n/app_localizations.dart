@@ -1846,41 +1846,11 @@ abstract class AppLocalizations {
   /// **'Opening hours'**
   String get openingHours;
 
-  /// No description provided for @dailyPrayers.
-  ///
-  /// In en, this message translates to:
-  /// **'Daily prayers'**
-  String get dailyPrayers;
-
-  /// No description provided for @dailyPrayersBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Open for every prayer, Fajr through Isha'**
-  String get dailyPrayersBody;
-
   /// No description provided for @jumuah.
   ///
   /// In en, this message translates to:
   /// **'Jumu\'ah'**
   String get jumuah;
-
-  /// No description provided for @fridays.
-  ///
-  /// In en, this message translates to:
-  /// **'Fridays'**
-  String get fridays;
-
-  /// No description provided for @office.
-  ///
-  /// In en, this message translates to:
-  /// **'Office'**
-  String get office;
-
-  /// No description provided for @callForHours.
-  ///
-  /// In en, this message translates to:
-  /// **'Call for current hours'**
-  String get callForHours;
 
   /// No description provided for @getInTouch.
   ///

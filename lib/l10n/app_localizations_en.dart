@@ -1095,22 +1095,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openingHours => 'Opening hours';
 
   @override
-  String get dailyPrayers => 'Daily prayers';
-
-  @override
-  String get dailyPrayersBody => 'Open for every prayer, Fajr through Isha';
-
-  @override
   String get jumuah => 'Jumu\'ah';
-
-  @override
-  String get fridays => 'Fridays';
-
-  @override
-  String get office => 'Office';
-
-  @override
-  String get callForHours => 'Call for current hours';
 
   @override
   String get getInTouch => 'Get in touch';

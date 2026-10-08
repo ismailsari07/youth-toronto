@@ -4,12 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models.dart';
-import '../../../core/mosque_info.dart';
 import '../../../core/mosque_time.dart';
 import '../../../core/prayer_utils.dart';
 import '../../../core/prayer_widget_sync.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -460,6 +460,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   /// Spec §7.1 step 8.
   Widget _mosqueCard() {
     final l = context.l10n;
+    final mosque = ref.watch(contentProvider.select((c) => c.mosque));
     return AppCard(
       radius: AppRadius.listCard,
       grouped: true,
@@ -467,8 +468,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         children: [
           AppListRow(
             icon: AppIcons.pin,
-            title: MosqueInfo.name,
-            subtitle: '${MosqueInfo.street}, ${l.city}',
+            title: mosque.name,
+            subtitle: '${mosque.street}, ${mosque.city}',
             trailing: const RowChevron(),
             onTap: () => context.push('/profile/mosque'),
           ),
@@ -480,7 +481,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: GhostButton(
                     label: l.directions,
                     icon: AppIcons.navigate,
-                    onTap: () => _open(MosqueInfo.mapsUri),
+                    onTap: () => _open(mosque.mapsUri),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -488,7 +489,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: GhostButton(
                     label: l.callOffice,
                     icon: AppIcons.phone,
-                    onTap: () => _open(MosqueInfo.phoneUri),
+                    onTap: () => _open(mosque.phoneUri),
                   ),
                 ),
               ],

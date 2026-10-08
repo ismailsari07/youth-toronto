@@ -573,12 +573,7 @@
   "withdrawn": "Your application has been withdrawn.",
   "theMosque": "THE MOSQUE",
   "openingHours": "Opening hours",
-  "dailyPrayers": "Daily prayers",
-  "dailyPrayersBody": "Open for every prayer, Fajr through Isha",
   "jumuah": "Jumu'ah",
-  "fridays": "Fridays",
-  "office": "Office",
-  "callForHours": "Call for current hours",
   "getInTouch": "Get in touch",
   "sizeMegabytes": "{size} MB",
   "@sizeMegabytes": {

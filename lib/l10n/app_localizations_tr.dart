@@ -1092,23 +1092,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get openingHours => 'Açık olduğu saatler';
 
   @override
-  String get dailyPrayers => 'Vakit namazları';
-
-  @override
-  String get dailyPrayersBody =>
-      'Sabah namazından yatsıya kadar her vakit açık';
-
-  @override
   String get jumuah => 'Cuma namazı';
-
-  @override
-  String get fridays => 'Cuma günleri';
-
-  @override
-  String get office => 'Ofis';
-
-  @override
-  String get callForHours => 'Güncel saatler için arayın';
 
   @override
   String get getInTouch => 'İletişim';

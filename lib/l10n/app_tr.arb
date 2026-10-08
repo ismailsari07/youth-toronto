@@ -291,12 +291,7 @@
   "withdrawn": "Başvurunuz geri çekildi.",
   "theMosque": "CAMİ",
   "openingHours": "Açık olduğu saatler",
-  "dailyPrayers": "Vakit namazları",
-  "dailyPrayersBody": "Sabah namazından yatsıya kadar her vakit açık",
   "jumuah": "Cuma namazı",
-  "fridays": "Cuma günleri",
-  "office": "Ofis",
-  "callForHours": "Güncel saatler için arayın",
   "getInTouch": "İletişim",
   "sizeMegabytes": "{size} MB",
   "sizeKilobytes": "{size} KB"

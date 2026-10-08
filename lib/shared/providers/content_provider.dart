@@ -50,3 +50,14 @@ class ContentNotifier extends Notifier<ContentBundle> {
     }
   }
 }
+
+/// This build's version (`1.0.1`), read in main(); null if it couldn't be
+/// read, and then the update screen never shows.
+final appVersionProvider = Provider<String?>((ref) => null);
+
+/// True when the panel's minimum supported version is above this build's.
+/// See [ContentBundle.requiresUpdate] for when it never blocks.
+final updateRequiredProvider = Provider<bool>((ref) {
+  final version = ref.watch(appVersionProvider);
+  return version != null && ref.watch(contentProvider).requiresUpdate(version);
+});

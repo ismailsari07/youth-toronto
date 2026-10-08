@@ -631,6 +631,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutThisApp => 'À propos de l\'application';
 
   @override
+  String get updateRequiredTitle => 'Mise à jour requise';
+
+  @override
+  String get updateRequiredBody =>
+      'Cette version de l\'application n\'est plus prise en charge. Mettez-la à jour pour continuer à l\'utiliser.';
+
+  @override
+  String get openAppStore => 'Ouvrir l\'App Store';
+
+  @override
   String versionLabel(String version) {
     return 'Version $version';
   }

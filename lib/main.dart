@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'core/content/content_repository.dart';
 import 'core/mosque_time.dart';
@@ -10,6 +11,7 @@ import 'core/prayer_service.dart';
 import 'core/prayer_widget_sync.dart';
 import 'core/reminder_sync.dart';
 import 'core/router.dart';
+import 'features/update/screens/update_required_screen.dart';
 import 'l10n/l10n.dart';
 import 'l10n/locale_provider.dart';
 import 'shared/providers/content_provider.dart';
@@ -41,11 +43,18 @@ void main() async {
   // The last good content bundle, else the one shipped in the app. Local
   // only; the network fetch runs after the first frame.
   final content = await ContentRepository.loadLocal();
+  String? appVersion;
+  try {
+    appVersion = (await PackageInfo.fromPlatform()).version;
+  } catch (_) {
+    // Unknown version: the update screen never shows.
+  }
   runApp(
     ProviderScope(
       overrides: [
         savedLocaleProvider.overrideWithValue(savedLocale),
         initialContentProvider.overrideWithValue(content),
+        appVersionProvider.overrideWithValue(appVersion),
       ],
       child: const MytApp(),
     ),
@@ -128,6 +137,11 @@ class _MytAppState extends ConsumerState<MytApp> {
           resolveAppLocale(null, device ?? const []),
       theme: appTheme,
       routerConfig: router,
+      // Below the panel's minimum version (and only then) the update screen
+      // replaces the whole app; nothing else is reachable.
+      builder: (context, child) => ref.watch(updateRequiredProvider)
+          ? const UpdateRequiredScreen()
+          : child!,
       debugShowCheckedModeBanner: false,
     );
   }

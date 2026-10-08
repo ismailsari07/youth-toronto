@@ -630,6 +630,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get aboutThisApp => 'Uygulama hakkında';
 
   @override
+  String get updateRequiredTitle => 'Güncelleme gerekli';
+
+  @override
+  String get updateRequiredBody =>
+      'Uygulamanın bu sürümü artık desteklenmiyor. Kullanmaya devam etmek için en son sürüme güncelleyin.';
+
+  @override
+  String get openAppStore => 'App Store\'u aç';
+
+  @override
   String versionLabel(String version) {
     return 'Sürüm $version';
   }

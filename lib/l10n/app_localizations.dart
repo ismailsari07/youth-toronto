@@ -1006,6 +1006,24 @@ abstract class AppLocalizations {
   /// **'About this app'**
   String get aboutThisApp;
 
+  /// Blocking screen when the app is older than the panel's minimum supported version.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This version of the app is no longer supported. Update to the latest version to keep using it.'**
+  String get updateRequiredBody;
+
+  /// No description provided for @openAppStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the App Store'**
+  String get openAppStore;
+
   /// No description provided for @versionLabel.
   ///
   /// In en, this message translates to:

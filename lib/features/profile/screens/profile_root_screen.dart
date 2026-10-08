@@ -39,6 +39,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     final user = ref.watch(currentUserProvider);
     final profile = ref.watch(userProfileProvider).valueOrNull;
     final services = ref.watch(contentProvider).visibleServices;
+    final version = ref.watch(appVersionProvider);
     final l = context.l10n;
 
     return RefreshableList(
@@ -161,7 +162,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
                 divided: true,
                 icon: AppIcons.info,
                 title: l.aboutThisApp,
-                subtitle: l.versionLabel('1.0'),
+                subtitle: version == null ? null : l.versionLabel(version),
                 trailing: const RowChevron(),
               ),
             ],

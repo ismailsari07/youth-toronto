@@ -631,6 +631,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutThisApp => 'About this app';
 
   @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredBody =>
+      'This version of the app is no longer supported. Update to the latest version to keep using it.';
+
+  @override
+  String get openAppStore => 'Open the App Store';
+
+  @override
   String versionLabel(String version) {
     return 'Version $version';
   }

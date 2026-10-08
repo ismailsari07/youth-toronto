@@ -17,9 +17,11 @@ import '../features/profile/screens/burial_services_screen.dart';
 import '../features/profile/screens/delete_account_screen.dart';
 import '../features/profile/screens/mosque_info_screen.dart';
 import '../features/profile/screens/profile_root_screen.dart';
+import '../features/profile/screens/service_detail_screen.dart';
 import '../features/profile/screens/settings_screen.dart';
 import '../features/profile/screens/sign_in_screen.dart';
 import '../features/profile/screens/sign_up_screen.dart';
+import 'content/content_bundle.dart';
 import 'event_schedule.dart';
 import 'models.dart';
 
@@ -120,6 +122,12 @@ final router = GoRouter(
                   path: 'burial',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const BurialServicesScreen(),
+                ),
+                GoRoute(
+                  path: 'service',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) =>
+                      ServiceDetailScreen(service: state.extra! as Service),
                 ),
                 // Marriage service (spec §8a). Paths match MarriageRoutes.
                 GoRoute(

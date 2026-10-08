@@ -1312,29 +1312,11 @@ abstract class AppLocalizations {
   /// **'Mosque services'**
   String get mosqueServices;
 
-  /// No description provided for @marriageService.
-  ///
-  /// In en, this message translates to:
-  /// **'Marriage service'**
-  String get marriageService;
-
-  /// No description provided for @marriageServiceRow.
-  ///
-  /// In en, this message translates to:
-  /// **'Confidential introductions'**
-  String get marriageServiceRow;
-
   /// No description provided for @burialServices.
   ///
   /// In en, this message translates to:
   /// **'Burial services'**
   String get burialServices;
-
-  /// No description provided for @burialServicesRow.
-  ///
-  /// In en, this message translates to:
-  /// **'Funeral and burial support'**
-  String get burialServicesRow;
 
   /// No description provided for @burialEyebrow.
   ///
@@ -1342,23 +1324,11 @@ abstract class AppLocalizations {
   /// **'MOSQUE SERVICES'**
   String get burialEyebrow;
 
-  /// No description provided for @burialIntro.
-  ///
-  /// In en, this message translates to:
-  /// **'Our administrators below support our community in every aspect of funeral and burial arrangements. All services are carried out with respect for religious sensitivities.'**
-  String get burialIntro;
-
   /// No description provided for @burialCemetery.
   ///
   /// In en, this message translates to:
   /// **'Cemetery'**
   String get burialCemetery;
-
-  /// No description provided for @burialCemeteryHistory.
-  ///
-  /// In en, this message translates to:
-  /// **'In May 1993 the Canadian Turkish Islamic Trust acquired 200 burial plots at Pine Ridge Memorial Gardens cemetery in Ajax, Ontario; with 120 more acquired in September 2004, the total reached 320. Together with plots acquired by other communities around ours, an approximately 10,000-person Muslim cemetery has formed.'**
-  String get burialCemeteryHistory;
 
   /// No description provided for @burialContacts.
   ///

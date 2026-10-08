@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/content/content_bundle.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../prayer/widgets/reminders_sheet.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -36,6 +38,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
     final profile = ref.watch(userProfileProvider).valueOrNull;
+    final services = ref.watch(contentProvider).visibleServices;
     final l = context.l10n;
 
     return RefreshableList(
@@ -83,31 +86,30 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
                   ),
           ),
         ),
-        const SizedBox(height: AppSpace.cardGapWide),
-        StaggerItem(
-          index: 1,
-          child: SectionHeader(title: l.mosqueServices),
-        ),
-        const SizedBox(height: AppSpace.sectionHeaderGap),
-        StaggerItem(
-          index: 1,
-          child: GroupedRows(
-            rows: [
-              _marriageRow(
-                l,
-                user == null ? null : ref.watch(myApplicationProvider).valueOrNull,
-              ),
-              AppListRow(
-                divided: true,
-                icon: AppIcons.users,
-                title: l.burialServices,
-                subtitle: l.burialServicesRow,
-                trailing: const RowChevron(),
-                onTap: () => context.push('/profile/burial'),
-              ),
-            ],
+        // The panel's services in its order; marriage and burial open their
+        // own screens. Hidden entirely when none is visible.
+        if (services.isNotEmpty) ...[
+          const SizedBox(height: AppSpace.cardGapWide),
+          StaggerItem(
+            index: 1,
+            child: SectionHeader(title: l.mosqueServices),
           ),
-        ),
+          const SizedBox(height: AppSpace.sectionHeaderGap),
+          StaggerItem(
+            index: 1,
+            child: GroupedRows(
+              rows: [
+                for (final (i, service) in services.indexed)
+                  _serviceRow(
+                    l,
+                    service,
+                    divided: i > 0,
+                    signedIn: user != null,
+                  ),
+              ],
+            ),
+          ),
+        ],
         if (user != null) ...[
           const SizedBox(height: AppSpace.cardGapWide),
           StaggerItem(
@@ -178,16 +180,64 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     );
   }
 
+  Widget _serviceRow(
+    AppLocalizations l,
+    Service service, {
+    required bool divided,
+    required bool signedIn,
+  }) {
+    final title = service.title.resolve(l.localeName);
+    final summary = service.summary.resolve(l.localeName);
+    final icon = AppIcons.forService(service.icon);
+    return switch (service.kind) {
+      ServiceKind.marriage => _marriageRow(
+          l,
+          signedIn ? ref.watch(myApplicationProvider).valueOrNull : null,
+          title: title,
+          summary: summary,
+          icon: icon,
+          divided: divided,
+        ),
+      ServiceKind.burial => AppListRow(
+          divided: divided,
+          icon: icon,
+          title: title,
+          subtitle: summary.isEmpty ? null : summary,
+          trailing: const RowChevron(),
+          onTap: () => context.push('/profile/burial'),
+        ),
+      ServiceKind.info => AppListRow(
+          divided: divided,
+          icon: icon,
+          title: title,
+          subtitle: summary.isEmpty ? null : summary,
+          trailing: const RowChevron(),
+          onTap: () => context.push('/profile/service', extra: service),
+        ),
+    };
+  }
+
   /// Spec §8a placement table. Signed out or not applied: the plain row.
   /// Applied: "Submitted 12 September" and the "Under review" pill. While
   /// the application loads (or if it can't), the plain row shows — tapping
   /// it still resolves the right screen.
-  Widget _marriageRow(AppLocalizations l, MarriageApplication? application) {
+  Widget _marriageRow(
+    AppLocalizations l,
+    MarriageApplication? application, {
+    required String title,
+    required String summary,
+    required String icon,
+    required bool divided,
+  }) {
     // The "Under review" state fades in once the application loads.
     return FadeSwitch(
       child: _marriageListRow(
         l,
         application,
+        title: title,
+        summary: summary,
+        icon: icon,
+        divided: divided,
         key: ValueKey(application == null),
       ),
     );
@@ -196,15 +246,20 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   Widget _marriageListRow(
     AppLocalizations l,
     MarriageApplication? application, {
+    required String title,
+    required String summary,
+    required String icon,
+    required bool divided,
     Key? key,
   }) {
     return AppListRow(
       key: key,
-      icon: AppIcons.documentLock,
-      title: l.marriageService,
-      subtitle: application == null
-          ? l.marriageServiceRow
-          : l.submittedOn(dayMonth(l, application.createdAt)),
+      divided: divided,
+      icon: icon,
+      title: title,
+      subtitle: application != null
+          ? l.submittedOn(dayMonth(l, application.createdAt))
+          : (summary.isEmpty ? null : summary),
       trailing: application == null
           ? const RowChevron()
           : const Row(

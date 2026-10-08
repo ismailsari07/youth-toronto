@@ -50,6 +50,9 @@ abstract final class AppIcons {
   static const leaf = 'leaf';
   static const book = 'book';
 
+  // The emergency banner's warning and urgent tones.
+  static const alert = 'alert';
+
   // Notification sound previews.
   static const play = 'play';
   static const stop = 'stop';

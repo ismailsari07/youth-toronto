@@ -19,6 +19,7 @@ import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/emergency_banner.dart';
 import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
@@ -54,6 +55,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     return RefreshableList(
       onRefresh: () async {
         ref.invalidate(prayerProvider);
+        // The panel's content too, so a new banner shows on a pull.
+        ref.read(contentProvider.notifier).refresh(force: true);
         await ref.read(prayerProvider.future);
         // The home-screen widget picks up any corrected times too.
         PrayerWidgetSync.sync();
@@ -64,14 +67,16 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         AppSpace.pageGutter,
         AppSpace.scrollBottomInset,
       ),
-      // The tab's entrance cascade, top to bottom: date and moon, the
-      // Community section, the times, the occasion card, the mosque card.
+      // The tab's entrance cascade, top to bottom: the emergency banner,
+      // date and moon, the Community section, the times, the occasion card,
+      // the mosque card.
       children: [
         StaggerItem(
           index: 0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const EmergencyBanner(),
               _header(payload, loading),
               const SizedBox(height: 14),
               MoonCountdownCard(prayers: payload?.dailyPrayerTimes),

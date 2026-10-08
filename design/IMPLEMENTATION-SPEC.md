@@ -163,6 +163,8 @@ Single hue, three tones. Never introduce a second colour into this gradient.
 |---|---|---|
 | danger | `#A8332A` | Delete account text and button |
 | dangerTint | `#FBEDEC` | Delete icon circle |
+| amber | `#9A4F00` | Emergency banner, "warning" tone: text and icon (5.4:1 on amberTint) |
+| amberTint | `#FFF1DE` | Emergency banner, "warning" tone: fill |
 | success | `#0E7550` | Same as green — there is no separate success hue |
 
 **On-gradient overlays** — white at alpha, never a solid colour
@@ -516,6 +518,11 @@ inset 96.
 ### 7.1 Prayer — home (tab root)
 
 Scrolls as one column.
+
+0. **Emergency banner** (only while the panel has one active): full-width card, radius
+   listCard, padding 14/16, icon 20 + text 14/600, then a 14 px gap. Tone from the
+   panel: info = blueTint/blue + `info`, warning = amberTint/amber + `alert`,
+   urgent = dangerTint/danger + `alert`. No dismiss; it ends at its `ends_at`.
 
 1. **Header row**, height 46, bottom-aligned, space-between.
    Left: eyebrow "PAPE MOSQUE" 11.5/700/+0.9 green, then date 20/700/−0.4 ink.

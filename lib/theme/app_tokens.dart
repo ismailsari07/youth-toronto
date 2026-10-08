@@ -63,6 +63,9 @@ abstract final class AppColor {
   // Status
   static const danger = Color(0xFFA8332A);
   static const dangerTint = Color(0xFFFBEDEC);
+  // Warning — the panel's "warning" banner tone only (gold stays Jumu'ah/Eid)
+  static const amber = Color(0xFF9A4F00); // 5.4:1 on amberTint
+  static const amberTint = Color(0xFFFFF1DE);
   static const success = green; // no separate success hue
 
   // Illustration placeholders

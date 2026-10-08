@@ -1092,6 +1092,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get getInTouch => 'Nous joindre';
 
   @override
+  String get linksSection => 'Liens';
+
+  @override
+  String get donation => 'Faire un don';
+
+  @override
   String sizeMegabytes(String size) {
     return '$size Mo';
   }

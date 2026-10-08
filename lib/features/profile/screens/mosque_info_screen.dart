@@ -30,6 +30,11 @@ class MosqueInfoScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
     final mosque = ref.watch(contentProvider.select((c) => c.mosque));
+    final links = _links(
+      l,
+      ref.watch(contentProvider.select((c) => c.links)),
+      mosque.website,
+    );
     final secondary = mosque.nameSecondary;
     final website = mosque.website;
     return Scaffold(
@@ -156,6 +161,24 @@ class MosqueInfoScreen extends ConsumerWidget {
                       ),
                   ],
                 ),
+                if (links.isNotEmpty) ...[
+                  const SizedBox(height: AppSpace.cardGapWide),
+                  SectionHeader(title: l.linksSection),
+                  const SizedBox(height: AppSpace.sectionHeaderGap),
+                  GroupedRows(
+                    rows: [
+                      for (final (i, link) in links.indexed)
+                        AppListRow(
+                          divided: i > 0,
+                          icon: link.icon,
+                          title: urlLabel(link.url),
+                          subtitle: link.label,
+                          trailing: const RowChevron(),
+                          onTap: () => _open(link.url),
+                        ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -163,6 +186,31 @@ class MosqueInfoScreen extends ConsumerWidget {
       ),
     );
   }
+
+  /// The panel's links that are set. The website is left out when it is
+  /// the mosque's own (same address, ignoring `www.` and a trailing slash),
+  /// already in Get in touch.
+  static List<({String icon, String label, String url})> _links(
+    AppLocalizations l,
+    Links links,
+    String? mosqueWebsite,
+  ) =>
+      [
+        if (links.website != null &&
+            (mosqueWebsite == null ||
+                urlLabel(links.website!) != urlLabel(mosqueWebsite)))
+          (icon: AppIcons.globe, label: l.website, url: links.website!),
+        if (links.donation != null)
+          (icon: AppIcons.heart, label: l.donation, url: links.donation!),
+        if (links.instagram != null)
+          (icon: AppIcons.globe, label: 'Instagram', url: links.instagram!),
+        if (links.facebook != null)
+          (icon: AppIcons.globe, label: 'Facebook', url: links.facebook!),
+        if (links.youtube != null)
+          (icon: AppIcons.globe, label: 'YouTube', url: links.youtube!),
+        if (links.whatsapp != null)
+          (icon: AppIcons.globe, label: 'WhatsApp', url: links.whatsapp!),
+      ];
 
   /// The rows keep the icons they had when the hours were built in: prayers,
   /// Jumu'ah, the office; any further row gets the clock.

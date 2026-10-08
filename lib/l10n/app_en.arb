@@ -570,6 +570,11 @@
   "openingHours": "Opening hours",
   "jumuah": "Jumu'ah",
   "getInTouch": "Get in touch",
+  "linksSection": "Links",
+  "@linksSection": {
+    "description": "Mosque & Contact: the website, donation and social links from the panel."
+  },
+  "donation": "Donate",
   "sizeMegabytes": "{size} MB",
   "@sizeMegabytes": {
     "placeholders": {

@@ -288,6 +288,8 @@
   "openingHours": "Açık olduğu saatler",
   "jumuah": "Cuma namazı",
   "getInTouch": "İletişim",
+  "linksSection": "Bağlantılar",
+  "donation": "Bağış yap",
   "sizeMegabytes": "{size} MB",
   "sizeKilobytes": "{size} KB"
 }

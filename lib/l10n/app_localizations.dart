@@ -1828,6 +1828,18 @@ abstract class AppLocalizations {
   /// **'Get in touch'**
   String get getInTouch;
 
+  /// Mosque & Contact: the website, donation and social links from the panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Links'**
+  String get linksSection;
+
+  /// No description provided for @donation.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate'**
+  String get donation;
+
   /// No description provided for @sizeMegabytes.
   ///
   /// In en, this message translates to:

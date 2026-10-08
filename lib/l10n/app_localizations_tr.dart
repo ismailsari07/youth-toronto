@@ -1081,6 +1081,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get getInTouch => 'İletişim';
 
   @override
+  String get linksSection => 'Bağlantılar';
+
+  @override
+  String get donation => 'Bağış yap';
+
+  @override
   String sizeMegabytes(String size) {
     return '$size MB';
   }

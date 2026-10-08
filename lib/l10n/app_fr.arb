@@ -288,6 +288,8 @@
   "openingHours": "Heures d'ouverture",
   "jumuah": "Prière du vendredi",
   "getInTouch": "Nous joindre",
+  "linksSection": "Liens",
+  "donation": "Faire un don",
   "sizeMegabytes": "{size} Mo",
   "sizeKilobytes": "{size} Ko"
 }

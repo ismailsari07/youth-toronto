@@ -1,0 +1,141 @@
+{
+  "contacts": [
+    {
+      "email": null,
+      "group": "burial",
+      "id": "9993df3a-8c4d-4dc1-a281-496a87e98f0f",
+      "name": "Fatih Sirinogullari",
+      "phone": "437 995 9470",
+      "position": {
+        "en": "Funeral and burial",
+        "fr": "Funérailles et inhumation",
+        "tr": "Cenaze ve defin"
+      }
+    },
+    {
+      "email": null,
+      "group": "burial",
+      "id": "6568cac2-038f-4c97-a763-f7789288a6fe",
+      "name": "Ahmet Er",
+      "phone": "647 709 7219",
+      "position": {
+        "en": "Funeral and burial",
+        "fr": "Funérailles et inhumation",
+        "tr": "Cenaze ve defin"
+      }
+    }
+  ],
+  "content": {
+    "app_config": {
+      "features": {
+        "announcements": true,
+        "burial_service": true,
+        "events": true,
+        "marriage_service": true
+      },
+      "latest_build": "1.0.0",
+      "min_supported_version": "1.0.0"
+    },
+    "cemetery": {
+      "city": "Ajax, ON L1T 4T2",
+      "history": {
+        "en": "In May 1993 the Canadian Turkish Islamic Trust acquired 200 burial plots at Pine Ridge Memorial Gardens cemetery in Ajax, Ontario; with 120 more acquired in September 2004, the total reached 320. Together with plots acquired by other communities around ours, an approximately 10,000-person Muslim cemetery has formed.",
+        "fr": "En mai 1993, le Canadian Turkish Islamic Trust a acquis 200 concessions au cimetière Pine Ridge Memorial Gardens, à Ajax (Ontario). Avec 120 concessions de plus acquises en septembre 2004, le total est passé à 320. Avec les concessions acquises par d'autres communautés autour des nôtres, un cimetière musulman d'environ 10 000 sépultures s'est formé.",
+        "tr": "Kanada Türk İslam Vakfı Mayıs 1993'de Pine Ridge Memorial Gardens'ın Ajax, Ontario mezarlığından 200 adet mezar yeri aldı. Eylül 2004'te alınan 120 mezar ile sayı 320 oldu. Mezarlığımızın etrafında diğer cemaatlerin aldıkları mezarlarla takriben 10,000 kişilik bir müslüman mezarlığı oluştu."
+      },
+      "name": "Pine Ridge Memorial Gardens",
+      "street": "1757 Church St N"
+    },
+    "links": {
+      "donation": "https://papemosque.ca/donation",
+      "website": "https://papemosque.ca"
+    },
+    "mosque_info": {
+      "city": "Toronto, ON",
+      "email": "info@papecami.com",
+      "hours": [
+        {
+          "label": {
+            "en": "Daily prayers",
+            "fr": "Prières quotidiennes",
+            "tr": "Vakit namazları"
+          },
+          "value": {
+            "en": "Open for every prayer, Fajr through Isha",
+            "fr": "Ouverte pour chaque prière, du Fajr à l'Icha",
+            "tr": "Sabah namazından yatsıya kadar her vakit açık"
+          }
+        },
+        {
+          "label": {
+            "en": "Jumu'ah",
+            "fr": "Prière du vendredi",
+            "tr": "Cuma namazı"
+          },
+          "value": {
+            "en": "Fridays",
+            "fr": "Le vendredi",
+            "tr": "Cuma günleri"
+          }
+        },
+        {
+          "label": {
+            "en": "Office",
+            "fr": "Bureau",
+            "tr": "Ofis"
+          },
+          "value": {
+            "en": "Call for current hours",
+            "fr": "Appelez pour connaître les horaires",
+            "tr": "Güncel saatler için arayın"
+          }
+        }
+      ],
+      "name": "Turkish Islamic Center Canada",
+      "name_secondary": "Pape Camii · Kanada Türk İslam Vakfı",
+      "phone": "647 834 2000",
+      "postal_code": "M4M 2W7",
+      "street": "336 Pape Avenue",
+      "website": "https://papemosque.ca"
+    }
+  },
+  "services": [
+    {
+      "body": null,
+      "icon": "heart",
+      "id": "f663513e-e31f-46e6-8078-63a36e1c99cb",
+      "kind": "marriage",
+      "summary": {
+        "en": "Confidential introductions",
+        "fr": "Mise en relation confidentielle",
+        "tr": "Gizlilik içinde aracılık"
+      },
+      "title": {
+        "en": "Marriage service",
+        "fr": "Service du mariage",
+        "tr": "Evlilik Hizmeti"
+      }
+    },
+    {
+      "body": {
+        "en": "Our administrators below support our community in every aspect of funeral and burial arrangements. All services are carried out with respect for religious sensitivities.",
+        "fr": "Nos administrateurs ci-dessous accompagnent notre communauté dans toutes les démarches liées aux funérailles et à l'inhumation. Tous les services sont assurés dans le respect des sensibilités religieuses.",
+        "tr": "Cenaze ve defin işlemlerinde, aşağıda belirtilen yöneticilerimiz toplumumuza her konuda destek sağlamaktadır. Tüm hizmetler, dini hassasiyetler gözetilerek yerine getirilmektedir."
+      },
+      "icon": "leaf",
+      "id": "0233917d-4d45-4776-883d-8a1e2f4fa8d4",
+      "kind": "burial",
+      "summary": {
+        "en": "Funeral and burial support",
+        "fr": "Funérailles et inhumation",
+        "tr": "Cenaze ve defin işlemleri"
+      },
+      "title": {
+        "en": "Burial services",
+        "fr": "Services funéraires",
+        "tr": "Defin Hizmetleri"
+      }
+    }
+  ],
+  "version": "2026-10-08T20:38:30.073934+00:00"
+}

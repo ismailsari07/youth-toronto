@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/content/content_repository.dart';
 import 'core/mosque_time.dart';
 import 'core/notification_service.dart';
 import 'core/prayer_service.dart';
@@ -11,6 +12,7 @@ import 'core/reminder_sync.dart';
 import 'core/router.dart';
 import 'l10n/l10n.dart';
 import 'l10n/locale_provider.dart';
+import 'shared/providers/content_provider.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -36,9 +38,15 @@ void main() async {
     debugPrint('Notification init failed: $e');
   }
   final savedLocale = await LocaleStore.load();
+  // The last good content bundle, else the one shipped in the app. Local
+  // only; the network fetch runs after the first frame.
+  final content = await ContentRepository.loadLocal();
   runApp(
     ProviderScope(
-      overrides: [savedLocaleProvider.overrideWithValue(savedLocale)],
+      overrides: [
+        savedLocaleProvider.overrideWithValue(savedLocale),
+        initialContentProvider.overrideWithValue(content),
+      ],
       child: const MytApp(),
     ),
   );
@@ -79,8 +87,18 @@ class _MytAppState extends ConsumerState<MytApp> {
     // blocks launch) and on every resume. Fire-and-forget: neither sync
     // throws or blocks the UI, and the widget's doesn't wait on the
     // reminders' permission prompt.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _syncSchedules());
-    _lifecycle = AppLifecycleListener(onResume: _syncSchedules);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncSchedules();
+      // The panel's content: at every launch, and on resume once it's
+      // 15 minutes old. In the background; screens keep what they show.
+      ref.read(contentProvider.notifier).refresh(force: true);
+    });
+    _lifecycle = AppLifecycleListener(onResume: _onResume);
+  }
+
+  void _onResume() {
+    _syncSchedules();
+    ref.read(contentProvider.notifier).refresh();
   }
 
   void _syncSchedules() {

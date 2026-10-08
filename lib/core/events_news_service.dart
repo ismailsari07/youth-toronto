@@ -14,6 +14,10 @@ class EventsNewsService {
     final rows = await Supabase.instance.client
         .from('youth_events')
         .select()
+        // RLS already hides drafts from app users, but admins can read every
+        // event (for the admin panel); an admin signed into the app must not
+        // see drafts either.
+        .eq('is_published', true)
         .or('date_time.gte.$cutoff,recurrence.in.(weekly,biweekly,monthly)')
         .order('date_time');
     return rows.map((row) => YouthEvent.fromJson(row)).toList();

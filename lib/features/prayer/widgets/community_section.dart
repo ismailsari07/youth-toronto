@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/events_news_provider.dart';
 import '../../../shared/providers/unread_provider.dart';
 import '../../../theme/app_tokens.dart';
@@ -20,18 +21,22 @@ import '../../../ui/components/motion.dart';
 /// Carries its own top gap, so when there is nothing to show — no events
 /// and no announcements, or both failed to load — the section disappears
 /// without leaving a hole. While both are still loading a shimmer card holds
-/// the place; whatever arrives cross-fades in.
+/// the place; whatever arrives cross-fades in. The panel's toggles leave
+/// out the events or the announcements.
 class CommunitySection extends ConsumerWidget {
   const CommunitySection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final features = ref.watch(contentProvider.select((c) => c.features));
     final events = ref.watch(eventsProvider);
     final news = ref.watch(newsProvider);
-    final next = events.valueOrNull?.firstOrNull;
-    final latest = news.valueOrNull?.firstOrNull;
-    final loading = (events.isLoading && !events.hasValue) ||
-        (news.isLoading && !news.hasValue);
+    final next = features.events ? events.valueOrNull?.firstOrNull : null;
+    final latest =
+        features.announcements ? news.valueOrNull?.firstOrNull : null;
+    final loading =
+        (features.events && events.isLoading && !events.hasValue) ||
+            (features.announcements && news.isLoading && !news.hasValue);
     final l = context.l10n;
 
     final Widget content;

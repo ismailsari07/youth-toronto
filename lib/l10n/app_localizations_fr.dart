@@ -631,6 +631,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutThisApp => 'À propos de l\'application';
 
   @override
+  String get updateRequiredTitle => 'Mise à jour requise';
+
+  @override
+  String get updateRequiredBody =>
+      'Cette version de l\'application n\'est plus prise en charge. Mettez-la à jour pour continuer à l\'utiliser.';
+
+  @override
+  String get openAppStore => 'Ouvrir l\'App Store';
+
+  @override
   String versionLabel(String version) {
     return 'Version $version';
   }
@@ -806,30 +816,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mosqueServices => 'Services de la mosquée';
 
   @override
-  String get marriageService => 'Service du mariage';
-
-  @override
-  String get marriageServiceRow => 'Mise en relation confidentielle';
-
-  @override
   String get burialServices => 'Services funéraires';
-
-  @override
-  String get burialServicesRow => 'Funérailles et inhumation';
 
   @override
   String get burialEyebrow => 'SERVICES DE LA MOSQUÉE';
 
   @override
-  String get burialIntro =>
-      'Nos administrateurs ci-dessous accompagnent notre communauté dans toutes les démarches liées aux funérailles et à l\'inhumation. Tous les services sont assurés dans le respect des sensibilités religieuses.';
-
-  @override
   String get burialCemetery => 'Cimetière';
-
-  @override
-  String get burialCemeteryHistory =>
-      'En mai 1993, le Canadian Turkish Islamic Trust a acquis 200 concessions au cimetière Pine Ridge Memorial Gardens, à Ajax (Ontario). Avec 120 concessions de plus acquises en septembre 2004, le total est passé à 320. Avec les concessions acquises par d\'autres communautés autour des nôtres, un cimetière musulman d\'environ 10 000 sépultures s\'est formé.';
 
   @override
   String get burialContacts => 'Personnes à contacter';
@@ -1103,26 +1096,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openingHours => 'Heures d\'ouverture';
 
   @override
-  String get dailyPrayers => 'Prières quotidiennes';
-
-  @override
-  String get dailyPrayersBody =>
-      'Ouverte pour chaque prière, du Fajr à l\'Icha';
-
-  @override
   String get jumuah => 'Prière du vendredi';
 
   @override
-  String get fridays => 'Le vendredi';
-
-  @override
-  String get office => 'Bureau';
-
-  @override
-  String get callForHours => 'Appelez pour connaître les horaires';
-
-  @override
   String get getInTouch => 'Nous joindre';
+
+  @override
+  String get linksSection => 'Liens';
+
+  @override
+  String get donation => 'Faire un don';
 
   @override
   String sizeMegabytes(String size) {

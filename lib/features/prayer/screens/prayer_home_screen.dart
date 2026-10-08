@@ -4,12 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models.dart';
-import '../../../core/mosque_info.dart';
 import '../../../core/mosque_time.dart';
 import '../../../core/prayer_utils.dart';
 import '../../../core/prayer_widget_sync.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -19,6 +19,7 @@ import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
+import '../../../ui/components/emergency_banner.dart';
 import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
@@ -54,6 +55,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     return RefreshableList(
       onRefresh: () async {
         ref.invalidate(prayerProvider);
+        // The panel's content too, so a new banner shows on a pull.
+        ref.read(contentProvider.notifier).refresh(force: true);
         await ref.read(prayerProvider.future);
         // The home-screen widget picks up any corrected times too.
         PrayerWidgetSync.sync();
@@ -64,14 +67,16 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         AppSpace.pageGutter,
         AppSpace.scrollBottomInset,
       ),
-      // The tab's entrance cascade, top to bottom: date and moon, the
-      // Community section, the times, the occasion card, the mosque card.
+      // The tab's entrance cascade, top to bottom: the emergency banner,
+      // date and moon, the Community section, the times, the occasion card,
+      // the mosque card.
       children: [
         StaggerItem(
           index: 0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const EmergencyBanner(),
               _header(payload, loading),
               const SizedBox(height: 14),
               MoonCountdownCard(prayers: payload?.dailyPrayerTimes),
@@ -460,6 +465,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   /// Spec §7.1 step 8.
   Widget _mosqueCard() {
     final l = context.l10n;
+    final mosque = ref.watch(contentProvider.select((c) => c.mosque));
     return AppCard(
       radius: AppRadius.listCard,
       grouped: true,
@@ -467,8 +473,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         children: [
           AppListRow(
             icon: AppIcons.pin,
-            title: MosqueInfo.name,
-            subtitle: '${MosqueInfo.street}, ${l.city}',
+            title: mosque.name,
+            subtitle: '${mosque.street}, ${mosque.city}',
             trailing: const RowChevron(),
             onTap: () => context.push('/profile/mosque'),
           ),
@@ -480,7 +486,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: GhostButton(
                     label: l.directions,
                     icon: AppIcons.navigate,
-                    onTap: () => _open(MosqueInfo.mapsUri),
+                    onTap: () => _open(mosque.mapsUri),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -488,7 +494,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: GhostButton(
                     label: l.callOffice,
                     icon: AppIcons.phone,
-                    onTap: () => _open(MosqueInfo.phoneUri),
+                    onTap: () => _open(mosque.phoneUri),
                   ),
                 ),
               ],

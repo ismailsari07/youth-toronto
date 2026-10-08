@@ -399,6 +399,12 @@
   "languageAuto": "Auto",
   "mosqueAndContact": "Mosque & contact",
   "aboutThisApp": "About this app",
+  "updateRequiredTitle": "Update required",
+  "@updateRequiredTitle": {
+    "description": "Blocking screen when the app is older than the panel's minimum supported version."
+  },
+  "updateRequiredBody": "This version of the app is no longer supported. Update to the latest version to keep using it.",
+  "openAppStore": "Open the App Store",
   "versionLabel": "Version {version}",
   "@versionLabel": {
     "placeholders": {
@@ -477,14 +483,9 @@
   },
   "accountDeleted": "Your account has been deleted.",
   "mosqueServices": "Mosque services",
-  "marriageService": "Marriage service",
-  "marriageServiceRow": "Confidential introductions",
   "burialServices": "Burial services",
-  "burialServicesRow": "Funeral and burial support",
   "burialEyebrow": "MOSQUE SERVICES",
-  "burialIntro": "Our administrators below support our community in every aspect of funeral and burial arrangements. All services are carried out with respect for religious sensitivities.",
   "burialCemetery": "Cemetery",
-  "burialCemeteryHistory": "In May 1993 the Canadian Turkish Islamic Trust acquired 200 burial plots at Pine Ridge Memorial Gardens cemetery in Ajax, Ontario; with 120 more acquired in September 2004, the total reached 320. Together with plots acquired by other communities around ours, an approximately 10,000-person Muslim cemetery has formed.",
   "burialContacts": "Contacts",
   "marriageEyebrow": "MARRIAGE SERVICE",
   "underReview": "Under review",
@@ -573,13 +574,13 @@
   "withdrawn": "Your application has been withdrawn.",
   "theMosque": "THE MOSQUE",
   "openingHours": "Opening hours",
-  "dailyPrayers": "Daily prayers",
-  "dailyPrayersBody": "Open for every prayer, Fajr through Isha",
   "jumuah": "Jumu'ah",
-  "fridays": "Fridays",
-  "office": "Office",
-  "callForHours": "Call for current hours",
   "getInTouch": "Get in touch",
+  "linksSection": "Links",
+  "@linksSection": {
+    "description": "Mosque & Contact: the website, donation and social links from the panel."
+  },
+  "donation": "Donate",
   "sizeMegabytes": "{size} MB",
   "@sizeMegabytes": {
     "placeholders": {

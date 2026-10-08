@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/burial_info.dart';
+import '../../../core/content/content_bundle.dart';
 import '../../../l10n/l10n.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -12,8 +14,9 @@ import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 
 /// Profile → Mosque services → Burial services: who to call, and the
-/// community's cemetery in Ajax.
-class BurialServicesScreen extends StatelessWidget {
+/// community's cemetery in Ajax. The intro is the burial service's body,
+/// the people are the `burial` contacts; parts the panel leaves empty hide.
+class BurialServicesScreen extends ConsumerWidget {
   const BurialServicesScreen({super.key});
 
   Future<void> _open(String url) async {
@@ -25,15 +28,25 @@ class BurialServicesScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
+    final content = ref.watch(contentProvider);
+    final service = content.serviceOf(ServiceKind.burial);
+    final title = service?.title.resolve(l.localeName) ?? '';
+    final intro = service?.body.resolve(l.localeName) ?? '';
+    final contacts = content.contactsIn('burial');
+    final cemetery = content.cemetery;
+    final history = cemetery.history.resolve(l.localeName);
     final body = const TextStyle(fontSize: 14.5, height: 1.5).c(AppColor.ink2);
     return Scaffold(
       backgroundColor: AppColor.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          PlainNavBar(eyebrow: l.burialEyebrow, title: l.burialServices),
+          PlainNavBar(
+            eyebrow: l.burialEyebrow,
+            title: title.isEmpty ? l.burialServices : title,
+          ),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(
@@ -43,34 +56,38 @@ class BurialServicesScreen extends StatelessWidget {
                 40,
               ),
               children: [
-                AppCard(
-                  padding: const EdgeInsets.all(18),
-                  child: Text(l.burialIntro, style: body),
-                ),
-                const SizedBox(height: AppSpace.cardGapWide),
-                SectionHeader(title: l.burialContacts),
-                const SizedBox(height: AppSpace.sectionHeaderGap),
-                GroupedRows(
-                  rows: [
-                    for (final (i, c) in BurialInfo.contacts.indexed)
-                      AppListRow(
-                        divided: i > 0,
-                        icon: AppIcons.person,
-                        title: c.name,
-                        subtitle: c.phone,
-                        trailing: SizedBox(
-                          width: 104,
-                          child: GhostButton(
-                            label: l.call,
-                            icon: AppIcons.phone,
-                            height: 38,
-                            onTap: () => _open(c.uri),
+                if (intro.isNotEmpty) ...[
+                  AppCard(
+                    padding: const EdgeInsets.all(18),
+                    child: Text(intro, style: body),
+                  ),
+                  const SizedBox(height: AppSpace.cardGapWide),
+                ],
+                if (contacts.isNotEmpty) ...[
+                  SectionHeader(title: l.burialContacts),
+                  const SizedBox(height: AppSpace.sectionHeaderGap),
+                  GroupedRows(
+                    rows: [
+                      for (final (i, c) in contacts.indexed)
+                        AppListRow(
+                          divided: i > 0,
+                          icon: AppIcons.person,
+                          title: c.name,
+                          subtitle: c.phone,
+                          trailing: SizedBox(
+                            width: 104,
+                            child: GhostButton(
+                              label: l.call,
+                              icon: AppIcons.phone,
+                              height: 38,
+                              onTap: () => _open(c.phoneUri),
+                            ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: AppSpace.cardGapWide),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpace.cardGapWide),
+                ],
                 SectionHeader(title: l.burialCemetery),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 AppCard(
@@ -78,19 +95,21 @@ class BurialServicesScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(l.burialCemeteryHistory, style: body),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Divider(height: 1, color: AppColor.hairline),
-                      ),
+                      if (history.isNotEmpty) ...[
+                        Text(history, style: body),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(height: 1, color: AppColor.hairline),
+                        ),
+                      ],
                       Text(
-                        BurialInfo.cemeteryName,
+                        cemetery.name,
                         style: AppText.cardTitle.c(AppColor.ink),
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '${BurialInfo.cemeteryStreet}\n'
-                        '${BurialInfo.cemeteryCity}',
+                        '${cemetery.street}\n'
+                        '${cemetery.city}',
                         style: const TextStyle(fontSize: 13.5, height: 1.45)
                             .c(AppColor.ink2),
                       ),
@@ -99,7 +118,7 @@ class BurialServicesScreen extends StatelessWidget {
                         label: l.directions,
                         height: 46,
                         icon: AppIcons.navigate,
-                        onTap: () => _open(BurialInfo.cemeteryMapsUri),
+                        onTap: () => _open(cemetery.mapsUri),
                       ),
                     ],
                   ),

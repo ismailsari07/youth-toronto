@@ -45,6 +45,14 @@ abstract final class AppIcons {
   // Recurring events (spec §7.3).
   static const repeat = 'repeat';
 
+  // Mosque services (the panel's icon choices; drawn as its previews).
+  static const heart = 'heart';
+  static const leaf = 'leaf';
+  static const book = 'book';
+
+  // The emergency banner's warning and urgent tones.
+  static const alert = 'alert';
+
   // Notification sound previews.
   static const play = 'play';
   static const stop = 'stop';
@@ -58,6 +66,20 @@ abstract final class AppIcons {
         'Maghrib' => maghrib,
         'Isha' => isha,
         _ => mosque,
+      };
+
+  /// Icon for a service's `icon` from the panel: heart, leaf, book, moon,
+  /// users, calendar, mosque, info. The crescent is Isha's; anything unknown
+  /// gets info.
+  static String forService(String name) => switch (name) {
+        'heart' => heart,
+        'leaf' => leaf,
+        'book' => book,
+        'moon' => isha,
+        'users' => users,
+        'calendar' => calendar,
+        'mosque' => mosque,
+        _ => info,
       };
 
   /// Event-card icon for `youth_events.category` (case-insensitive).

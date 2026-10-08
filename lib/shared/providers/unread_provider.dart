@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models.dart';
 import '../../core/unread_store.dart';
+import 'content_provider.dart';
 import 'events_news_provider.dart';
 
 /// The last announcement the reader has seen, from this device's storage.
@@ -17,8 +18,11 @@ final unreadAnnouncementsProvider = Provider<List<Announcement>>((ref) {
   return items.where((a) => a.date.isAfter(lastSeen)).toList();
 });
 
+/// Never while the panel has announcements turned off.
 final hasUnreadAnnouncementsProvider = Provider<bool>(
-  (ref) => ref.watch(unreadAnnouncementsProvider).isNotEmpty,
+  (ref) =>
+      ref.watch(contentProvider.select((c) => c.showAnnouncements)) &&
+      ref.watch(unreadAnnouncementsProvider).isNotEmpty,
 );
 
 /// Marks everything up to the newest announcement as seen, then refreshes the

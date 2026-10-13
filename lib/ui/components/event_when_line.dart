@@ -61,7 +61,7 @@ class EventWhenLine extends ConsumerWidget {
             child: AppIcon(
               AppIcons.forPrayer(prayerName(prayer)),
               size: 14,
-              color: context.colors.green,
+              color: context.colors.selected,
             ),
           ),
           const SizedBox(width: 5),

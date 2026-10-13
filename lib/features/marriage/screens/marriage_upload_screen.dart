@@ -388,7 +388,7 @@ class _ChooseCard extends StatelessWidget {
             height: 60,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: context.colors.greenTint,
+              color: context.colors.iconCircle,
               shape: BoxShape.circle,
             ),
             child: AppIcon(

@@ -10,7 +10,7 @@ enum RowTone { green, neutral, blue, gold, danger }
 
 extension on RowTone {
   Color fill(AppColors c) => switch (this) {
-        RowTone.green => c.greenTint,
+        RowTone.green => c.iconCircle,
         RowTone.neutral => c.neutralTint,
         RowTone.blue => c.blueTint,
         RowTone.gold => c.goldCircle,

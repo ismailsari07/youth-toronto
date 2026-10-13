@@ -126,7 +126,7 @@ class EventCard extends StatelessWidget {
           const SizedBox(height: 5),
           Row(
             children: [
-              AppIcon(AppIcons.pin, size: 13, color: context.colors.ink3),
+              AppIcon(AppIcons.pin, size: 13, color: context.colors.mutedIcon),
               const SizedBox(width: 5),
               Expanded(
                 child: Text(

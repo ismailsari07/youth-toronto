@@ -261,11 +261,11 @@ class RecurringBadge extends StatelessWidget {
             height: _size,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: onPhoto ? context.colors.raised : context.colors.greenTint,
+              color: onPhoto ? context.colors.raised : context.colors.iconCircle,
               shape: BoxShape.circle,
               boxShadow: onPhoto ? context.shadows.badgeOnPhoto : null,
             ),
-            child: AppIcon(icon, size: 19, color: context.colors.green),
+            child: AppIcon(icon, size: 19, color: context.colors.selected),
           ),
           // The repeat mark: white ring so it separates from the circle.
           Positioned(

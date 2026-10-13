@@ -95,7 +95,7 @@ class _IslandItem extends StatelessWidget {
   Widget build(BuildContext context) {
     // The tint eases between tabs instead of snapping.
     return TweenAnimationBuilder<Color?>(
-      tween: ColorTween(end: active ? context.colors.green : context.colors.tabInactive),
+      tween: ColorTween(end: active ? context.colors.selected : context.colors.tabInactive),
       duration: AppMotion.fast,
       curve: Curves.easeOut,
       builder: (context, color, _) => _item(context, color!),

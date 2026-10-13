@@ -116,7 +116,7 @@ class _StepNumber extends StatelessWidget {
       height: 28,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: context.colors.greenTint,
+        color: context.colors.iconCircle,
         shape: BoxShape.circle,
       ),
       child: Text(

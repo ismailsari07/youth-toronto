@@ -96,6 +96,15 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.heroArcTrack,
     required this.heroKnobHalo,
     required this.onGradientButtonText,
+    required this.selected,
+    required this.selectedDeep,
+    required this.selectedDark,
+    required this.selectedLabel,
+    required this.selectedCaption,
+    required this.mutedIcon,
+    required this.sunriseIcon,
+    required this.iconCircle,
+    required this.iconCircleActive,
     required this.heroShimmerTo,
     required this.heroShimmerFrom,
     required this.heroOutline,
@@ -212,6 +221,18 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color heroShimmerFrom; // shimmer on the hero
   final Color heroShimmerTo;
 
+  // Selected / active — each keeps its exact light-mode colour; in dark mode
+  // they are all white, so the dark theme isn't wall-to-wall green.
+  final Color selected; // selected / active: active tab, row icons, a choice's check
+  final Color selectedDeep; // text of the current prayer row and of a chosen option
+  final Color selectedDark; // where light uses greenDark: current-row icon, ghost label
+  final Color selectedLabel; // IQAMAH label on the current prayer row
+  final Color selectedCaption; // athan line on the current prayer row
+  final Color mutedIcon; // grey in light: prayer icons, an event's location pin
+  final Color sunriseIcon; // the Sunrise icon in the times list
+  final Color iconCircle; // green icon circle (light = greenTint; darker in dark)
+  final Color iconCircleActive; // the current prayer row's icon circle
+
   Color get success => green; // no separate success hue
 
   /// The tab-root gradient: linear-gradient(148deg, top 0%, mid 56%,
@@ -312,6 +333,15 @@ class AppColors extends ThemeExtension<AppColors> {
     heroOutline: Color(0x4DFFFFFF),
     heroShimmerFrom: Color(0x14FFFFFF),
     heroShimmerTo: Color(0x2EFFFFFF),
+    selected: Color(0xFF0E7550),
+    selectedDeep: Color(0xFF126148),
+    selectedDark: Color(0xFF0C5B3E),
+    selectedLabel: Color(0xFF5C7E6D),
+    selectedCaption: Color(0xFF67766F),
+    mutedIcon: Color(0xFF67766F),
+    sunriseIcon: Color(0xFF3C6E96),
+    iconCircle: Color(0xFFF1F8F4),
+    iconCircleActive: Color(0xFFDCEDE4),
   );
 
   /// Matched to the dark design.
@@ -398,6 +428,15 @@ class AppColors extends ThemeExtension<AppColors> {
     heroOutline: Color(0x4DFFFFFF),
     heroShimmerFrom: Color(0x14FFFFFF),
     heroShimmerTo: Color(0x2EFFFFFF),
+    selected: Color(0xFFEDF3F0),
+    selectedDeep: Color(0xFFEDF3F0),
+    selectedDark: Color(0xFFEDF3F0),
+    selectedLabel: Color(0xFFEDF3F0),
+    selectedCaption: Color(0xFFEDF3F0),
+    mutedIcon: Color(0xFFEDF3F0),
+    sunriseIcon: Color(0xFFEDF3F0),
+    iconCircle: Color(0xFF142B23),
+    iconCircleActive: Color(0xFF1B3B30),
   );
 
   @override

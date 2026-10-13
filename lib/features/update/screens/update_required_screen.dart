@@ -44,7 +44,7 @@ class UpdateRequiredScreen extends ConsumerWidget {
                     height: 72,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: context.colors.greenTint,
+                      color: context.colors.iconCircle,
                       shape: BoxShape.circle,
                     ),
                     child: AppIcon(

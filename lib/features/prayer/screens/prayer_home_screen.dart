@@ -282,19 +282,25 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           divided: i > 0,
           icon: AppIcons.forPrayer(p.name),
           tone: isSunrise ? RowTone.blue : RowTone.neutral,
-          iconFill: isCurrent ? context.colors.greenTintStrong : null,
-          iconGlyph: isCurrent ? context.colors.greenDark : null,
+          iconFill: isCurrent ? context.colors.iconCircleActive : null,
+          iconGlyph: isCurrent
+              ? context.colors.selectedDark
+              : isSunrise
+                  ? context.colors.sunriseIcon
+                  : context.colors.mutedIcon,
           background: isCurrent ? context.colors.greenRowBg : null,
           title: prayerLabel(l, p.name),
           titleStyle: isCurrent
               ? AppText.prayerName
                   .copyWith(fontWeight: FontWeight.w700)
-                  .c(context.colors.greenDeep)
+                  .c(context.colors.selectedDeep)
               : AppText.prayerName.c(past ? context.colors.ink2 : context.colors.ink),
           subtitle: isSunrise
               ? l.fajrWindowCloses
               : l.athanAt(prayerClock12(p.name, p.time)),
-          subtitleStyle: AppText.caption.c(context.colors.ink3),
+          subtitleStyle: AppText.caption.c(
+            isCurrent ? context.colors.selectedCaption : context.colors.ink3,
+          ),
           trailing: _trailing(p, isCurrent),
         ),
       );
@@ -316,7 +322,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         style: isCurrent
             ? AppText.iqamahValue
                 .copyWith(fontWeight: FontWeight.w700)
-                .c(context.colors.greenDeep)
+                .c(context.colors.selectedDeep)
             : AppText.iqamahValue.c(context.colors.ink2),
       );
     }
@@ -327,14 +333,14 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         Text(
           context.l10n.iqamah,
           style: AppText.iqamahLabel
-              .c(isCurrent ? context.colors.greenLabel : context.colors.ink4),
+              .c(isCurrent ? context.colors.selectedLabel : context.colors.ink4),
         ),
         Text(
           prayerClock12(p.name, iqamah),
           style: isCurrent
               ? AppText.iqamahValue
                   .copyWith(fontWeight: FontWeight.w700)
-                  .c(context.colors.greenDeep)
+                  .c(context.colors.selectedDeep)
               : AppText.iqamahValue.c(context.colors.ink),
         ),
       ],
@@ -467,6 +473,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         children: [
           AppListRow(
             icon: AppIcons.pin,
+            iconGlyph: context.colors.selected,
             title: mosque.name,
             subtitle: '${mosque.street}, ${mosque.city}',
             trailing: const RowChevron(),
@@ -480,6 +487,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: GhostButton(
                     label: l.directions,
                     icon: AppIcons.navigate,
+                    color: context.colors.selectedDark,
                     onTap: () => _open(mosque.mapsUri),
                   ),
                 ),
@@ -488,6 +496,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: GhostButton(
                     label: l.callOffice,
                     icon: AppIcons.phone,
+                    color: context.colors.selectedDark,
                     onTap: () => _open(mosque.phoneUri),
                   ),
                 ),

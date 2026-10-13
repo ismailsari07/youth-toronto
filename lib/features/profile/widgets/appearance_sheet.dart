@@ -12,9 +12,12 @@ import '../../../ui/components/app_sheet.dart';
 /// The Appearance row, on Profile and in Settings. Trailing text is the
 /// member's choice: System, Light or Dark.
 class AppearanceRow extends ConsumerWidget {
-  const AppearanceRow({super.key, this.divided = false});
+  const AppearanceRow({super.key, this.divided = false, this.iconGlyph});
 
   final bool divided;
+
+  /// Overrides the icon's colour (Settings paints it `selected`).
+  final Color? iconGlyph;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,6 +26,7 @@ class AppearanceRow extends ConsumerWidget {
     return AppListRow(
       divided: divided,
       icon: AppIcons.appearance,
+      iconGlyph: iconGlyph,
       title: l.appearance,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -75,11 +79,11 @@ class _AppearanceSheet extends ConsumerWidget {
         title: _label(l, mode),
         titleStyle: AppText.rowTitle
             .copyWith(fontWeight: on ? FontWeight.w700 : null)
-            .c(on ? context.colors.greenDeep : context.colors.ink),
+            .c(on ? context.colors.selectedDeep : context.colors.ink),
         subtitle: subtitle,
         background: on ? context.colors.greenRowBg : null,
         trailing: on
-            ? AppIcon(AppIcons.check, size: 20, color: context.colors.green)
+            ? AppIcon(AppIcons.check, size: 20, color: context.colors.selected)
             : null,
         onTap: () => choose(mode),
       );

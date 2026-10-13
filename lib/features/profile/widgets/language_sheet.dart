@@ -13,9 +13,12 @@ import '../../../ui/components/app_sheet.dart';
 /// member's choice in its own language, or "Auto" while following the
 /// device.
 class LanguageRow extends ConsumerWidget {
-  const LanguageRow({super.key, this.divided = false});
+  const LanguageRow({super.key, this.divided = false, this.iconGlyph});
 
   final bool divided;
+
+  /// Overrides the icon's colour (Settings paints it `selected`).
+  final Color? iconGlyph;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,6 +32,7 @@ class LanguageRow extends ConsumerWidget {
     return AppListRow(
       divided: divided,
       icon: AppIcons.globe,
+      iconGlyph: iconGlyph,
       title: l.language,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -77,11 +81,11 @@ class _LanguageSheet extends ConsumerWidget {
         title: title,
         titleStyle: AppText.rowTitle
             .copyWith(fontWeight: on ? FontWeight.w700 : null)
-            .c(on ? context.colors.greenDeep : context.colors.ink),
+            .c(on ? context.colors.selectedDeep : context.colors.ink),
         subtitle: subtitle,
         background: on ? context.colors.greenRowBg : null,
         trailing: on
-            ? AppIcon(AppIcons.check, size: 20, color: context.colors.green)
+            ? AppIcon(AppIcons.check, size: 20, color: context.colors.selected)
             : null,
         onTap: () => choose(locale),
       );

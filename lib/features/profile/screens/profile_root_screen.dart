@@ -136,12 +136,19 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           child: GroupedRows(
             rows: [
               if (kPrayerRemindersEnabled) const RemindersRow(),
-              const LanguageRow(divided: kPrayerRemindersEnabled),
-              const AppearanceRow(divided: true),
+              LanguageRow(
+                divided: kPrayerRemindersEnabled,
+                iconGlyph: context.colors.selected,
+              ),
+              AppearanceRow(
+                divided: true,
+                iconGlyph: context.colors.selected,
+              ),
               if (user != null)
                 AppListRow(
                   divided: true,
                   icon: AppIcons.person,
+                  iconGlyph: context.colors.selected,
                   title: l.settings,
                   subtitle: l.settingsRowSubtitle,
                   trailing: const RowChevron(),
@@ -157,6 +164,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
             rows: [
               AppListRow(
                 icon: AppIcons.pin,
+                iconGlyph: context.colors.selected,
                 title: l.mosqueAndContact,
                 trailing: const RowChevron(),
                 onTap: () => context.push('/profile/mosque'),
@@ -164,6 +172,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
               AppListRow(
                 divided: true,
                 icon: AppIcons.info,
+                iconGlyph: context.colors.selected,
                 title: l.aboutThisApp,
                 subtitle: version == null ? null : l.versionLabel(version),
                 trailing: const RowChevron(),
@@ -205,6 +214,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       ServiceKind.burial => AppListRow(
           divided: divided,
           icon: icon,
+          iconGlyph: context.colors.selected,
           title: title,
           subtitle: summary.isEmpty ? null : summary,
           trailing: const RowChevron(),
@@ -213,6 +223,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       ServiceKind.info => AppListRow(
           divided: divided,
           icon: icon,
+          iconGlyph: context.colors.selected,
           title: title,
           subtitle: summary.isEmpty ? null : summary,
           trailing: const RowChevron(),
@@ -260,6 +271,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       key: key,
       divided: divided,
       icon: icon,
+      iconGlyph: context.colors.selected,
       title: title,
       subtitle: application != null
           ? l.submittedOn(dayMonth(l, application.createdAt))
@@ -375,24 +387,28 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       rows: [
         AppListRow(
           icon: AppIcons.person,
+          iconGlyph: context.colors.selected,
           title: (profile?['full_name'] as String?) ?? '—',
           subtitle: l.name,
         ),
         AppListRow(
           divided: true,
           icon: AppIcons.mail,
+          iconGlyph: context.colors.selected,
           title: user.email ?? '—',
           subtitle: l.email,
         ),
         AppListRow(
           divided: true,
           icon: AppIcons.phone,
+          iconGlyph: context.colors.selected,
           title: phone == null || phone.isEmpty ? l.notAdded : phone,
           subtitle: l.phone,
         ),
         AppListRow(
           divided: true,
           icon: AppIcons.calendar,
+          iconGlyph: context.colors.selected,
           title: _formatDob(l, dob) ?? l.notAdded,
           subtitle: l.dobField,
         ),

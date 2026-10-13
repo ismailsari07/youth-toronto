@@ -119,12 +119,16 @@ class GhostButton extends StatelessWidget {
     this.onTap,
     this.height = 44,
     this.icon,
+    this.color,
   });
 
   final String label;
   final VoidCallback? onTap;
   final double height;
   final String? icon;
+
+  /// Label and icon colour; greenDark by default.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -140,8 +144,8 @@ class GhostButton extends StatelessWidget {
         child: _LabelWithIcon(
           label: label,
           icon: icon,
-          style: AppText.buttonSmall.c(context.colors.greenDark),
-          color: context.colors.greenDark,
+          style: AppText.buttonSmall.c(color ?? context.colors.greenDark),
+          color: color ?? context.colors.greenDark,
           iconSize: 17,
         ),
       ),

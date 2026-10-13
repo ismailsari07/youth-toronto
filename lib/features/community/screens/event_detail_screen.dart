@@ -129,7 +129,7 @@ class EventDetailScreen extends ConsumerWidget {
     final l = context.l10n;
 
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -181,7 +181,7 @@ class EventDetailScreen extends ConsumerWidget {
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                              ).c(AppColor.green),
+                              ).c(context.colors.green),
                             ),
                           ),
                         ),
@@ -213,7 +213,7 @@ class EventDetailScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(AppSpace.cardPadding),
                     child: Text(
                       description,
-                      style: AppText.body.c(AppColor.ink2),
+                      style: AppText.body.c(context.colors.ink2),
                     ),
                   ),
                 ],

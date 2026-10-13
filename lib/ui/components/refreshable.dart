@@ -9,11 +9,17 @@ class RefreshableList extends StatelessWidget {
     required this.onRefresh,
     required this.padding,
     required this.children,
+    this.header,
   });
 
   final Future<void> Function() onRefresh;
   final EdgeInsets padding;
   final List<Widget> children;
+
+  /// Full-bleed content above [children], outside [padding] (the Prayer
+  /// home's hero). The refresh spinner then sits on it, so it is drawn for
+  /// a dark background.
+  final Widget? header;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +30,14 @@ class RefreshableList extends StatelessWidget {
       slivers: [
         SliverPadding(
           padding: EdgeInsets.only(top: padding.top),
-          sliver: CupertinoSliverRefreshControl(onRefresh: onRefresh),
+          sliver: header == null
+              ? CupertinoSliverRefreshControl(onRefresh: onRefresh)
+              : CupertinoTheme(
+                  data: const CupertinoThemeData(brightness: Brightness.dark),
+                  child: CupertinoSliverRefreshControl(onRefresh: onRefresh),
+                ),
         ),
+        if (header != null) SliverToBoxAdapter(child: header),
         SliverPadding(
           padding: padding.copyWith(top: 0),
           sliver: SliverList(

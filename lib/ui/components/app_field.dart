@@ -44,10 +44,10 @@ class AppField extends StatelessWidget {
               height: 34,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: AppColor.neutralTint,
+                color: context.colors.neutralTint,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: AppIcon(iconName, size: 17, color: AppColor.ink3),
+              child: AppIcon(iconName, size: 17, color: context.colors.ink3),
             ),
             const SizedBox(width: 12),
           ],
@@ -62,7 +62,7 @@ class AppField extends StatelessWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.4,
-                  ).c(AppColor.ink3),
+                  ).c(context.colors.ink3),
                 ),
                 TextField(
                   controller: controller,
@@ -70,9 +70,9 @@ class AppField extends StatelessWidget {
                   keyboardType: keyboardType,
                   readOnly: readOnly,
                   onTap: onTap,
-                  cursorColor: AppColor.green,
+                  cursorColor: context.colors.green,
                   style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w500)
-                      .c(AppColor.ink),
+                      .c(context.colors.ink),
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: const EdgeInsets.only(top: 4),
@@ -81,7 +81,7 @@ class AppField extends StatelessWidget {
                     focusedBorder: InputBorder.none,
                     hintText: hint,
                     hintStyle:
-                        const TextStyle(fontSize: 15.5).c(const Color(0xFFA4B0AA)),
+                        const TextStyle(fontSize: 15.5).c(context.colors.placeholder),
                   ),
                 ),
               ],
@@ -93,8 +93,8 @@ class AppField extends StatelessWidget {
 
     if (!divided) return field;
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColor.hairline)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.colors.hairline)),
       ),
       child: field,
     );
@@ -112,9 +112,9 @@ class FieldGroup extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: AppColor.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        boxShadow: AppShadow.card,
+        boxShadow: context.shadows.card,
       ),
       child: Column(mainAxisSize: MainAxisSize.min, children: children),
     );

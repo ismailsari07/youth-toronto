@@ -20,7 +20,7 @@ class ServiceDetailScreen extends StatelessWidget {
     final body = service.body.resolve(l.localeName);
     final text = body.isEmpty ? service.summary.resolve(l.localeName) : body;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -45,7 +45,7 @@ class ServiceDetailScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 14.5,
                         height: 1.5,
-                      ).c(AppColor.ink2),
+                      ).c(context.colors.ink2),
                     ),
                   ),
               ],

@@ -75,7 +75,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     final l = context.l10n;
     final error = _error;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -106,7 +106,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                           Expanded(
                             child: Text(
                               l.cannotBeUndone,
-                              style: AppText.cardTitle.c(AppColor.ink),
+                              style: AppText.cardTitle.c(context.colors.ink),
                             ),
                           ),
                         ],
@@ -116,12 +116,12 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                         // Shown to everyone, whether or not they applied, so
                         // the copy never reveals who used the service.
                         l.deleteAccountBody1,
-                        style: AppText.body.c(AppColor.ink2),
+                        style: AppText.body.c(context.colors.ink2),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         l.deleteAccountBody2,
-                        style: AppText.body.c(AppColor.ink2),
+                        style: AppText.body.c(context.colors.ink2),
                       ),
                     ],
                   ),
@@ -160,7 +160,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   const SizedBox(height: 12),
                   Text(
                     authErrorText(l, error),
-                    style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
+                    style: const TextStyle(fontSize: 13.5).c(context.colors.danger),
                   ),
                 ],
               ],

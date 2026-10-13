@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
+import '../../../core/feature_flags.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../prayer/widgets/reminders_sheet.dart';
@@ -13,6 +14,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
+import '../widgets/appearance_sheet.dart';
 import '../widgets/language_sheet.dart';
 
 /// Spec §7.10. Only the reminder toggle that actually works is shown: the
@@ -32,7 +34,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final l = context.l10n;
 
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -52,19 +54,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 40,
               ),
               children: [
-                SectionHeader(title: l.notifications),
-                const SizedBox(height: AppSpace.sectionHeaderGap),
-                GroupedRows(
-                  rows: [
-                    const RemindersRow(),
-                  ],
-                ),
-                const SizedBox(height: AppSpace.cardGapWide),
+                if (kPrayerRemindersEnabled) ...[
+                  SectionHeader(title: l.notifications),
+                  const SizedBox(height: AppSpace.sectionHeaderGap),
+                  GroupedRows(
+                    rows: [
+                      const RemindersRow(),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpace.cardGapWide),
+                ],
                 SectionHeader(title: l.app),
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 GroupedRows(
                   rows: [
                     const LanguageRow(),
+                    const AppearanceRow(divided: true),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.pin,
@@ -117,10 +122,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           Expanded(
                             child: Text(
                               l.deleteAccount,
-                              style: AppText.rowTitle.c(AppColor.danger),
+                              style: AppText.rowTitle.c(context.colors.danger),
                             ),
                           ),
-                          const RowChevron(color: Color(0xFFC99A95)),
+                          RowChevron(color: context.colors.dangerChevron),
                         ],
                       ),
                     ),

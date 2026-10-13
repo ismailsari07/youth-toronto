@@ -13,17 +13,26 @@ import 'app_scaffolding.dart';
 import 'moon_countdown.dart';
 import 'motion.dart';
 
-/// Spec §6 — the Prayer root's hero. A night-navy card around the moon, whose
-/// fill is the elapsed share of the current prayer window.
+/// Spec §6 — the Prayer root's hero around the moon, whose fill is the
+/// elapsed share of the current prayer window. It runs full-bleed from the
+/// top of the screen (behind the status bar) and ends in a soft curve:
+/// night navy in light mode, the green gradient in dark mode. [header] sits
+/// at its top, below the status bar.
 ///
 /// Digits tick every second. The card stops that timer when the tab is hidden
 /// or the app is backgrounded; the moon's own ripple controller is muted by
 /// the same signals (see [_visible]).
 class MoonCountdownCard extends StatefulWidget {
-  const MoonCountdownCard({super.key, required this.prayers});
+  const MoonCountdownCard({super.key, required this.prayers, this.header});
 
   /// Null while loading; empty-handed when prayer times cannot be loaded.
   final List<DailyPrayerItem>? prayers;
+
+  /// Who we are and today's date, above the moon.
+  final Widget? header;
+
+  /// The radius of the bottom curve.
+  static const bottomRadius = 40.0;
 
   @override
   State<MoonCountdownCard> createState() => _MoonCountdownCardState();
@@ -103,18 +112,27 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
     final loading = widget.prayers == null;
     final reduceMotion = MediaQuery.of(context).disableAnimations;
 
-    return Container(
-      // Height is content-driven (≈407); never hard-coded.
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-      clipBehavior: Clip.antiAlias, // the halo must not leak past the radius
+    final colors = context.colors;
+    const shape = BorderRadius.vertical(
+      bottom: Radius.circular(MoonCountdownCard.bottomRadius),
+    );
+    final card = Container(
+      // Height is content-driven; never hard-coded.
+      padding: EdgeInsets.fromLTRB(20, topInset(context), 20, 24),
+      clipBehavior: Clip.antiAlias, // the halo must not leak past the curve
       decoration: BoxDecoration(
-        color: AppColor.night,
-        borderRadius: BorderRadius.circular(AppRadius.hero),
-        boxShadow: AppShadow.night,
+        color: colors.night,
+        gradient: colors.nightGradient,
+        borderRadius: shape,
+        boxShadow: context.shadows.night,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (widget.header != null) ...[
+            widget.header!,
+            const SizedBox(height: 18),
+          ],
           _topRow(),
           const SizedBox(height: 12),
           Center(
@@ -141,7 +159,7 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
             ),
           ),
           const SizedBox(height: 16),
-          const Divider(height: 1, thickness: 1, color: AppColor.nightDivider),
+          Divider(height: 1, thickness: 1, color: context.colors.nightDivider),
           const SizedBox(height: 14),
           FadeSwitch(
             alignment: AlignmentDirectional.topCenter,
@@ -152,6 +170,24 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
           ),
         ],
       ),
+    );
+
+    // Pulled down past the top, the hero's colour continues upwards instead
+    // of opening a gap of page ground above it.
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: MoonCountdownCard.bottomRadius,
+          height: 2000,
+          child: ColoredBox(color: colors.nightGradient == null
+              ? colors.night
+              : colors.gradTop),
+        ),
+        card,
+      ],
     );
   }
 
@@ -166,33 +202,33 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 11),
             decoration: BoxDecoration(
-              color: AppColor.nightPill,
+              color: context.colors.nightPill,
               borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
             child: Text(
               context.l10n.nextPrayer,
               style:
-                  AppText.badge.copyWith(letterSpacing: 1.1).c(AppColor.onHero),
+                  AppText.badge.copyWith(letterSpacing: 1.1).c(context.colors.onHero),
             ),
           ),
           Container(
             height: 26,
             padding: const EdgeInsets.only(left: 8, right: 11),
             decoration: BoxDecoration(
-              color: AppColor.nightChip,
+              color: context.colors.nightChip,
               borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const AppIcon(AppIcons.pin,
-                    size: 13, color: AppColor.onHeroChipText),
+                AppIcon(AppIcons.pin,
+                    size: 13, color: context.colors.onHeroChipText),
                 const SizedBox(width: 5),
                 Text(
                   context.l10n.city,
                   style:
                       const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)
-                          .c(AppColor.onHeroChipText),
+                          .c(context.colors.onHeroChipText),
                 ),
               ],
             ),
@@ -225,12 +261,12 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
           Text(
             context.l10n.timesUnavailable,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
-                .c(AppColor.onHero),
+                .c(context.colors.onHero),
           ),
           const SizedBox(height: 4),
           Text(
             context.l10n.pullToRefresh,
-            style: AppText.countdownSub.c(AppColor.onHeroSecondary),
+            style: AppText.countdownSub.c(context.colors.onHeroSecondary),
           ),
         ],
       );
@@ -248,10 +284,10 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
       children: [
         Text(
           upper(prayerLabel(l, next.name), l.localeName),
-          style: AppText.countdownLabel.c(AppColor.onHeroLabel),
+          style: AppText.countdownLabel.c(context.colors.onHeroLabel),
         ),
         const SizedBox(height: 2),
-        Text(digits, style: AppText.countdown.c(AppColor.onHero)),
+        Text(digits, style: AppText.countdown.c(context.colors.onHero)),
         const SizedBox(height: 2),
         Text(
           [
@@ -259,7 +295,7 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
             if (next.iqamah != null)
               l.iqamahAt(prayerClock12(next.name, next.iqamah!)),
           ].join(' · '),
-          style: AppText.countdownSub.c(AppColor.onHeroSecondary),
+          style: AppText.countdownSub.c(context.colors.onHeroSecondary),
         ),
       ],
     );
@@ -306,14 +342,14 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
       width: 28,
       height: 28,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: AppColor.nightChip,
+      decoration: BoxDecoration(
+        color: context.colors.nightChip,
         shape: BoxShape.circle,
       ),
       child: AppIcon(
         AppIcons.forPrayer(prayer.name),
         size: 16,
-        color: AppColor.onHero,
+        color: context.colors.onHero,
       ),
     );
     final label = Column(
@@ -327,12 +363,12 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
             height: 1.15,
-          ).c(AppColor.onHero),
+          ).c(context.colors.onHero),
         ),
         Text(
           prayerClock12(prayer.name, prayer.time),
           style: const TextStyle(fontSize: 11.5, height: 1.2)
-              .c(AppColor.onHeroSecondary),
+              .c(context.colors.onHeroSecondary),
         ),
       ],
     );

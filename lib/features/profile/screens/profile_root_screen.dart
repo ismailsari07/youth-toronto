@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/content/content_bundle.dart';
+import '../../../core/feature_flags.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
@@ -23,6 +24,7 @@ import '../../marriage/data/marriage_application.dart';
 import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
 import '../../marriage/widgets/marriage_widgets.dart';
+import '../widgets/appearance_sheet.dart';
 import '../widgets/language_sheet.dart';
 
 /// Spec §7.9. Never empty: settings exist whether or not anyone is signed in.
@@ -133,8 +135,9 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           index: 3,
           child: GroupedRows(
             rows: [
-              const RemindersRow(),
-              const LanguageRow(divided: true),
+              if (kPrayerRemindersEnabled) const RemindersRow(),
+              const LanguageRow(divided: kPrayerRemindersEnabled),
+              const AppearanceRow(divided: true),
               if (user != null)
                 AppListRow(
                   divided: true,
@@ -174,7 +177,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           child: Text(
             l.worksWithoutAccount,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12, height: 1.5).c(AppColor.ink3),
+            style: const TextStyle(fontSize: 12, height: 1.5).c(context.colors.ink3),
           ),
         ),
       ],
@@ -293,8 +296,8 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           width: 54,
           height: 54,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: AppColor.heroCircleBg,
+          decoration: BoxDecoration(
+            color: context.colors.heroCircleBg,
             shape: BoxShape.circle,
           ),
           child: Text(
@@ -303,7 +306,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
               fontSize: 19,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.5,
-            ).c(AppColor.onHero),
+            ).c(context.colors.onHero),
           ),
         ),
         const SizedBox(width: 13),
@@ -320,12 +323,12 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
-                ).c(AppColor.onHero),
+                ).c(context.colors.onHero),
               ),
               const SizedBox(height: 2),
               Text(
                 since,
-                style: AppText.countdownSub.c(AppColor.onHeroSecondary),
+                style: AppText.countdownSub.c(context.colors.onHeroSecondary),
               ),
             ],
           ),
@@ -336,11 +339,11 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
             width: 44,
             height: 44,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: AppColor.heroCircleBg,
+            decoration: BoxDecoration(
+              color: context.colors.heroCircleBg,
               shape: BoxShape.circle,
             ),
-            child: const RowChevron(color: AppColor.onHero, size: 18),
+            child: RowChevron(color: context.colors.onHero, size: 18),
           ),
         ),
       ],

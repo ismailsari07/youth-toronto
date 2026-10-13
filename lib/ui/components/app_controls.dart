@@ -16,8 +16,6 @@ class AppSwitch extends StatelessWidget {
   final bool value;
   final ValueChanged<bool>? onChanged;
 
-  static const _trackOff = Color(0xFFD6DCD9);
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -34,7 +32,7 @@ class AppSwitch extends StatelessWidget {
             height: 31,
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
-              color: value ? AppColor.green : _trackOff,
+              color: value ? context.colors.green : context.colors.switchTrackOff,
               borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
             child: AnimatedAlign(
@@ -44,10 +42,10 @@ class AppSwitch extends StatelessWidget {
               child: Container(
                 width: 27,
                 height: 27,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: value ? context.colors.switchKnobOn : context.colors.switchKnob,
                   shape: BoxShape.circle,
-                  boxShadow: AppShadow.switchKnob,
+                  boxShadow: context.shadows.switchKnob,
                 ),
               ),
             ),
@@ -80,7 +78,7 @@ class AppSegmented extends StatelessWidget {
           height: 40,
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
-            color: AppColor.segmentTrack,
+            color: context.colors.segmentTrack,
             borderRadius: BorderRadius.circular(AppRadius.segmentOuter),
           ),
           child: Stack(
@@ -94,9 +92,9 @@ class AppSegmented extends StatelessWidget {
                 width: segmentWidth,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.colors.segmentThumb,
                     borderRadius: BorderRadius.circular(AppRadius.segmentThumb),
-                    boxShadow: AppShadow.segmentThumb,
+                    boxShadow: context.shadows.segmentThumb,
                   ),
                 ),
               ),
@@ -111,10 +109,10 @@ class AppSegmented extends StatelessWidget {
                           child: Text(
                             labels[i],
                             style: i == index
-                                ? AppText.segment.c(AppColor.ink)
+                                ? AppText.segment.c(context.colors.ink)
                                 : AppText.segment
                                     .copyWith(fontWeight: FontWeight.w500)
-                                    .c(AppColor.ink2),
+                                    .c(context.colors.ink2),
                           ),
                         ),
                       ),
@@ -141,7 +139,7 @@ class DateBadge extends StatelessWidget {
       width: 58,
       height: 64,
       decoration: BoxDecoration(
-        color: AppColor.greenTint,
+        color: context.colors.greenTint,
         borderRadius: BorderRadius.circular(AppRadius.tile),
       ),
       child: Column(
@@ -153,7 +151,7 @@ class DateBadge extends StatelessWidget {
               fontSize: 9.5,
               fontWeight: FontWeight.w700,
               letterSpacing: 1,
-            ).c(AppColor.green),
+            ).c(context.colors.green),
           ),
           Text(
             '${date.day}',
@@ -162,7 +160,7 @@ class DateBadge extends StatelessWidget {
               fontWeight: FontWeight.w700,
               letterSpacing: -0.7,
               height: 1.15,
-            ).c(AppColor.greenDark),
+            ).c(context.colors.greenDark),
           ),
           Text(
             badgeMonth(context.l10n, date),
@@ -170,7 +168,7 @@ class DateBadge extends StatelessWidget {
               fontSize: 9.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.6,
-            ).c(AppColor.ink2),
+            ).c(context.colors.ink2),
           ),
         ],
       ),
@@ -189,9 +187,9 @@ class DateBadgeOnPhoto extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.raised,
         borderRadius: BorderRadius.circular(AppRadius.dateBadgeOnPhoto),
-        boxShadow: AppShadow.badgeOnPhoto,
+        boxShadow: context.shadows.badgeOnPhoto,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -202,7 +200,7 @@ class DateBadgeOnPhoto extends StatelessWidget {
               fontSize: 9.5,
               fontWeight: FontWeight.w700,
               letterSpacing: 1,
-            ).c(AppColor.green),
+            ).c(context.colors.green),
           ),
           Text(
             '${date.day}',
@@ -211,7 +209,7 @@ class DateBadgeOnPhoto extends StatelessWidget {
               fontWeight: FontWeight.w700,
               letterSpacing: -0.7,
               height: 1.2,
-            ).c(AppColor.greenDark),
+            ).c(context.colors.greenDark),
           ),
           Text(
             badgeMonth(context.l10n, date),
@@ -219,7 +217,7 @@ class DateBadgeOnPhoto extends StatelessWidget {
               fontSize: 9.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.6,
-            ).c(AppColor.ink2),
+            ).c(context.colors.ink2),
           ),
         ],
       ),
@@ -263,11 +261,11 @@ class RecurringBadge extends StatelessWidget {
             height: _size,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: onPhoto ? Colors.white : AppColor.greenTint,
+              color: onPhoto ? context.colors.raised : context.colors.greenTint,
               shape: BoxShape.circle,
-              boxShadow: onPhoto ? AppShadow.badgeOnPhoto : null,
+              boxShadow: onPhoto ? context.shadows.badgeOnPhoto : null,
             ),
-            child: AppIcon(icon, size: 19, color: AppColor.green),
+            child: AppIcon(icon, size: 19, color: context.colors.green),
           ),
           // The repeat mark: white ring so it separates from the circle.
           Positioned(
@@ -278,14 +276,14 @@ class RecurringBadge extends StatelessWidget {
               height: _markSize,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: AppColor.green,
+                color: context.colors.green,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.5),
+                border: Border.all(color: context.colors.card, width: 1.5),
               ),
-              child: const AppIcon(
+              child: AppIcon(
                 AppIcons.repeat,
                 size: 10,
-                color: Colors.white,
+                color: context.colors.onGreen,
               ),
             ),
           ),
@@ -307,8 +305,8 @@ class AppBadge extends StatelessWidget {
   const AppBadge({
     super.key,
     required this.label,
-    this.fill = AppColor.green,
-    this.textColor = Colors.white,
+    this.fill,
+    this.textColor,
     this.height = 17,
     this.fontSize = 9,
     this.letterSpacing = 0.7,
@@ -316,8 +314,8 @@ class AppBadge extends StatelessWidget {
   });
 
   final String label;
-  final Color fill;
-  final Color textColor;
+  final Color? fill;
+  final Color? textColor;
   final double height;
   final double fontSize;
   final double letterSpacing;
@@ -330,7 +328,7 @@ class AppBadge extends StatelessWidget {
       alignment: Alignment.center,
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       decoration: BoxDecoration(
-        color: fill,
+        color: fill ?? context.colors.green,
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
@@ -339,7 +337,7 @@ class AppBadge extends StatelessWidget {
           fontSize: fontSize,
           fontWeight: FontWeight.w700,
           letterSpacing: letterSpacing,
-        ).c(textColor),
+        ).c(textColor ?? context.colors.onGreen),
       ),
     );
   }

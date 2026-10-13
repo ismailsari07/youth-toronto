@@ -21,7 +21,7 @@ class MarriageReceivedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = context.l10n;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: ListView(
         padding: EdgeInsets.fromLTRB(
           AppSpace.pageGutter,
@@ -36,15 +36,15 @@ class MarriageReceivedScreen extends StatelessWidget {
               height: 88,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                gradient: heroGradient,
-                color: AppColor.heroBase,
+                gradient: context.colors.heroGradient,
+                color: context.colors.heroBase,
                 shape: BoxShape.circle,
-                boxShadow: AppShadow.hero,
+                boxShadow: context.shadows.hero,
               ),
-              child: const AppIcon(
+              child: AppIcon(
                 AppIcons.check,
                 size: 40,
-                color: AppColor.onHero,
+                color: context.colors.onHero,
               ),
             ),
           ),
@@ -56,14 +56,14 @@ class MarriageReceivedScreen extends StatelessWidget {
               fontSize: 26,
               fontWeight: FontWeight.w700,
               letterSpacing: -0.4,
-            ).c(AppColor.ink),
+            ).c(context.colors.ink),
           ),
           const SizedBox(height: 8),
           Text(
             l.receivedBody,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 14.5, height: 1.45)
-                .c(AppColor.ink2),
+                .c(context.colors.ink2),
           ),
           const SizedBox(height: 28),
           SectionHeader(title: l.whatHappensNext),
@@ -115,14 +115,14 @@ class _StepNumber extends StatelessWidget {
       width: 28,
       height: 28,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: AppColor.greenTint,
+      decoration: BoxDecoration(
+        color: context.colors.greenTint,
         shape: BoxShape.circle,
       ),
       child: Text(
         '$number',
         style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)
-            .c(AppColor.greenDark),
+            .c(context.colors.greenDark),
       ),
     );
   }

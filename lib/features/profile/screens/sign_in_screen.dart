@@ -55,7 +55,7 @@ class _SignInScreenState extends State<SignInScreen> {
     final l = context.l10n;
     final error = _error;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -95,7 +95,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   const SizedBox(height: 12),
                   Text(
                     authErrorText(l, error),
-                    style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
+                    style: const TextStyle(fontSize: 13.5).c(context.colors.danger),
                   ),
                 ],
                 const SizedBox(height: 18),
@@ -106,18 +106,18 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(height: 24),
                 Row(
                   children: [
-                    const Expanded(
-                      child: Divider(color: AppColor.hairline, thickness: 1),
+                    Expanded(
+                      child: Divider(color: context.colors.hairline, thickness: 1),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
                         l.noAccountYet,
-                        style: const TextStyle(fontSize: 12).c(AppColor.ink3),
+                        style: const TextStyle(fontSize: 12).c(context.colors.ink3),
                       ),
                     ),
-                    const Expanded(
-                      child: Divider(color: AppColor.hairline, thickness: 1),
+                    Expanded(
+                      child: Divider(color: context.colors.hairline, thickness: 1),
                     ),
                   ],
                 ),
@@ -130,7 +130,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Center(
                       child: Text(
                         l.createAccount,
-                        style: AppText.buttonLarge.c(AppColor.greenDark),
+                        style: AppText.buttonLarge.c(context.colors.greenDark),
                       ),
                     ),
                   ),
@@ -140,7 +140,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   l.accountOptional,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 12.5, height: 1.5)
-                      .c(AppColor.ink3),
+                      .c(context.colors.ink3),
                 ),
               ],
             ),

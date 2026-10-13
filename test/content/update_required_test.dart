@@ -6,6 +6,7 @@ import 'package:myt_flutter/core/content/content_bundle.dart';
 import 'package:myt_flutter/features/update/screens/update_required_screen.dart';
 import 'package:myt_flutter/l10n/l10n.dart';
 import 'package:myt_flutter/shared/providers/content_provider.dart';
+import 'package:myt_flutter/theme/app_theme.dart';
 
 void main() {
   const store = 'https://apps.apple.com/ca/app/id1234567890';
@@ -56,10 +57,11 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [initialContentProvider.overrideWithValue(bundle())],
-        child: const MaterialApp(
-          locale: Locale('tr'),
+        child: MaterialApp(
+          theme: appLightTheme,
+          locale: const Locale('tr'),
           supportedLocales: AppLocalizations.supportedLocales,
-          localizationsDelegates: [
+          localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

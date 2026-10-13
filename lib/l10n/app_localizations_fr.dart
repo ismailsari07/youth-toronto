@@ -218,6 +218,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le calendrier de la mosquée est inaccessible. Les rappels déjà programmés sur cet appareil restent actifs.';
 
   @override
+  String get timesUnavailableShortBody =>
+      'Le calendrier de la mosquée est inaccessible.';
+
+  @override
   String get tryAgain => 'Réessayer';
 
   @override
@@ -623,6 +627,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get languageAuto => 'Auto';
+
+  @override
+  String get appearance => 'Apparence';
+
+  @override
+  String get appearanceSystem => 'Système';
+
+  @override
+  String get appearanceSystemDetail => 'Suit le réglage de votre téléphone';
+
+  @override
+  String get appearanceLight => 'Clair';
+
+  @override
+  String get appearanceDark => 'Sombre';
 
   @override
   String get mosqueAndContact => 'Mosquée et contact';

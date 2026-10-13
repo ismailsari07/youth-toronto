@@ -73,7 +73,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                 children: [
                   Text(
                     l.applicationUnavailable,
-                    style: AppText.body.c(AppColor.ink2),
+                    style: AppText.body.c(context.colors.ink2),
                   ),
                   const SizedBox(height: 14),
                   GhostButton(
@@ -97,7 +97,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
     required List<Widget> children,
   }) {
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -151,7 +151,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
               const SizedBox(height: 12),
               Text(
                 l.underReviewBody,
-                style: AppText.body.c(AppColor.ink2),
+                style: AppText.body.c(context.colors.ink2),
               ),
             ],
           ),
@@ -214,18 +214,18 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                         style: const TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.w600,
-                        ).c(AppColor.danger),
+                        ).c(context.colors.danger),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         l.withdrawCaption,
                         style: const TextStyle(fontSize: 12.5)
-                            .c(AppColor.ink3),
+                            .c(context.colors.ink3),
                       ),
                     ],
                   ),
                 ),
-                const RowChevron(color: Color(0xFFC99A95)),
+                RowChevron(color: context.colors.dangerChevron),
               ],
             ),
           ),

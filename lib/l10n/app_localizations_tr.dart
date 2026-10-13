@@ -218,6 +218,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Caminin takvimine ulaşılamadı. Bu cihazda daha önce kurulan hatırlatıcılar çalışmaya devam eder.';
 
   @override
+  String get timesUnavailableShortBody => 'Caminin takvimine ulaşılamadı.';
+
+  @override
   String get tryAgain => 'Tekrar dene';
 
   @override
@@ -622,6 +625,21 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get languageAuto => 'Otomatik';
+
+  @override
+  String get appearance => 'Görünüm';
+
+  @override
+  String get appearanceSystem => 'Sistem';
+
+  @override
+  String get appearanceSystemDetail => 'Telefonunun ayarını izler';
+
+  @override
+  String get appearanceLight => 'Açık';
+
+  @override
+  String get appearanceDark => 'Koyu';
 
   @override
   String get mosqueAndContact => 'Cami ve iletişim';

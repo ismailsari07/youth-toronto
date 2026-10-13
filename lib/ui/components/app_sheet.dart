@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_motion.dart';
+import '../../theme/app_tokens.dart';
 
 /// Every bottom sheet in the app: over the tab bar, sized to its content,
 /// on the app's dimmed barrier. It rises over [AppMotion.sheet] and leaves
@@ -15,7 +16,7 @@ Future<T?> showAppSheet<T>({
     useRootNavigator: true,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor: const Color(0x6B0F1C17), // rgba(15,28,23,.42)
+    barrierColor: context.colors.barrier,
     sheetAnimationStyle: AppMotion.reduced(context)
         ? AnimationStyle.noAnimation
         : const AnimationStyle(

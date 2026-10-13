@@ -36,7 +36,7 @@ class AppShell extends ConsumerWidget {
       );
     }
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       extendBody: true, // content must flow under the island
       body: navigationShell,
       bottomNavigationBar: IslandTabBar(

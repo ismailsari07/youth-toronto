@@ -95,7 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final l = context.l10n;
     final error = _error;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -159,14 +159,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 12),
                   Text(
                     error(l),
-                    style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
+                    style: const TextStyle(fontSize: 13.5).c(context.colors.danger),
                   ),
                 ],
                 const SizedBox(height: 14),
                 Text(
                   l.detailsSharedOnlyWithOffice,
                   style: const TextStyle(fontSize: 12.5, height: 1.5)
-                      .c(AppColor.ink3),
+                      .c(context.colors.ink3),
                 ),
                 const SizedBox(height: 18),
                 PrimaryButton(
@@ -184,7 +184,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: const TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,
-                        ).c(AppColor.green),
+                        ).c(context.colors.green),
                       ),
                     ),
                   ),

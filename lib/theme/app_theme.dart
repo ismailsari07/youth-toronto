@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'app_motion.dart';
 import 'app_tokens.dart';
@@ -21,52 +22,72 @@ extension AppTextFamily on TextStyle {
   TextStyle c(Color color) => sys.copyWith(color: color);
 }
 
-final ThemeData appTheme = ThemeData(
-  brightness: Brightness.light,
-  fontFamily: kFontText,
-  fontFamilyFallback: kFontFallback,
-  scaffoldBackgroundColor: AppColor.ground,
-  // The iOS slide everywhere, so a push feels the same on every device.
-  pageTransitionsTheme: const PageTransitionsTheme(
-    builders: {
-      TargetPlatform.android: AppPageTransitionsBuilder(),
-      TargetPlatform.iOS: AppPageTransitionsBuilder(),
-      TargetPlatform.macOS: AppPageTransitionsBuilder(),
-      TargetPlatform.linux: AppPageTransitionsBuilder(),
-      TargetPlatform.windows: AppPageTransitionsBuilder(),
-      TargetPlatform.fuchsia: AppPageTransitionsBuilder(),
-    },
-  ),
-  colorScheme: const ColorScheme.light(
-    primary: AppColor.green,
-    onPrimary: Colors.white,
-    secondary: AppColor.blue,
-    surface: AppColor.card,
-    onSurface: AppColor.ink,
-    error: AppColor.danger,
-  ),
-  dividerTheme: const DividerThemeData(
-    color: AppColor.hairline,
-    thickness: 1,
-    space: 1,
-  ),
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Colors.transparent,
-    surfaceTintColor: Colors.transparent,
-    elevation: 0,
-    scrolledUnderElevation: 0,
-    iconTheme: IconThemeData(color: AppColor.ink),
-  ),
-  progressIndicatorTheme: const ProgressIndicatorThemeData(
-    color: AppColor.green,
-  ),
-  snackBarTheme: SnackBarThemeData(
-    backgroundColor: AppColor.ink,
-    contentTextStyle: AppText.rowTitle.c(Colors.white),
-    behavior: SnackBarBehavior.floating,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-  ),
-);
+/// The light and dark themes. Every colour comes from [AppColors]; widgets
+/// read it with `context.colors`.
+final ThemeData appLightTheme = _theme(AppColors.light, AppShadows.light);
+final ThemeData appDarkTheme = _theme(AppColors.dark, AppShadows.dark);
+
+ThemeData _theme(AppColors c, AppShadows shadows) => ThemeData(
+      brightness: c.brightness,
+      fontFamily: kFontText,
+      fontFamilyFallback: kFontFallback,
+      scaffoldBackgroundColor: c.ground,
+      canvasColor: c.ground,
+      extensions: [c, shadows],
+      // The iOS slide everywhere, so a push feels the same on every device.
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: AppPageTransitionsBuilder(),
+          TargetPlatform.iOS: AppPageTransitionsBuilder(),
+          TargetPlatform.macOS: AppPageTransitionsBuilder(),
+          TargetPlatform.linux: AppPageTransitionsBuilder(),
+          TargetPlatform.windows: AppPageTransitionsBuilder(),
+          TargetPlatform.fuchsia: AppPageTransitionsBuilder(),
+        },
+      ),
+      colorScheme: ColorScheme(
+        brightness: c.brightness,
+        primary: c.green,
+        onPrimary: c.onGreen,
+        secondary: c.blue,
+        onSecondary: c.onGreen,
+        surface: c.card,
+        onSurface: c.ink,
+        error: c.danger,
+        onError: c.onDanger,
+      ),
+      dividerTheme: DividerThemeData(
+        color: c.hairline,
+        thickness: 1,
+        space: 1,
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: IconThemeData(color: c.ink),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: c.green),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: c.green,
+        selectionColor: c.greenTintStrong,
+        selectionHandleColor: c.green,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: c.snackBg,
+        contentTextStyle: AppText.rowTitle.c(c.snackText),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+    );
+
+/// Status-bar icons for a screen whose top is [background]'s brightness:
+/// light icons over the dark hero, and on the ground in dark mode.
+SystemUiOverlayStyle statusBarOver(Brightness background) =>
+    background == Brightness.dark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
 
 /// Spec §0: the top 59px is reserved, but never less than the device's own
 /// safe-area inset (notch devices report more).

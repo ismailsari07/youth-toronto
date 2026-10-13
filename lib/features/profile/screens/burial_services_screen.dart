@@ -37,9 +37,9 @@ class BurialServicesScreen extends ConsumerWidget {
     final contacts = content.contactsIn('burial');
     final cemetery = content.cemetery;
     final history = cemetery.history.resolve(l.localeName);
-    final body = const TextStyle(fontSize: 14.5, height: 1.5).c(AppColor.ink2);
+    final body = const TextStyle(fontSize: 14.5, height: 1.5).c(context.colors.ink2);
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -97,21 +97,21 @@ class BurialServicesScreen extends ConsumerWidget {
                     children: [
                       if (history.isNotEmpty) ...[
                         Text(history, style: body),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Divider(height: 1, color: AppColor.hairline),
+                          child: Divider(height: 1, color: context.colors.hairline),
                         ),
                       ],
                       Text(
                         cemetery.name,
-                        style: AppText.cardTitle.c(AppColor.ink),
+                        style: AppText.cardTitle.c(context.colors.ink),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         '${cemetery.street}\n'
                         '${cemetery.city}',
                         style: const TextStyle(fontSize: 13.5, height: 1.45)
-                            .c(AppColor.ink2),
+                            .c(context.colors.ink2),
                       ),
                       const SizedBox(height: 16),
                       PrimaryButton(

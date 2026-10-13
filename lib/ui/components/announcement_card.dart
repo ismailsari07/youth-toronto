@@ -57,7 +57,7 @@ class AnnouncementCard extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: -0.2,
                               )
-                              .c(AppColor.ink),
+                              .c(context.colors.ink),
                         ),
                       ),
                       if (unread)
@@ -65,8 +65,8 @@ class AnnouncementCard extends StatelessWidget {
                           width: 8,
                           height: 8,
                           margin: const EdgeInsets.only(left: 4, top: 6),
-                          decoration: const BoxDecoration(
-                            color: AppColor.green,
+                          decoration: BoxDecoration(
+                            color: context.colors.green,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -78,12 +78,12 @@ class AnnouncementCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 13, height: 1.45)
-                        .c(AppColor.ink2),
+                        .c(context.colors.ink2),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     context.l10n.postedAgo(timeAgo(context.l10n, item.date)),
-                    style: const TextStyle(fontSize: 12).c(AppColor.ink3),
+                    style: const TextStyle(fontSize: 12).c(context.colors.ink3),
                   ),
                 ],
               ),

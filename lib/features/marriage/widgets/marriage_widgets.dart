@@ -21,19 +21,19 @@ class PrivacyStrip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColor.greenTint,
+        color: context.colors.greenTint,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppIcon(AppIcons.shieldCheck, size: 18, color: AppColor.green),
+          AppIcon(AppIcons.shieldCheck, size: 18, color: context.colors.green),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text ?? l.privacyStrip,
               style: const TextStyle(fontSize: 12.5, height: 1.4)
-                  .c(AppColor.greenDark),
+                  .c(context.colors.greenDark),
             ),
           ),
         ],
@@ -52,8 +52,8 @@ class UnderReviewPill extends StatelessWidget {
     final l = context.l10n;
     return AppBadge(
       label: l.underReview,
-      fill: AppColor.greenTint,
-      textColor: AppColor.greenDark,
+      fill: context.colors.greenTint,
+      textColor: context.colors.greenDark,
       height: 24,
       fontSize: 11,
       letterSpacing: 0,
@@ -69,19 +69,17 @@ class DropZoneCard extends StatelessWidget {
 
   final Widget child;
 
-  static const _dash = Color(0xFFBFD3C8);
-
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColor.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        boxShadow: AppShadow.card,
+        boxShadow: context.shadows.card,
       ),
       child: CustomPaint(
-        painter: const _DashedRRectPainter(
-          color: _dash,
+        painter: _DashedRRectPainter(
+          color: context.colors.dashedBorder,
           radius: AppRadius.card,
           strokeWidth: 1.5,
         ),
@@ -140,7 +138,7 @@ class FileTile extends StatelessWidget {
     super.key,
     required this.typeLabel,
     required this.caption,
-    this.captionColor = AppColor.ink3,
+    this.captionColor,
     this.captionWeight = FontWeight.w400,
     this.danger = false,
     this.trailing,
@@ -148,7 +146,7 @@ class FileTile extends StatelessWidget {
 
   final String typeLabel;
   final String caption;
-  final Color captionColor;
+  final Color? captionColor;
   final FontWeight captionWeight;
   final bool danger;
   final Widget? trailing;
@@ -156,8 +154,8 @@ class FileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    final tint = danger ? AppColor.dangerTint : AppColor.greenTint;
-    final ink = danger ? AppColor.danger : AppColor.green;
+    final tint = danger ? context.colors.dangerTint : context.colors.greenTint;
+    final ink = danger ? context.colors.danger : context.colors.green;
     return Row(
       children: [
         Container(
@@ -196,13 +194,13 @@ class FileTile extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
-                ).c(AppColor.ink),
+                ).c(context.colors.ink),
               ),
               const SizedBox(height: 3),
               Text(
                 caption,
                 style: TextStyle(fontSize: 12.5, fontWeight: captionWeight)
-                    .c(captionColor),
+                    .c(captionColor ?? context.colors.ink3),
               ),
             ],
           ),
@@ -227,8 +225,8 @@ class UploadProgressBar extends StatelessWidget {
         height: 6,
         child: Stack(
           children: [
-            const Positioned.fill(
-              child: ColoredBox(color: AppColor.segmentTrack),
+            Positioned.fill(
+              child: ColoredBox(color: context.colors.segmentTrack),
             ),
             // Glides between progress reports instead of jumping per chunk.
             TweenAnimationBuilder<double>(
@@ -243,7 +241,7 @@ class UploadProgressBar extends StatelessWidget {
                 heightFactor: 1,
                 child: child,
               ),
-              child: const ColoredBox(color: AppColor.green),
+              child: ColoredBox(color: context.colors.green),
             ),
           ],
         ),
@@ -268,12 +266,12 @@ class DisabledSubmitButton extends StatelessWidget {
       height: 50,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: AppColor.segmentTrack,
+        color: context.colors.segmentTrack,
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
         label ?? l.submit,
-        style: AppText.buttonLarge.c(const Color(0xFF7C8A84)),
+        style: AppText.buttonLarge.c(context.colors.inkDisabled),
       ),
     );
   }
@@ -292,7 +290,7 @@ class StickyCaption extends StatelessWidget {
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 12.5).c(AppColor.ink3),
+        style: const TextStyle(fontSize: 12.5).c(context.colors.ink3),
       ),
     );
   }
@@ -313,7 +311,7 @@ class StatusPill extends StatelessWidget {
       height: 26,
       padding: const EdgeInsets.symmetric(horizontal: 11),
       decoration: BoxDecoration(
-        color: AppColor.greenTint,
+        color: context.colors.greenTint,
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Row(
@@ -322,8 +320,8 @@ class StatusPill extends StatelessWidget {
           Container(
             width: 7,
             height: 7,
-            decoration: const BoxDecoration(
-              color: AppColor.green,
+            decoration: BoxDecoration(
+              color: context.colors.green,
               shape: BoxShape.circle,
             ),
           ),
@@ -331,7 +329,7 @@ class StatusPill extends StatelessWidget {
           Text(
             label ?? l.underReview,
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)
-                .c(AppColor.greenDark),
+                .c(context.colors.greenDark),
           ),
         ],
       ),

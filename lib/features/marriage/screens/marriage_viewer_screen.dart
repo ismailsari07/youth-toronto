@@ -70,7 +70,7 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
     final error = _error;
     final kind = widget.application.kind;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -105,7 +105,7 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
                         key: const ValueKey('document'),
                         borderRadius: BorderRadius.circular(AppRadius.card),
                         child: ColoredBox(
-                          color: AppColor.card,
+                          color: context.colors.card,
                           child: kind == DocumentKind.pdf
                               ? _pdf(bytes)
                               : InteractiveViewer(
@@ -145,7 +145,7 @@ class _MarriageViewerScreenState extends State<MarriageViewerScreen> {
       bytes,
       sourceName: _sourceName,
       params: PdfViewerParams(
-        backgroundColor: AppColor.ground,
+        backgroundColor: context.colors.ground,
         margin: 8,
         errorBannerBuilder: (context, error, stackTrace, documentRef) =>
             _Message(text: context.l10n.openFailed),
@@ -172,7 +172,7 @@ class _Message extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(text, style: AppText.body.c(AppColor.ink2)),
+            Text(text, style: AppText.body.c(context.colors.ink2)),
             if (retry != null) ...[
               const SizedBox(height: 14),
               GhostButton(label: l.tryAgain, onTap: retry),

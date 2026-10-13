@@ -76,7 +76,7 @@ class _Frame extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = context.l10n;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -291,12 +291,12 @@ class _UploadFlowState extends ConsumerState<_UploadFlow> {
             children: [
               Text(
                 l.whatToIncludeBody1,
-                style: AppText.body.c(AppColor.ink2),
+                style: AppText.body.c(context.colors.ink2),
               ),
               const SizedBox(height: 10),
               Text(
                 l.whatToIncludeBody2,
-                style: AppText.body.c(AppColor.ink2),
+                style: AppText.body.c(context.colors.ink2),
               ),
             ],
           ),
@@ -387,26 +387,26 @@ class _ChooseCard extends StatelessWidget {
             width: 60,
             height: 60,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: AppColor.greenTint,
+            decoration: BoxDecoration(
+              color: context.colors.greenTint,
               shape: BoxShape.circle,
             ),
-            child: const AppIcon(
+            child: AppIcon(
               AppIcons.upload,
               size: 26,
-              color: AppColor.green,
+              color: context.colors.green,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             l.chooseOneFile,
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)
-                .c(AppColor.ink),
+                .c(context.colors.ink),
           ),
           const SizedBox(height: 4),
           Text(
             l.fileRules,
-            style: const TextStyle(fontSize: 13).c(AppColor.ink3),
+            style: const TextStyle(fontSize: 13).c(context.colors.ink3),
           ),
           if (message != null) ...[
             const SizedBox(height: 10),
@@ -414,7 +414,7 @@ class _ChooseCard extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 13.5, height: 1.4)
-                  .c(AppColor.danger),
+                  .c(context.colors.danger),
             ),
           ],
           const SizedBox(height: 18),
@@ -473,7 +473,7 @@ class _ProgressCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
-                  ).c(AppColor.greenDark),
+                  ).c(context.colors.greenDark),
                 ),
               ),
               if (value != null)
@@ -483,7 +483,7 @@ class _ProgressCard extends StatelessWidget {
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                     fontFeatures: [FontFeature.tabularFigures()],
-                  ).c(AppColor.ink2),
+                  ).c(context.colors.ink2),
                 ),
             ],
           ),
@@ -520,7 +520,7 @@ class _RejectedCard extends StatelessWidget {
         rejected.size > 0 ? '${fileSize(l, rejected.size)} · $why' : why;
     return AppCard(
       padding: const EdgeInsets.all(AppSpace.cardPadding),
-      border: Border.all(color: const Color(0xFFE9C3BF), width: 1.5),
+      border: Border.all(color: context.colors.dangerBorder, width: 1.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -528,14 +528,14 @@ class _RejectedCard extends StatelessWidget {
             danger: true,
             typeLabel: rejected.kind?.label ?? '',
             caption: caption,
-            captionColor: AppColor.danger,
+            captionColor: context.colors.danger,
             captionWeight: FontWeight.w600,
           ),
           const SizedBox(height: 14),
           Text(
             explanation,
             style: const TextStyle(fontSize: 13.5, height: 1.45)
-                .c(AppColor.ink2),
+                .c(context.colors.ink2),
           ),
           const SizedBox(height: 16),
           _PickButtons(onFiles: onFiles, onPhotos: onPhotos),
@@ -573,7 +573,7 @@ class _NotEligibleView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       l.notEligibleTitle,
-                      style: AppText.cardTitle.c(AppColor.ink),
+                      style: AppText.cardTitle.c(context.colors.ink),
                     ),
                   ),
                 ],
@@ -581,7 +581,7 @@ class _NotEligibleView extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 l.notEligibleBody,
-                style: AppText.body.c(AppColor.ink2),
+                style: AppText.body.c(context.colors.ink2),
               ),
             ],
           ),
@@ -612,7 +612,7 @@ class _ProfileUnavailableView extends StatelessWidget {
             children: [
               Text(
                 l.detailsUnavailable,
-                style: AppText.body.c(AppColor.ink2),
+                style: AppText.body.c(context.colors.ink2),
               ),
               const SizedBox(height: 14),
               GhostButton(label: l.tryAgain, onTap: onRetry),

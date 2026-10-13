@@ -370,6 +370,12 @@ abstract class AppLocalizations {
   /// **'The mosque calendar could not be reached. Reminders already scheduled on this device still run.'**
   String get timesUnavailableBody;
 
+  /// No description provided for @timesUnavailableShortBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The mosque calendar could not be reached.'**
+  String get timesUnavailableShortBody;
+
   /// No description provided for @tryAgain.
   ///
   /// In en, this message translates to:
@@ -993,6 +999,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Auto'**
   String get languageAuto;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @appearanceSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get appearanceSystem;
+
+  /// No description provided for @appearanceSystemDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Follows your phone\'s setting'**
+  String get appearanceSystemDetail;
+
+  /// No description provided for @appearanceLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get appearanceLight;
+
+  /// No description provided for @appearanceDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get appearanceDark;
 
   /// No description provided for @mosqueAndContact.
   ///

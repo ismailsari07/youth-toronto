@@ -29,7 +29,7 @@ class UpdateRequiredScreen extends ConsumerWidget {
     final l = context.l10n;
     final appStore = ref.watch(contentProvider.select((c) => c.links.appStore));
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -43,14 +43,14 @@ class UpdateRequiredScreen extends ConsumerWidget {
                     width: 72,
                     height: 72,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: AppColor.greenTint,
+                    decoration: BoxDecoration(
+                      color: context.colors.greenTint,
                       shape: BoxShape.circle,
                     ),
-                    child: const AppIcon(
+                    child: AppIcon(
                       AppIcons.upload,
                       size: 32,
-                      color: AppColor.green,
+                      color: context.colors.green,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -61,7 +61,7 @@ class UpdateRequiredScreen extends ConsumerWidget {
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.2,
-                    ).c(AppColor.ink),
+                    ).c(context.colors.ink),
                   ),
                   const SizedBox(height: 6),
                   ConstrainedBox(
@@ -72,7 +72,7 @@ class UpdateRequiredScreen extends ConsumerWidget {
                       style: const TextStyle(
                         fontSize: 13.5,
                         height: 1.45,
-                      ).c(AppColor.ink2),
+                      ).c(context.colors.ink2),
                     ),
                   ),
                   const SizedBox(height: 22),

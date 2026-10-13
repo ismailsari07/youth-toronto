@@ -29,7 +29,7 @@ class EventWhenLine extends ConsumerWidget {
     final event = upcoming.event;
     final prayer = event.startsAfterPrayer;
     if (prayer == null) {
-      return Text(sessionLine(l, upcoming), style: _main.c(AppColor.ink2));
+      return Text(sessionLine(l, upcoming), style: _main.c(context.colors.ink2));
     }
 
     final start = upcoming.startsAt;
@@ -61,7 +61,7 @@ class EventWhenLine extends ConsumerWidget {
             child: AppIcon(
               AppIcons.forPrayer(prayerName(prayer)),
               size: 14,
-              color: AppColor.green,
+              color: context.colors.green,
             ),
           ),
           const SizedBox(width: 5),
@@ -69,7 +69,7 @@ class EventWhenLine extends ConsumerWidget {
             child: Text.rich(
               TextSpan(
                 text: lead,
-                style: _main.c(AppColor.ink2),
+                style: _main.c(context.colors.ink2),
                 children: [
                   if (about != null)
                     TextSpan(
@@ -77,7 +77,7 @@ class EventWhenLine extends ConsumerWidget {
                       style: const TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w400,
-                      ).c(AppColor.ink3),
+                      ).c(context.colors.ink3),
                     ),
                 ],
               ),

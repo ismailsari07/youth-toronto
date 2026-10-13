@@ -79,7 +79,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
     final error = _error;
     final ready = _date != null && !_busy;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -101,7 +101,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
                   padding: const EdgeInsets.all(AppSpace.cardPadding),
                   child: Text(
                     l.dobBody,
-                    style: AppText.body.c(AppColor.ink2),
+                    style: AppText.body.c(context.colors.ink2),
                   ),
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
@@ -121,7 +121,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
                   const SizedBox(height: 12),
                   Text(
                     error.message(l),
-                    style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
+                    style: const TextStyle(fontSize: 13.5).c(context.colors.danger),
                   ),
                 ],
                 const SizedBox(height: AppSpace.cardGapWide),

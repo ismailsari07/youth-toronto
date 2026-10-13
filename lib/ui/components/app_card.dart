@@ -13,18 +13,18 @@ class AppCard extends StatelessWidget {
     this.radius = AppRadius.card,
     this.padding,
     this.grouped = false,
-    this.color = AppColor.card,
+    this.color,
     this.border,
-    this.shadow = AppShadow.card,
+    this.shadow,
   });
 
   final Widget child;
   final double radius;
   final EdgeInsetsGeometry? padding;
   final bool grouped;
-  final Color color;
+  final Color? color;
   final BoxBorder? border;
-  final List<BoxShadow> shadow;
+  final List<BoxShadow>? shadow;
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +32,10 @@ class AppCard extends StatelessWidget {
       padding: padding,
       clipBehavior: grouped ? Clip.antiAlias : Clip.none,
       decoration: BoxDecoration(
-        color: color,
+        color: color ?? context.colors.card,
         borderRadius: BorderRadius.circular(radius),
         border: border,
-        boxShadow: shadow,
+        boxShadow: shadow ?? context.shadows.card,
       ),
       child: child,
     );
@@ -63,7 +63,7 @@ class SectionHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(title, style: AppText.sectionHeader.c(AppColor.ink)),
+        Text(title, style: AppText.sectionHeader.c(context.colors.ink)),
         if (trailing != null)
           if (onTrailingTap != null)
             Pressable(
@@ -73,7 +73,7 @@ class SectionHeader extends StatelessWidget {
                 child: Text(
                   trailing,
                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)
-                      .c(AppColor.green),
+                      .c(context.colors.green),
                 ),
               ),
             )
@@ -81,7 +81,7 @@ class SectionHeader extends StatelessWidget {
             Text(
               trailing,
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)
-                  .c(AppColor.ink3),
+                  .c(context.colors.ink3),
             ),
       ],
     );

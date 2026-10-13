@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'app_tokens.dart';
+
 /// The design's 35 stroke icons. All are 24×24 with `stroke="currentColor"`,
 /// so the colour is applied here, not in the file.
 abstract final class AppIcons {
@@ -24,6 +26,7 @@ abstract final class AppIcons {
   static const phone = 'phone';
   static const mail = 'mail';
   static const globe = 'globe';
+  static const appearance = 'appearance';
   static const info = 'info';
   static const lock = 'lock';
   static const check = 'check';
@@ -115,7 +118,8 @@ class AppIcon extends StatelessWidget {
 
 /// One of the two placeholder illustrations. `mosque-silhouette.svg` uses
 /// `currentColor` and takes [color]; `map-placeholder.svg` carries its own
-/// palette, so it is rendered untinted (pass no colour).
+/// palette, so it is rendered untinted (pass no colour) — in dark mode that
+/// palette is swapped for the dark photo-band tones.
 class AppIllustration extends StatelessWidget {
   const AppIllustration(
     this.name, {
@@ -145,6 +149,29 @@ class AppIllustration extends StatelessWidget {
       colorFilter: color == null
           ? null
           : ColorFilter.mode(color!, BlendMode.srcIn),
+      colorMapper: name == mapPlaceholder &&
+              context.colors.brightness == Brightness.dark
+          ? _DarkMap(context.colors)
+          : null,
     );
   }
+}
+
+/// The map placeholder's light palette, swapped for dark surfaces: ground,
+/// blocks, the park and the white streets.
+class _DarkMap extends ColorMapper {
+  const _DarkMap(this.colors);
+
+  final AppColors colors;
+
+  @override
+  Color substitute(String? id, String elementName, String attributeName,
+          Color color) =>
+      switch (color.toARGB32()) {
+        0xFFE7EDEA => colors.photoBandBg,
+        0xFFDDE5E1 => colors.photoBandArt,
+        0xFFD3E3DA => colors.greenTintStrong,
+        0xFFFFFFFF => colors.segmentThumb,
+        _ => color,
+      };
 }

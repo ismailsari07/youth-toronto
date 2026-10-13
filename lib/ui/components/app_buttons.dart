@@ -28,15 +28,15 @@ class PrimaryButton extends StatelessWidget {
         height: height,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppColor.green,
+          color: context.colors.green,
           borderRadius: BorderRadius.circular(AppRadius.pill),
-          boxShadow: AppShadow.greenButton,
+          boxShadow: context.shadows.greenButton,
         ),
         child: _LabelWithIcon(
           label: label,
           icon: icon,
-          style: AppText.buttonLarge.c(Colors.white),
-          color: Colors.white,
+          style: AppText.buttonLarge.c(context.colors.onGreen),
+          color: context.colors.onGreen,
         ),
       ),
     );
@@ -64,18 +64,14 @@ class PrimaryOnGradientButton extends StatelessWidget {
         height: height,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.colors.onHero,
           borderRadius: BorderRadius.circular(AppRadius.pill),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x4D000000),
-              offset: Offset(0, 4),
-              blurRadius: 14,
-              spreadRadius: -4,
-            ),
-          ],
+          boxShadow: context.shadows.onGradientButton,
         ),
-        child: Text(label, style: AppText.buttonLarge.c(AppColor.greenDark)),
+        child: Text(
+          label,
+          style: AppText.buttonLarge.c(context.colors.onGradientButtonText),
+        ),
       ),
     );
   }
@@ -103,12 +99,12 @@ class OutlinedOnGradientButton extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadius.pill),
-          border: Border.all(color: const Color(0x4DFFFFFF)),
+          border: Border.all(color: context.colors.heroOutline),
         ),
         child: Text(
           label,
           style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)
-              .c(Colors.white),
+              .c(context.colors.onHero),
         ),
       ),
     );
@@ -138,14 +134,14 @@ class GhostButton extends StatelessWidget {
         height: height,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppColor.neutralTint,
+          color: context.colors.neutralTint,
           borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
         child: _LabelWithIcon(
           label: label,
           icon: icon,
-          style: AppText.buttonSmall.c(AppColor.greenDark),
-          color: AppColor.greenDark,
+          style: AppText.buttonSmall.c(context.colors.greenDark),
+          color: context.colors.greenDark,
           iconSize: 17,
         ),
       ),
@@ -173,10 +169,10 @@ class DestructiveButton extends StatelessWidget {
         height: height,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppColor.danger,
+          color: context.colors.danger,
           borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
-        child: Text(label, style: AppText.buttonLarge.c(Colors.white)),
+        child: Text(label, style: AppText.buttonLarge.c(context.colors.onDanger)),
       ),
     );
   }
@@ -190,7 +186,7 @@ class CircleIconButton extends StatelessWidget {
     this.onTap,
     this.size = 50,
     this.iconSize = 19,
-    this.color = AppColor.greenDark,
+    this.color,
     this.bordered = true,
     this.shadow,
   });
@@ -199,7 +195,7 @@ class CircleIconButton extends StatelessWidget {
   final VoidCallback? onTap;
   final double size;
   final double iconSize;
-  final Color color;
+  final Color? color;
   final bool bordered;
   final List<BoxShadow>? shadow;
 
@@ -212,12 +208,16 @@ class CircleIconButton extends StatelessWidget {
         height: size,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppColor.card,
+          color: context.colors.card,
           shape: BoxShape.circle,
-          border: bordered ? Border.all(color: AppColor.border) : null,
+          border: bordered ? Border.all(color: context.colors.border) : null,
           boxShadow: shadow,
         ),
-        child: AppIcon(icon, size: iconSize, color: color),
+        child: AppIcon(
+          icon,
+          size: iconSize,
+          color: color ?? context.colors.greenDark,
+        ),
       ),
     );
   }

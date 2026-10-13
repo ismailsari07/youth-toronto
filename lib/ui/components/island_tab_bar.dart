@@ -52,10 +52,10 @@ class IslandTabBar extends StatelessWidget {
               height: AppSpace.islandHeight,
               padding: const EdgeInsets.symmetric(horizontal: 6),
               decoration: BoxDecoration(
-                color: const Color(0xD1FFFFFF), // white 82%
+                color: context.colors.islandBg,
                 borderRadius: BorderRadius.circular(AppRadius.island),
-                border: Border.all(color: const Color(0xBFFFFFFF)), // white 75%
-                boxShadow: AppShadow.island,
+                border: Border.all(color: context.colors.islandBorder),
+                boxShadow: context.shadows.island,
               ),
               child: Row(
                 children: [
@@ -95,14 +95,14 @@ class _IslandItem extends StatelessWidget {
   Widget build(BuildContext context) {
     // The tint eases between tabs instead of snapping.
     return TweenAnimationBuilder<Color?>(
-      tween: ColorTween(end: active ? AppColor.green : AppColor.tabInactive),
+      tween: ColorTween(end: active ? context.colors.green : context.colors.tabInactive),
       duration: AppMotion.fast,
       curve: Curves.easeOut,
-      builder: (context, color, _) => _item(color!),
+      builder: (context, color, _) => _item(context, color!),
     );
   }
 
-  Widget _item(Color color) {
+  Widget _item(BuildContext context, Color color) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -123,9 +123,9 @@ class _IslandItem extends StatelessWidget {
                       width: 9,
                       height: 9,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFC2453B),
+                        color: context.colors.unreadDot,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
+                        border: Border.all(color: context.colors.card, width: 2),
                       ),
                     ),
                   ),

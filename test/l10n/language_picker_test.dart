@@ -6,6 +6,7 @@ import 'package:myt_flutter/features/profile/widgets/language_sheet.dart';
 import 'package:myt_flutter/l10n/l10n.dart';
 import 'package:myt_flutter/l10n/locale_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:myt_flutter/theme/app_theme.dart';
 
 /// The app's localisation setup around a single Language row, with the
 /// device reporting [device].
@@ -15,6 +16,7 @@ class _Harness extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
+      theme: appLightTheme,
       locale: ref.watch(localeOverrideProvider),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [

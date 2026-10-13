@@ -56,7 +56,7 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
   Widget build(BuildContext context) {
     final l = context.l10n;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -78,7 +78,7 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
                   padding: const EdgeInsets.all(AppSpace.cardPadding),
                   child: Text(
                     l.marriageGateBody,
-                    style: AppText.body.c(AppColor.ink2),
+                    style: AppText.body.c(context.colors.ink2),
                   ),
                 ),
                 const SizedBox(height: AppSpace.cardGapWide),
@@ -109,7 +109,7 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
                 Text(
                   l.marriageAgeNote,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 12.5).c(AppColor.ink3),
+                  style: const TextStyle(fontSize: 12.5).c(context.colors.ink3),
                 ),
               ],
             ),
@@ -138,7 +138,7 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
             Text(
               l.marriageGateCaption,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12.5).c(AppColor.ink3),
+              style: const TextStyle(fontSize: 12.5).c(context.colors.ink3),
             ),
           ],
         ),

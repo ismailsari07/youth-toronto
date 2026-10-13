@@ -38,7 +38,7 @@ class MosqueInfoScreen extends ConsumerWidget {
     final secondary = mosque.nameSecondary;
     final website = mosque.website;
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -57,7 +57,7 @@ class MosqueInfoScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _mapBand(),
+                      _mapBand(context),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
                         child: Column(
@@ -65,7 +65,7 @@ class MosqueInfoScreen extends ConsumerWidget {
                           children: [
                             Text(
                               mosque.name,
-                              style: AppText.cardTitle.c(AppColor.ink),
+                              style: AppText.cardTitle.c(context.colors.ink),
                             ),
                             if (secondary != null) ...[
                               const SizedBox(height: 2),
@@ -74,7 +74,7 @@ class MosqueInfoScreen extends ConsumerWidget {
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                ).c(AppColor.ink3),
+                                ).c(context.colors.ink3),
                               ),
                             ],
                             const SizedBox(height: 8),
@@ -84,7 +84,7 @@ class MosqueInfoScreen extends ConsumerWidget {
                               style: const TextStyle(
                                 fontSize: 13.5,
                                 height: 1.45,
-                              ).c(AppColor.ink2),
+                              ).c(context.colors.ink2),
                             ),
                             const SizedBox(height: 16),
                             Row(
@@ -220,7 +220,7 @@ class MosqueInfoScreen extends ConsumerWidget {
         _ => AppIcons.clock,
       };
 
-  Widget _mapBand() {
+  Widget _mapBand(BuildContext context) {
     return SizedBox(
       height: 170,
       child: Stack(
@@ -228,7 +228,7 @@ class MosqueInfoScreen extends ConsumerWidget {
         children: [
           Positioned.fill(
             child: Container(
-              color: AppColor.photoBandBg,
+              color: context.colors.photoBandBg,
               alignment: Alignment.center,
               child: const AppIllustration(
                 AppIllustration.mapPlaceholder,
@@ -241,21 +241,14 @@ class MosqueInfoScreen extends ConsumerWidget {
             height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              gradient: heroGradient,
+              gradient: context.colors.heroGradient,
               shape: BoxShape.circle,
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x8008281C),
-                  offset: Offset(0, 6),
-                  blurRadius: 16,
-                  spreadRadius: -4,
-                ),
-              ],
+              boxShadow: context.shadows.heroBadge,
             ),
-            child: const AppIcon(
+            child: AppIcon(
               AppIcons.mosque,
               size: 22,
-              color: AppColor.onHero,
+              color: context.colors.onHero,
             ),
           ),
         ],

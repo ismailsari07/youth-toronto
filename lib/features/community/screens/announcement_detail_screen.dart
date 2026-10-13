@@ -53,7 +53,7 @@ class AnnouncementDetailScreen extends ConsumerWidget {
     final posted = '$ago · ${l.mosqueOffice}';
 
     return Scaffold(
-      backgroundColor: AppColor.ground,
+      backgroundColor: context.colors.ground,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -84,14 +84,14 @@ class AnnouncementDetailScreen extends ConsumerWidget {
                           padding: const EdgeInsets.only(bottom: 14),
                           child: Text(
                             paragraph,
-                            style: AppText.bodyLarge.c(AppColor.ink2),
+                            style: AppText.bodyLarge.c(context.colors.ink2),
                           ),
                         ),
                       const SizedBox(height: 6),
-                      const Divider(
+                      Divider(
                         height: 1,
                         thickness: 1,
-                        color: AppColor.hairline,
+                        color: context.colors.hairline,
                       ),
                       const SizedBox(height: 16),
                       Row(
@@ -110,13 +110,13 @@ class AnnouncementDetailScreen extends ConsumerWidget {
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                ).c(AppColor.ink),
+                                ).c(context.colors.ink),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 ago,
                                 style:
-                                    const TextStyle(fontSize: 12).c(AppColor.ink3),
+                                    const TextStyle(fontSize: 12).c(context.colors.ink3),
                               ),
                             ],
                           ),

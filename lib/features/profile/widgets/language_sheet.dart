@@ -33,7 +33,7 @@ class LanguageRow extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(current, style: const TextStyle(fontSize: 13.5).c(AppColor.ink3)),
+          Text(current, style: const TextStyle(fontSize: 13.5).c(context.colors.ink3)),
           const SizedBox(width: 6),
           const RowChevron(),
         ],
@@ -77,19 +77,19 @@ class _LanguageSheet extends ConsumerWidget {
         title: title,
         titleStyle: AppText.rowTitle
             .copyWith(fontWeight: on ? FontWeight.w700 : null)
-            .c(on ? AppColor.greenDeep : AppColor.ink),
+            .c(on ? context.colors.greenDeep : context.colors.ink),
         subtitle: subtitle,
-        background: on ? AppColor.greenRowBg : null,
+        background: on ? context.colors.greenRowBg : null,
         trailing: on
-            ? const AppIcon(AppIcons.check, size: 20, color: AppColor.green)
+            ? AppIcon(AppIcons.check, size: 20, color: context.colors.green)
             : null,
         onTap: () => choose(locale),
       );
     }
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColor.ground,
+      decoration: BoxDecoration(
+        color: context.colors.ground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 34),
@@ -104,7 +104,7 @@ class _LanguageSheet extends ConsumerWidget {
                 width: 40,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDDE3E0),
+                  color: context.colors.grabber,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
               ),
@@ -114,7 +114,7 @@ class _LanguageSheet extends ConsumerWidget {
               l.language,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)
-                  .c(AppColor.ink),
+                  .c(context.colors.ink),
             ),
             const SizedBox(height: 18),
             GroupedRows(

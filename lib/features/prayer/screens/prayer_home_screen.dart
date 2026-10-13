@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/feature_flags.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
 import '../../../core/prayer_utils.dart';
@@ -61,28 +63,31 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         // The home-screen widget picks up any corrected times too.
         PrayerWidgetSync.sync();
       },
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         AppSpace.pageGutter,
-        topInset(context),
+        0,
         AppSpace.pageGutter,
         AppSpace.scrollBottomInset,
       ),
-      // The tab's entrance cascade, top to bottom: the emergency banner,
-      // date and moon, the Community section, the times, the occasion card,
-      // the mosque card.
-      children: [
-        StaggerItem(
-          index: 0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const EmergencyBanner(),
-              _header(payload, loading),
-              const SizedBox(height: 14),
-              MoonCountdownCard(prayers: payload?.dailyPrayerTimes),
-            ],
+      // The tab's entrance cascade, top to bottom: the hero (who we are,
+      // the date and the moon), the emergency banner, the Community
+      // section, the times, the occasion card, the mosque card.
+      // The hero runs under the status bar, which keeps light icons over it
+      // in both modes.
+      header: StaggerItem(
+        index: 0,
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: statusBarOver(Brightness.dark),
+          child: MoonCountdownCard(
+            // Failed (not loading): an empty day, so the hero says the
+            // times are unavailable instead of shimmering forever.
+            prayers: payload?.dailyPrayerTimes ?? (loading ? null : const []),
+            header: _header(payload, loading),
           ),
         ),
+      ),
+      children: [
+        const StaggerItem(index: 0, child: EmergencyBanner()),
         // Next event and latest announcement; brings its own top gap and
         // hides entirely when there is nothing to show.
         const StaggerItem(index: 1, child: CommunitySection()),
@@ -119,14 +124,14 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     );
   }
 
-  /// Who we are, then today. Row 1: the app icon's mosque on its green, the
-  /// organisation and the mosque, and the reminders bell. Row 2: the
-  /// Gregorian date and the Hijri date in a pill, on one line.
+  /// Who we are, then today, at the top of the hero. Row 1: the app icon's
+  /// mosque on its green, the organisation and the mosque, and the
+  /// reminders bell. Row 2: the Gregorian date and the Hijri date in a
+  /// pill, on one line.
   Widget _header(PrayerCachePayload? payload, bool loading) {
     final l = context.l10n;
+    final colors = context.colors;
     final hijri = hijriTitle(l, payload?.hijriDate);
-    final remindersOn =
-        ref.watch(reminderSettingsProvider).valueOrNull?.active ?? true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -152,7 +157,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
                         height: 1.25,
-                      ).c(AppColor.ink),
+                      ).c(colors.onHero),
                     ),
                   ),
                   const SizedBox(height: 1),
@@ -161,28 +166,19 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 13, height: 1.3)
-                        .c(AppColor.ink3),
+                        .c(colors.onHeroSecondary),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
-            Semantics(
-              label: l.prayerReminders,
-              button: true,
-              child: CircleIconButton(
-                icon: remindersOn ? AppIcons.bell : AppIcons.bellOff,
-                size: 44,
-                iconSize: 21,
-                bordered: false,
-                shadow: AppShadow.floatingButton,
-                onTap: () => showRemindersSheet(context),
-              ),
-            ),
+            if (kPrayerRemindersEnabled) ...[
+              const SizedBox(width: 12),
+              _ReminderBell(),
+            ],
           ],
         ),
         const SizedBox(height: 16),
-        // Always one line, so the moon card sits at the same height in every
+        // Always one line, so the moon sits at the same height in every
         // language: the date keeps 20pt when it fits and only shrinks (to
         // about 17-18pt for French or long English dates) when it doesn't.
         Row(
@@ -198,7 +194,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.3,
-                  ).c(AppColor.ink),
+                  ).c(colors.onHero),
                 ),
               ),
             ),
@@ -211,6 +207,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                       width: 120,
                       height: 26,
                       radius: AppRadius.pill,
+                      onDark: true,
                     )
                   : hijri != null
                       ? _HijriPill(hijri, key: const ValueKey('hijri'))
@@ -234,13 +231,15 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           children: [
             Text(
               l.timesUnavailableTitle,
-              style: AppText.cardTitle.c(AppColor.ink),
+              style: AppText.cardTitle.c(context.colors.ink),
             ),
             const SizedBox(height: 6),
             Text(
-              l.timesUnavailableBody,
+              kPrayerRemindersEnabled
+                  ? l.timesUnavailableBody
+                  : l.timesUnavailableShortBody,
               style: const TextStyle(fontSize: 13.5, height: 1.45)
-                  .c(AppColor.ink2),
+                  .c(context.colors.ink2),
             ),
             const SizedBox(height: 16),
             GhostButton(
@@ -261,7 +260,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               leading: const Shimmer(width: 38, height: 38, radius: 19),
               trailing: const Shimmer(width: 64, height: 18),
             ),
-          const RemindersRow(divided: true, background: AppColor.cardMuted),
+          if (kPrayerRemindersEnabled)
+            RemindersRow(divided: true, background: context.colors.cardMuted),
         ],
       );
     }
@@ -282,27 +282,29 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
           divided: i > 0,
           icon: AppIcons.forPrayer(p.name),
           tone: isSunrise ? RowTone.blue : RowTone.neutral,
-          iconFill: isCurrent ? AppColor.greenTintStrong : null,
-          iconGlyph: isCurrent ? AppColor.greenDark : null,
-          background: isCurrent ? AppColor.greenRowBg : null,
+          iconFill: isCurrent ? context.colors.greenTintStrong : null,
+          iconGlyph: isCurrent ? context.colors.greenDark : null,
+          background: isCurrent ? context.colors.greenRowBg : null,
           title: prayerLabel(l, p.name),
           titleStyle: isCurrent
               ? AppText.prayerName
                   .copyWith(fontWeight: FontWeight.w700)
-                  .c(AppColor.greenDeep)
-              : AppText.prayerName.c(past ? AppColor.ink2 : AppColor.ink),
+                  .c(context.colors.greenDeep)
+              : AppText.prayerName.c(past ? context.colors.ink2 : context.colors.ink),
           subtitle: isSunrise
               ? l.fajrWindowCloses
               : l.athanAt(prayerClock12(p.name, p.time)),
-          subtitleStyle: AppText.caption.c(AppColor.ink3),
+          subtitleStyle: AppText.caption.c(context.colors.ink3),
           trailing: _trailing(p, isCurrent),
         ),
       );
     }
 
-    rows.add(
-      const RemindersRow(divided: true, background: AppColor.cardMuted),
-    );
+    if (kPrayerRemindersEnabled) {
+      rows.add(
+        RemindersRow(divided: true, background: context.colors.cardMuted),
+      );
+    }
     return GroupedRows(rows: rows);
   }
 
@@ -314,8 +316,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         style: isCurrent
             ? AppText.iqamahValue
                 .copyWith(fontWeight: FontWeight.w700)
-                .c(AppColor.greenDeep)
-            : AppText.iqamahValue.c(AppColor.ink2),
+                .c(context.colors.greenDeep)
+            : AppText.iqamahValue.c(context.colors.ink2),
       );
     }
     return Column(
@@ -325,15 +327,15 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         Text(
           context.l10n.iqamah,
           style: AppText.iqamahLabel
-              .c(isCurrent ? const Color(0xFF5C7E6D) : AppColor.ink4),
+              .c(isCurrent ? context.colors.greenLabel : context.colors.ink4),
         ),
         Text(
           prayerClock12(p.name, iqamah),
           style: isCurrent
               ? AppText.iqamahValue
                   .copyWith(fontWeight: FontWeight.w700)
-                  .c(AppColor.greenDeep)
-              : AppText.iqamahValue.c(AppColor.ink),
+                  .c(context.colors.greenDeep)
+              : AppText.iqamahValue.c(context.colors.ink),
         ),
       ],
     );
@@ -372,17 +374,9 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   Widget _goldCard({required String title, required String subtitle}) {
     return AppCard(
       radius: AppRadius.listCard,
-      color: AppColor.goldBg,
-      border: Border.all(color: AppColor.goldBorder),
-      shadow: const [
-        BoxShadow(color: Color(0x0D503C0A), offset: Offset(0, 1), blurRadius: 2),
-        BoxShadow(
-          color: Color(0x38503C0A),
-          offset: Offset(0, 10),
-          blurRadius: 26,
-          spreadRadius: -12,
-        ),
-      ],
+      color: context.colors.goldBg,
+      border: Border.all(color: context.colors.goldBorder),
+      shadow: context.shadows.gold,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
       child: Row(
         children: [
@@ -401,18 +395,18 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   title,
                   style: AppText.rowTitle
                       .copyWith(fontWeight: FontWeight.w700)
-                      .c(AppColor.goldText),
+                      .c(context.colors.goldText),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)
-                      .c(AppColor.goldTextSoft),
+                      .c(context.colors.goldTextSoft),
                 ),
               ],
             ),
           ),
-          const RowChevron(color: Color(0xFF8A6516), size: 18),
+          RowChevron(color: context.colors.goldChevron, size: 18),
         ],
       ),
     );
@@ -510,8 +504,6 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
 class _BrandTile extends StatelessWidget {
   const _BrandTile();
 
-  static const _iconGreen = Color(0xFF0F4D3A);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -519,7 +511,7 @@ class _BrandTile extends StatelessWidget {
       height: 40,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: _iconGreen,
+        color: context.colors.brandTile,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Image.asset(
@@ -543,9 +535,8 @@ class _HijriPill extends StatelessWidget {
       height: 26,
       padding: const EdgeInsets.symmetric(horizontal: 11),
       decoration: BoxDecoration(
-        color: AppColor.greenTint,
+        color: context.colors.heroPillBg,
         borderRadius: BorderRadius.circular(AppRadius.pill),
-        border: Border.all(color: AppColor.greenTintStrong),
       ),
       // Hugs the text: centred vertically without taking the full width.
       child: Center(
@@ -554,7 +545,44 @@ class _HijriPill extends StatelessWidget {
           text,
           maxLines: 1,
           style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)
-              .c(AppColor.greenDeep),
+              .c(context.colors.onHero),
+        ),
+      ),
+    );
+  }
+}
+
+/// The reminders bell on the hero: a white glyph in a translucent circle.
+/// Shown only while [kPrayerRemindersEnabled].
+class _ReminderBell extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final on =
+        ref.watch(reminderSettingsProvider).valueOrNull?.active ?? true;
+    return Semantics(
+      label: context.l10n.prayerReminders,
+      button: true,
+      child: Pressable(
+        onTap: () => showRemindersSheet(context),
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Center(
+            child: Container(
+              width: 42,
+              height: 42,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: context.colors.heroCircleBg,
+                shape: BoxShape.circle,
+              ),
+              child: AppIcon(
+                on ? AppIcons.bell : AppIcons.bellOff,
+                size: 21,
+                color: context.colors.onHero,
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -16,6 +16,7 @@ import 'l10n/l10n.dart';
 import 'l10n/locale_provider.dart';
 import 'shared/providers/content_provider.dart';
 import 'theme/app_theme.dart';
+import 'theme/theme_mode_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ void main() async {
     debugPrint('Notification init failed: $e');
   }
   final savedLocale = await LocaleStore.load();
+  final savedThemeMode = await ThemeModeStore.load();
   // The last good content bundle, else the one shipped in the app. Local
   // only; the network fetch runs after the first frame.
   final content = await ContentRepository.loadLocal();
@@ -53,6 +55,7 @@ void main() async {
     ProviderScope(
       overrides: [
         savedLocaleProvider.overrideWithValue(savedLocale),
+        savedThemeModeProvider.overrideWithValue(savedThemeMode),
         initialContentProvider.overrideWithValue(content),
         appVersionProvider.overrideWithValue(appVersion),
       ],
@@ -135,13 +138,20 @@ class _MytAppState extends ConsumerState<MytApp> {
       ],
       localeListResolutionCallback: (device, _) =>
           resolveAppLocale(null, device ?? const []),
-      theme: appTheme,
+      theme: appLightTheme,
+      darkTheme: appDarkTheme,
+      themeMode: ref.watch(themeModeProvider),
       routerConfig: router,
       // Below the panel's minimum version (and only then) the update screen
       // replaces the whole app; nothing else is reachable.
-      builder: (context, child) => ref.watch(updateRequiredProvider)
-          ? const UpdateRequiredScreen()
-          : child!,
+      // Status-bar icons follow the theme: dark over the light ground,
+      // light over the dark one (the Prayer hero sets its own).
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: statusBarOver(Theme.of(context).brightness),
+        child: ref.watch(updateRequiredProvider)
+            ? const UpdateRequiredScreen()
+            : child!,
+      ),
       debugShowCheckedModeBanner: false,
     );
   }

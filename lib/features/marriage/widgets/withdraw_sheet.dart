@@ -56,8 +56,8 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
       // Don't let a swipe dismiss the sheet halfway through deleting.
       canPop: !_busy,
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColor.card,
+        decoration: BoxDecoration(
+          color: context.colors.card,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 34),
@@ -70,7 +70,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                 width: 40,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDDE3E0),
+                  color: context.colors.grabber,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
               ),
@@ -79,14 +79,14 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                 width: 56,
                 height: 56,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: AppColor.dangerTint,
+                decoration: BoxDecoration(
+                  color: context.colors.dangerTint,
                   shape: BoxShape.circle,
                 ),
-                child: const AppIcon(
+                child: AppIcon(
                   AppIcons.trash,
                   size: 24,
-                  color: AppColor.danger,
+                  color: context.colors.danger,
                 ),
               ),
               const SizedBox(height: 14),
@@ -94,21 +94,21 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                 l.withdrawSheetTitle,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)
-                    .c(AppColor.ink),
+                    .c(context.colors.ink),
               ),
               const SizedBox(height: 8),
               Text(
                 l.withdrawSheetBody,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14.5, height: 1.45)
-                    .c(AppColor.ink2),
+                    .c(context.colors.ink2),
               ),
               if (error != null) ...[
                 const SizedBox(height: 12),
                 Text(
                   error.message(l),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 13.5).c(AppColor.danger),
+                  style: const TextStyle(fontSize: 13.5).c(context.colors.danger),
                 ),
               ],
               const SizedBox(height: 22),

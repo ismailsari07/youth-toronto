@@ -34,17 +34,17 @@ class GradientTabHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
       decoration: BoxDecoration(
-        gradient: heroGradient,
-        color: AppColor.heroBase,
+        gradient: context.colors.heroGradient,
+        color: context.colors.heroBase,
         borderRadius: BorderRadius.circular(AppRadius.hero),
-        boxShadow: AppShadow.hero,
+        boxShadow: context.shadows.hero,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppText.heroTitle.c(AppColor.onHero)),
+          Text(title, style: AppText.heroTitle.c(context.colors.onHero)),
           const SizedBox(height: 14),
-          const Divider(height: 1, thickness: 1, color: AppColor.heroDivider),
+          Divider(height: 1, thickness: 1, color: context.colors.heroDivider),
           const SizedBox(height: 14),
           row,
           if (footer != null) ...[const SizedBox(height: 14), footer!],
@@ -85,11 +85,11 @@ class HeroRow extends StatelessWidget {
           width: circleSize,
           height: circleSize,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: AppColor.heroCircleBg,
+          decoration: BoxDecoration(
+            color: context.colors.heroCircleBg,
             shape: BoxShape.circle,
           ),
-          child: AppIcon(icon, size: iconSize, color: AppColor.onHero),
+          child: AppIcon(icon, size: iconSize, color: context.colors.onHero),
         ),
         const SizedBox(width: 13),
         Expanded(
@@ -101,7 +101,7 @@ class HeroRow extends StatelessWidget {
                 title,
                 style: titleStyle ??
                     const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700)
-                        .c(AppColor.onHero),
+                        .c(context.colors.onHero),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -109,7 +109,7 @@ class HeroRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   sub,
-                  style: AppText.countdownSub.c(AppColor.onHeroSecondary),
+                  style: AppText.countdownSub.c(context.colors.onHeroSecondary),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -159,20 +159,20 @@ class PlainNavBar extends StatelessWidget {
               size: 44,
               iconSize: 20,
               bordered: false,
-              shadow: AppShadow.floatingButton,
+              shadow: context.shadows.floatingButton,
               onTap: onBack ?? () => Navigator.of(context).maybePop(),
             ),
           ),
           const SizedBox(height: 16),
-          Text(eyebrow, style: AppText.eyebrow.c(AppColor.green)),
+          Text(eyebrow, style: AppText.eyebrow.c(context.colors.green)),
           const SizedBox(height: 4),
-          Text(title, style: AppText.screenTitle.c(AppColor.ink)),
+          Text(title, style: AppText.screenTitle.c(context.colors.ink)),
           if (sub != null) ...[
             const SizedBox(height: 4),
             Text(
               sub,
               style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500)
-                  .c(AppColor.ink2),
+                  .c(context.colors.ink2),
             ),
           ],
         ],
@@ -213,11 +213,11 @@ class EmptyStateCard extends StatelessWidget {
                   width: 72,
                   height: 72,
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    color: AppColor.greenTint,
+                  decoration: BoxDecoration(
+                    color: context.colors.greenTint,
                     shape: BoxShape.circle,
                   ),
-                  child: AppIcon(icon, size: 32, color: AppColor.green),
+                  child: AppIcon(icon, size: 32, color: context.colors.green),
                 ),
                 const SizedBox(height: 14),
                 Text(
@@ -226,7 +226,7 @@ class EmptyStateCard extends StatelessWidget {
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.2,
-                  ).c(AppColor.ink),
+                  ).c(context.colors.ink),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 6),
@@ -239,19 +239,19 @@ class EmptyStateCard extends StatelessWidget {
                       fontSize: 13.5,
                       fontWeight: FontWeight.w400,
                       height: 1.45,
-                    ).c(AppColor.ink2),
+                    ).c(context.colors.ink2),
                   ),
                 ),
                 const SizedBox(height: 22),
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: AppColor.hairline),
+          Divider(height: 1, thickness: 1, color: context.colors.hairline),
           AppListRow(
             icon: AppIcons.bell,
             title: context.l10n.notifyMe,
             titleStyle: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)
-                .c(AppColor.ink),
+                .c(context.colors.ink),
             trailing: AppSwitch(value: notifyValue, onChanged: onNotifyChanged),
           ),
         ],
@@ -302,11 +302,6 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
     }
   }
 
-  static const _from = Color(0xFFE8EDEB);
-  static const _to = Color(0xFFF4F7F6);
-  static const _darkFrom = Color(0x14FFFFFF);
-  static const _darkTo = Color(0x2EFFFFFF);
-
   @override
   void dispose() {
     _c.dispose();
@@ -322,8 +317,8 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
         height: widget.height,
         decoration: BoxDecoration(
           color: widget.onDark
-              ? Color.lerp(_darkFrom, _darkTo, _c.value)
-              : Color.lerp(_from, _to, _c.value),
+              ? Color.lerp(context.colors.heroShimmerFrom, context.colors.heroShimmerTo, _c.value)
+              : Color.lerp(context.colors.shimmerFrom, context.colors.shimmerTo, _c.value),
           borderRadius: BorderRadius.circular(widget.radius),
         ),
       ),
@@ -344,9 +339,9 @@ class StickyBottomBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
         child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xD1FFFFFF),
-            border: Border(top: BorderSide(color: Color(0x120A3222))),
+          decoration: BoxDecoration(
+            color: context.colors.barBg,
+            border: Border(top: BorderSide(color: context.colors.barBorder)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
           child: SafeArea(top: false, child: child),

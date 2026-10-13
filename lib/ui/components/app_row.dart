@@ -9,20 +9,20 @@ import 'motion.dart';
 enum RowTone { green, neutral, blue, gold, danger }
 
 extension on RowTone {
-  Color get fill => switch (this) {
-        RowTone.green => AppColor.greenTint,
-        RowTone.neutral => AppColor.neutralTint,
-        RowTone.blue => AppColor.blueTint,
-        RowTone.gold => AppColor.goldCircle,
-        RowTone.danger => AppColor.dangerTint,
+  Color fill(AppColors c) => switch (this) {
+        RowTone.green => c.greenTint,
+        RowTone.neutral => c.neutralTint,
+        RowTone.blue => c.blueTint,
+        RowTone.gold => c.goldCircle,
+        RowTone.danger => c.dangerTint,
       };
 
-  Color get glyph => switch (this) {
-        RowTone.green => AppColor.green,
-        RowTone.neutral => AppColor.ink3,
-        RowTone.blue => AppColor.blue,
-        RowTone.gold => AppColor.goldTextSoft,
-        RowTone.danger => AppColor.danger,
+  Color glyph(AppColors c) => switch (this) {
+        RowTone.green => c.green,
+        RowTone.neutral => c.ink3,
+        RowTone.blue => c.blue,
+        RowTone.gold => c.goldTextSoft,
+        RowTone.danger => c.danger,
       };
 }
 
@@ -56,10 +56,10 @@ class IconBubble extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: fill ?? tone.fill,
+        color: fill ?? tone.fill(context.colors),
         borderRadius: BorderRadius.circular(square ? 12 : AppRadius.pill),
       ),
-      child: AppIcon(icon, size: iconSize, color: glyphColor ?? tone.glyph),
+      child: AppIcon(icon, size: iconSize, color: glyphColor ?? tone.glyph(context.colors)),
     );
   }
 }
@@ -130,10 +130,10 @@ class AppListRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(title, style: titleStyle ?? AppText.rowTitle.c(AppColor.ink)),
+                Text(title, style: titleStyle ?? AppText.rowTitle.c(context.colors.ink)),
                 if (sub != null) ...[
                   const SizedBox(height: 2),
-                  Text(sub, style: subtitleStyle ?? AppText.caption.c(AppColor.ink3)),
+                  Text(sub, style: subtitleStyle ?? AppText.caption.c(context.colors.ink3)),
                 ],
               ],
             ),
@@ -155,8 +155,8 @@ class AppListRow extends StatelessWidget {
 
     return divided
         ? DecoratedBox(
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: AppColor.hairline)),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: context.colors.hairline)),
             ),
             child: pressable,
           )
@@ -166,14 +166,15 @@ class AppListRow extends StatelessWidget {
 
 /// The disclosure chevron used as a row's trailing element.
 class RowChevron extends StatelessWidget {
-  const RowChevron({super.key, this.color = AppColor.chevron, this.size = 17});
+  const RowChevron({super.key, this.color, this.size = 17});
 
-  final Color color;
+  final Color? color;
   final double size;
 
   @override
   Widget build(BuildContext context) =>
-      AppIcon(AppIcons.chevronRight, size: size, color: color);
+      AppIcon(AppIcons.chevronRight,
+          size: size, color: color ?? context.colors.chevron);
 }
 
 /// Stacks rows into one grouped card, adding the hairline between them.
@@ -188,9 +189,9 @@ class GroupedRows extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: AppColor.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(radius),
-        boxShadow: AppShadow.card,
+        boxShadow: context.shadows.card,
       ),
       child: Column(mainAxisSize: MainAxisSize.min, children: rows),
     );

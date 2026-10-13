@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_motion.dart';
+import '../../theme/app_tokens.dart';
 
 /// Cross-fades when [child]'s key (or type) changes, so content arriving —
 /// data replacing a shimmer, one stage replacing another — never snaps.
@@ -71,8 +72,6 @@ class Pressable extends StatefulWidget {
   /// Opacity while held, for [PressEffect.dim].
   final double pressedOpacity;
 
-  static const _highlight = Color(0x0F0F1C17);
-
   @override
   State<Pressable> createState() => _PressableState();
 }
@@ -104,7 +103,7 @@ class _PressableState extends State<Pressable> {
                   opacity: _down ? 1 : 0,
                   duration: duration,
                   curve: Curves.easeOut,
-                  child: const ColoredBox(color: Pressable._highlight),
+                  child: ColoredBox(color: context.colors.pressWash),
                 ),
               ),
             ),

@@ -6,6 +6,7 @@ import 'package:myt_flutter/core/content/content_bundle.dart';
 import 'package:myt_flutter/l10n/l10n.dart';
 import 'package:myt_flutter/shared/providers/content_provider.dart';
 import 'package:myt_flutter/ui/components/emergency_banner.dart';
+import 'package:myt_flutter/theme/app_theme.dart';
 
 void main() {
   ContentBundle withBanner(Map<String, Object?>? banner) => ContentBundle.parse(
@@ -25,6 +26,7 @@ void main() {
       ProviderScope(
         overrides: [initialContentProvider.overrideWithValue(content)],
         child: MaterialApp(
+          theme: appLightTheme,
           locale: locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: const [

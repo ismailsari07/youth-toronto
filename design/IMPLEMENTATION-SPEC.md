@@ -429,6 +429,8 @@ a one-widget swap if it is ever wanted.
 
 ## 6. Signature element — the moon countdown card
 
+(1.0.2: the card is now full-bleed with a curved bottom, green in dark mode — see §8b.)
+
 The Prayer root's hero is a night-navy card holding an animated moon that fills with
 glowing white liquid as the next prayer approaches. **The moon widget and all of its
 animation (fill level, surface ripple, glow) are built in code and are out of scope for
@@ -942,6 +944,57 @@ promise is only true if the backend makes it true.
 
 New icons for this feature (in `assets/icons/`): `document-lock.svg`, `document.svg`,
 `upload.svg`, `shield-check.svg`, `eye.svg`, `replace.svg`, `close.svg`, `photo.svg`.
+
+---
+
+## 8b. Dark mode and the full-bleed hero (1.0.2)
+
+Design reference: "Dark — home (tam kaydırma)" (HTML export of the dark Prayer home).
+
+### Theme mode
+
+Follows the iOS setting by default. Profile and Settings carry an **Appearance** row
+(System / Light / Dark, saved on the device, key `app_theme_mode`; absent = System).
+
+### Tokens
+
+`app_tokens.dart` holds two sets with the same names: `AppColors.light` (the original
+palette, unchanged) and `AppColors.dark`, plus `AppShadows.light` / `.dark`. Widgets read
+the active set with `context.colors` / `context.shadows` — never a colour literal. Key dark
+values:
+
+| Token | Dark | Use |
+|---|---|---|
+| ground | `#0A1310` | page background |
+| card | `#141F1B` | cards, sheets' rows |
+| ink / ink2 / ink3 | `#EDF3F0` / `#A7B8B0` / `#7F918A` | text |
+| green | `#4ECFA0` (mint) | primary action, active tab, NOW pill |
+| onGreen | `#06251A` | text on mint (white fails at 1.9:1) |
+| greenLabel | `#45B088` | IQAMAH label on the active row (the design's `#2E8E6B` is 3.6:1) |
+| greenTint / greenTintStrong / greenRowBg | mint at 12% / 16% / 8% | icon circles, active row |
+| hairline / border | white at 7% / 12% | dividers, outlined buttons |
+| gold | text `#E3B964`, bg `#241D11`, border gold at 22% | Jumu'ah / Eid card |
+| hero gradient | `#17604A` → `#114A39` → `#0A2E24` (148deg) | tab headers and the dark Prayer hero |
+
+Dark shadows are plain black (card: `0 1px 2px rgba(0,0,0,.3)` + `0 14px 30px -16px
+rgba(0,0,0,.6)`). Text pairs on dark surfaces are checked for WCAG AA (4.5:1) in
+`test/theme/theme_test.dart`.
+
+### Prayer hero (both modes)
+
+The moon card of section 6 is no longer a floating card: it runs **full-bleed from the
+top of the screen**, behind the status bar, with no side margins, and ends in a 40 px
+bottom radius. Fill: night navy `#0E1A2B` in light mode, the green hero gradient in dark
+mode. Top padding is the status-bar inset (`topInset`, ≥ 59); 20 left/right; 24 bottom.
+The date header now sits inside it, above the NEXT PRAYER row: logo tile, organisation
+and mosque line, then the Gregorian date and the Hijri pill (white 16%), all in the
+on-hero whites. The status bar keeps light icons over the hero in both modes; the rest
+of the app follows the theme. The emergency banner sits 18 below the hero.
+
+### Unchanged
+
+The iOS home-screen widget stays navy in both modes. The launch screen has a light and a
+dark variant (`LaunchBackground` colour set; mint mosque on `#0A1310`).
 
 ---
 

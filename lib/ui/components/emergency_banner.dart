@@ -11,11 +11,11 @@ import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
 import 'app_card.dart';
 
-/// The panel's emergency banner, at the top of the Prayer home (spec §7.1
-/// step 0). The app decides for itself whether it shows: enabled, with
-/// text, and before `ends_at` (an admin signed in receives it even while
-/// it's off, and a cached copy must expire offline). Leaves no gap when
-/// there is nothing to show; disappears on its own at `ends_at`.
+/// The panel's emergency banner, on the Prayer home right under the hero
+/// (spec §7.1 step 0). The app decides for itself whether it shows:
+/// enabled, with text, and before `ends_at` (an admin signed in receives it
+/// even while it's off, and a cached copy must expire offline). Leaves no
+/// gap when there is nothing to show; disappears on its own at `ends_at`.
 class EmergencyBanner extends ConsumerStatefulWidget {
   const EmergencyBanner({super.key});
 
@@ -50,20 +50,20 @@ class _EmergencyBannerState extends ConsumerState<EmergencyBanner> {
     if (banner == null) return const SizedBox.shrink();
 
     final (fill, ink, icon) = switch (banner.tone) {
-      BannerTone.info => (AppColor.blueTint, AppColor.blue, AppIcons.info),
+      BannerTone.info => (context.colors.blueTint, context.colors.blue, AppIcons.info),
       BannerTone.warning => (
-        AppColor.amberTint,
-        AppColor.amber,
+        context.colors.amberTint,
+        context.colors.amber,
         AppIcons.alert,
       ),
       BannerTone.urgent => (
-        AppColor.dangerTint,
-        AppColor.danger,
+        context.colors.dangerTint,
+        context.colors.danger,
         AppIcons.alert,
       ),
     };
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(top: 18),
       child: Semantics(
         container: true,
         liveRegion: true,

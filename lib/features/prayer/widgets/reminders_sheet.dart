@@ -148,8 +148,8 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
         maxHeight: MediaQuery.sizeOf(context).height * 0.92,
       ),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColor.ground,
+        decoration: BoxDecoration(
+          color: context.colors.ground,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SafeArea(
@@ -164,7 +164,7 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
                   width: 40,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFDDE3E0),
+                    color: context.colors.grabber,
                     borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                 ),
@@ -174,7 +174,7 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
                 l.prayerReminders,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)
-                    .c(AppColor.ink),
+                    .c(context.colors.ink),
               ),
               const SizedBox(height: 18),
               Flexible(
@@ -371,7 +371,7 @@ class _ChoiceRow extends StatelessWidget {
             SizedBox(
               width: 22,
               child: selected
-                  ? const AppIcon(AppIcons.check, size: 22, color: AppColor.green)
+                  ? AppIcon(AppIcons.check, size: 22, color: context.colors.green)
                   : null,
             ),
           ],
@@ -417,7 +417,7 @@ class _BlockedNote extends StatelessWidget {
       children: [
         Text(
           l.remindersDeniedNote,
-          style: const TextStyle(fontSize: 13.5, height: 1.45).c(AppColor.ink2),
+          style: const TextStyle(fontSize: 13.5, height: 1.45).c(context.colors.ink2),
         ),
         const SizedBox(height: 12),
         GhostButton(label: l.openSettings, onTap: onOpenSettings),

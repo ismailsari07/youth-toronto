@@ -158,7 +158,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         trailing: latest.isNew
             ? AppBadge(
                 label: l.newBadge,
-                fill: AppColor.heroArcTrack,
+                fill: context.colors.heroArcTrack,
                 height: 24,
                 fontSize: 11,
                 letterSpacing: 0,
@@ -175,7 +175,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         subtitle: nextSessionLine(l, next),
         trailing: AppBadge(
           label: _inDays(l, next.startsAt),
-          fill: AppColor.heroArcTrack,
+          fill: context.colors.heroArcTrack,
           height: 24,
           fontSize: 11,
           letterSpacing: 0,
@@ -249,11 +249,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         child: Container(
           height: announcement ? 104 : 176,
           decoration: BoxDecoration(
-            color: AppColor.card,
+            color: context.colors.card,
             borderRadius: BorderRadius.circular(
               announcement ? AppRadius.listCard : AppRadius.card,
             ),
-            boxShadow: AppShadow.card,
+            boxShadow: context.shadows.card,
           ),
           padding: announcement
               ? const EdgeInsets.symmetric(vertical: 16, horizontal: 18)

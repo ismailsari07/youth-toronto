@@ -78,10 +78,10 @@ class EventCard extends StatelessWidget {
               padding: imageUrl != null
                   ? const EdgeInsets.fromLTRB(18, 16, 18, 18)
                   : const EdgeInsets.all(AppSpace.cardPadding),
-              child: imageUrl != null ? _body() : _bodyWithBadge(l),
+              child: imageUrl != null ? _body(context) : _bodyWithBadge(context, l),
             ),
             if (_hasActions) ...[
-              const Divider(height: 1, thickness: 1, color: AppColor.hairline),
+              Divider(height: 1, thickness: 1, color: context.colors.hairline),
               Padding(
                 padding: const EdgeInsets.all(AppSpace.cardPadding),
                 child: Row(
@@ -101,7 +101,7 @@ class EventCard extends StatelessWidget {
     );
   }
 
-  Widget _bodyWithBadge(AppLocalizations l) {
+  Widget _bodyWithBadge(BuildContext context, AppLocalizations l) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -109,31 +109,31 @@ class EventCard extends StatelessWidget {
             ? _recurringBadge(l)
             : DateBadge(date: upcoming.startsAt),
         const SizedBox(width: 14),
-        Expanded(child: _body()),
+        Expanded(child: _body(context)),
       ],
     );
   }
 
-  Widget _body() {
+  Widget _body(BuildContext context) {
     final location = upcoming.event.location;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(upcoming.event.title, style: AppText.cardTitle.c(AppColor.ink)),
+        Text(upcoming.event.title, style: AppText.cardTitle.c(context.colors.ink)),
         const SizedBox(height: 5),
         EventWhenLine(upcoming: upcoming),
         if (location != null && location.trim().isNotEmpty) ...[
           const SizedBox(height: 5),
           Row(
             children: [
-              const AppIcon(AppIcons.pin, size: 13, color: AppColor.ink3),
+              AppIcon(AppIcons.pin, size: 13, color: context.colors.ink3),
               const SizedBox(width: 5),
               Expanded(
                 child: Text(
                   location,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppText.caption.c(AppColor.ink3),
+                  style: AppText.caption.c(context.colors.ink3),
                 ),
               ),
             ],
@@ -190,11 +190,11 @@ class PhotoBandFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColor.photoBandBg,
+      color: context.colors.photoBandBg,
       alignment: Alignment.bottomCenter,
-      child: const AppIllustration(
+      child: AppIllustration(
         AppIllustration.mosqueSilhouette,
-        color: AppColor.photoBandArt,
+        color: context.colors.photoBandArt,
         fit: BoxFit.contain,
       ),
     );

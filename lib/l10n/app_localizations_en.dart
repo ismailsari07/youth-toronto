@@ -218,6 +218,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The mosque calendar could not be reached. Reminders already scheduled on this device still run.';
 
   @override
+  String get timesUnavailableShortBody =>
+      'The mosque calendar could not be reached.';
+
+  @override
   String get tryAgain => 'Try again';
 
   @override
@@ -623,6 +627,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageAuto => 'Auto';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get appearanceSystem => 'System';
+
+  @override
+  String get appearanceSystemDetail => 'Follows your phone\'s setting';
+
+  @override
+  String get appearanceLight => 'Light';
+
+  @override
+  String get appearanceDark => 'Dark';
 
   @override
   String get mosqueAndContact => 'Mosque & contact';

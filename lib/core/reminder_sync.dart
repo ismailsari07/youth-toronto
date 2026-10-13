@@ -4,6 +4,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../l10n/l10n.dart';
 import '../shared/formatters.dart';
+import 'feature_flags.dart';
 import 'mosque_time.dart';
 import 'notification_service.dart';
 import 'notification_sounds.dart';
@@ -80,6 +81,12 @@ class ReminderSync {
 
   static Future<void> _run() async {
     try {
+      if (!kPrayerRemindersEnabled) {
+        // Switched off: cancel anything an earlier build scheduled, and
+        // never ask for permission.
+        await NotificationService.cancelPending();
+        return;
+      }
       final settings = await loadSettings();
       if (!settings.active) {
         await NotificationService.cancelAll();

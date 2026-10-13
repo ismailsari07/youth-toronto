@@ -157,4 +157,10 @@ class NotificationService {
   static Future<void> cancelAll() async {
     await _plugin.cancelAll();
   }
+
+  /// Cancels every scheduled reminder that hasn't fired yet; leaves the ones
+  /// already in Notification Center.
+  static Future<void> cancelPending() async {
+    await _plugin.cancelAllPendingNotifications();
+  }
 }

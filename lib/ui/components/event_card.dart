@@ -90,7 +90,11 @@ class EventCard extends StatelessWidget {
                       child: PrimaryButton(label: l.register, onTap: onRegister),
                     ),
                     const SizedBox(width: 10),
-                    CircleIconButton(icon: AppIcons.share, onTap: onShare),
+                    CircleIconButton(
+                      icon: AppIcons.share,
+                      color: context.colors.selectedDark,
+                      onTap: onShare,
+                    ),
                   ],
                 ),
               ),

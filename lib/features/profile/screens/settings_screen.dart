@@ -68,15 +68,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: AppSpace.sectionHeaderGap),
                 GroupedRows(
                   rows: [
-                    LanguageRow(iconGlyph: context.colors.selected),
-                    AppearanceRow(
-                      divided: true,
-                      iconGlyph: context.colors.selected,
-                    ),
+                    const LanguageRow(),
+                    const AppearanceRow(divided: true),
                     AppListRow(
                       divided: true,
                       icon: AppIcons.pin,
-                      iconGlyph: context.colors.selected,
                       title: l.mosqueAndContact,
                       trailing: const RowChevron(),
                       onTap: () => context.push('/profile/mosque'),
@@ -84,7 +80,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     AppListRow(
                       divided: true,
                       icon: AppIcons.info,
-                      iconGlyph: context.colors.selected,
                       title: l.aboutThisApp,
                       subtitle: l.versionLabel('1.0'),
                       trailing: const RowChevron(),

@@ -18,7 +18,7 @@ extension on RowTone {
       };
 
   Color glyph(AppColors c) => switch (this) {
-        RowTone.green => c.green,
+        RowTone.green => c.selected,
         RowTone.neutral => c.ink3,
         RowTone.blue => c.blue,
         RowTone.gold => c.goldTextSoft,

@@ -50,7 +50,7 @@ class UpdateRequiredScreen extends ConsumerWidget {
                     child: AppIcon(
                       AppIcons.upload,
                       size: 32,
-                      color: context.colors.green,
+                      color: context.colors.selected,
                     ),
                   ),
                   const SizedBox(height: 14),

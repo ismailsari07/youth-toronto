@@ -80,6 +80,7 @@ class BurialServicesScreen extends ConsumerWidget {
                               label: l.call,
                               icon: AppIcons.phone,
                               height: 38,
+                              color: context.colors.selectedDark,
                               onTap: () => _open(c.phoneUri),
                             ),
                           ),

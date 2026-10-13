@@ -473,7 +473,6 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         children: [
           AppListRow(
             icon: AppIcons.pin,
-            iconGlyph: context.colors.selected,
             title: mosque.name,
             subtitle: '${mosque.street}, ${mosque.city}',
             trailing: const RowChevron(),

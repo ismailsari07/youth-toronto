@@ -103,6 +103,7 @@ class MosqueInfoScreen extends ConsumerWidget {
                                     label: l.call,
                                     height: 46,
                                     icon: AppIcons.phone,
+                                    color: context.colors.selectedDark,
                                     onTap: () => _open(mosque.phoneUri),
                                   ),
                                 ),

@@ -217,7 +217,7 @@ class EmptyStateCard extends StatelessWidget {
                     color: context.colors.iconCircle,
                     shape: BoxShape.circle,
                   ),
-                  child: AppIcon(icon, size: 32, color: context.colors.green),
+                  child: AppIcon(icon, size: 32, color: context.colors.selected),
                 ),
                 const SizedBox(height: 14),
                 Text(

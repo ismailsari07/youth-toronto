@@ -122,7 +122,7 @@ class _StepNumber extends StatelessWidget {
       child: Text(
         '$number',
         style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)
-            .c(context.colors.greenDark),
+            .c(context.colors.selectedDark),
       ),
     );
   }

@@ -175,6 +175,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                       label: l.view,
                       icon: AppIcons.eye,
                       height: 46,
+                      color: context.colors.selectedDark,
                       onTap: () => context.push(MarriageRoutes.view, extra: app),
                     ),
                   ),
@@ -184,6 +185,7 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
                       label: l.replace,
                       icon: AppIcons.replace,
                       height: 46,
+                      color: context.colors.selectedDark,
                       onTap: () =>
                           context.push(MarriageRoutes.upload, extra: true),
                     ),

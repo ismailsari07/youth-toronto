@@ -13,12 +13,9 @@ import '../../../ui/components/app_sheet.dart';
 /// member's choice in its own language, or "Auto" while following the
 /// device.
 class LanguageRow extends ConsumerWidget {
-  const LanguageRow({super.key, this.divided = false, this.iconGlyph});
+  const LanguageRow({super.key, this.divided = false});
 
   final bool divided;
-
-  /// Overrides the icon's colour (Settings paints it `selected`).
-  final Color? iconGlyph;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,7 +29,6 @@ class LanguageRow extends ConsumerWidget {
     return AppListRow(
       divided: divided,
       icon: AppIcons.globe,
-      iconGlyph: iconGlyph,
       title: l.language,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

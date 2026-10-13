@@ -27,7 +27,7 @@ class PrivacyStrip extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppIcon(AppIcons.shieldCheck, size: 18, color: context.colors.green),
+          AppIcon(AppIcons.shieldCheck, size: 18, color: context.colors.selected),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -154,8 +154,8 @@ class FileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    final tint = danger ? context.colors.dangerTint : context.colors.greenTint;
-    final ink = danger ? context.colors.danger : context.colors.green;
+    final tint = danger ? context.colors.dangerTint : context.colors.iconCircle;
+    final ink = danger ? context.colors.danger : context.colors.selected;
     return Row(
       children: [
         Container(

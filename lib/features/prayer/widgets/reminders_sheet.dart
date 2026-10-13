@@ -371,7 +371,7 @@ class _ChoiceRow extends StatelessWidget {
             SizedBox(
               width: 22,
               child: selected
-                  ? AppIcon(AppIcons.check, size: 22, color: context.colors.green)
+                  ? AppIcon(AppIcons.check, size: 22, color: context.colors.selected)
                   : null,
             ),
           ],
@@ -398,6 +398,7 @@ class _PreviewButton extends StatelessWidget {
         icon: playing ? AppIcons.stop : AppIcons.play,
         size: 34,
         iconSize: 15,
+        color: context.colors.selectedDark,
         onTap: onTap,
       ),
     );

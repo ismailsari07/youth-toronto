@@ -10,12 +10,14 @@ import '../../../shared/providers/content_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
+import '../../../ui/components/announcement_photo.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 
-/// Spec §7.5. Text only: announcements carry no imagery, which is what makes
-/// them read as a different species from events (spec §0).
+/// Spec §7.5. The optional photo sits on top at its own aspect ratio (no
+/// crop); tapping it opens the full-screen viewer. Without a photo the page
+/// is text only, as before.
 class AnnouncementDetailScreen extends ConsumerWidget {
   const AnnouncementDetailScreen({super.key, required this.item});
 
@@ -51,6 +53,7 @@ class AnnouncementDetailScreen extends ConsumerWidget {
     final l = context.l10n;
     final ago = l.postedAgo(timeAgo(l, item.date));
     final posted = '$ago · ${l.mosqueOffice}';
+    final imageUrl = item.imageUrl;
 
     return Scaffold(
       backgroundColor: context.colors.ground,
@@ -71,6 +74,20 @@ class AnnouncementDetailScreen extends ConsumerWidget {
                 40,
               ),
               children: [
+                if (imageUrl != null)
+                  AnnouncementPhoto.natural(
+                    url: imageUrl,
+                    altText: item.imageAltText,
+                    onTap: () => showAnnouncementPhotoViewer(
+                      context,
+                      url: imageUrl,
+                      altText: item.imageAltText,
+                    ),
+                    wrap: (photo) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpace.cardGap),
+                      child: AppCard(grouped: true, child: photo),
+                    ),
+                  ),
                 AppCard(
                   padding: const EdgeInsets.symmetric(
                     vertical: 22,

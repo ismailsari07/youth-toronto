@@ -6,13 +6,15 @@ import '../../shared/formatters.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
+import 'announcement_photo.dart';
 import 'app_card.dart';
 import 'app_row.dart';
 import 'motion.dart';
 
 /// Spec §7.4. One announcement: title (with the unread dot), two lines of
-/// the body and how long ago it was posted. Used by the Announcements list
-/// and the Prayer home's Community section.
+/// the body and how long ago it was posted. With a photo, the photo (16:9)
+/// sits on top and the bookmark tile is left out. Used by the Announcements list and the Prayer home's Community
+/// section.
 class AnnouncementCard extends StatelessWidget {
   const AnnouncementCard({
     super.key,
@@ -27,21 +29,45 @@ class AnnouncementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = item.imageUrl;
     return Pressable(
       onTap: onTap,
       pressedOpacity: 0.85,
       child: AppCard(
         radius: AppRadius.listCard,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
-        child: Row(
+        grouped: imageUrl != null,
+        padding: imageUrl != null ? null : _padding,
+        child: imageUrl == null
+            ? _body(context, icon: true)
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AnnouncementPhoto.cover(
+                    url: imageUrl,
+                    altText: item.imageAltText,
+                  ),
+                  Padding(padding: _padding, child: _body(context, icon: false)),
+                ],
+              ),
+      ),
+    );
+  }
+
+  static const _padding = EdgeInsets.symmetric(vertical: 16, horizontal: 18);
+
+  /// [icon]: the bookmark tile, shown only when there is no photo.
+  Widget _body(BuildContext context, {required bool icon}) {
+    return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const IconBubble(
-              icon: AppIcons.announcement,
-              tone: RowTone.blue,
-              square: true,
-            ),
-            const SizedBox(width: AppSpace.rowGap),
+            if (icon) ...[
+              const IconBubble(
+                icon: AppIcons.announcement,
+                tone: RowTone.blue,
+                square: true,
+              ),
+              const SizedBox(width: AppSpace.rowGap),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,8 +115,6 @@ class AnnouncementCard extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
+        );
   }
 }

@@ -26,7 +26,7 @@ import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
-import '../../donations/donate_menu.dart';
+import '../../donations/donate_sheet.dart';
 import '../widgets/community_section.dart';
 import '../widgets/reminders_sheet.dart';
 
@@ -573,27 +573,26 @@ class _ReminderBell extends ConsumerWidget {
     return _HeroCircleButton(
       label: context.l10n.prayerReminders,
       icon: on ? AppIcons.bell : AppIcons.bellOff,
-      onTap: (_) => showRemindersSheet(context),
+      onTap: () => showRemindersSheet(context),
     );
   }
 }
 
-/// The donate heart on the hero: opens the donate menu below it.
-class _DonateHeart extends ConsumerWidget {
+/// The donate heart on the hero: opens the donate sheet.
+class _DonateHeart extends StatelessWidget {
   const _DonateHeart();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return _HeroCircleButton(
       label: context.l10n.donation,
       icon: AppIcons.heart,
-      onTap: (anchor) => showDonateMenu(anchor, ref),
+      onTap: () => showDonateSheet(context),
     );
   }
 }
 
-/// A white glyph in a translucent circle on the hero, 44 pt to tap. [onTap]
-/// gets the circle's own context, for a menu anchored to it.
+/// A white glyph in a translucent circle on the hero, 44 pt to tap.
 class _HeroCircleButton extends StatelessWidget {
   const _HeroCircleButton({
     required this.label,
@@ -603,7 +602,7 @@ class _HeroCircleButton extends StatelessWidget {
 
   final String label;
   final String icon;
-  final void Function(BuildContext anchor) onTap;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -611,7 +610,7 @@ class _HeroCircleButton extends StatelessWidget {
       label: label,
       button: true,
       child: Pressable(
-        onTap: () => onTap(context),
+        onTap: onTap,
         child: SizedBox(
           width: 44,
           height: 44,

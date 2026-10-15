@@ -1115,7 +1115,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get donation => 'Bağış yap';
 
   @override
-  String get donateMenuTitle => 'Web sitemiz Safari\'de açılır';
+  String get donateSheetNote => 'Web sitemiz Safari\'de açılır';
 
   @override
   String get allDonationOptions => 'Tüm bağış seçenekleri';

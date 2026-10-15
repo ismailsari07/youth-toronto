@@ -299,7 +299,7 @@
   "getInTouch": "Nous joindre",
   "linksSection": "Liens",
   "donation": "Faire un don",
-  "donateMenuTitle": "Ouvre notre site web dans Safari",
+  "donateSheetNote": "Ouvre notre site web dans Safari",
   "allDonationOptions": "Toutes les options de don",
   "donateRowSubtitle": "Donnez via notre site web",
   "sizeMegabytes": "{size} Mo",

@@ -34,12 +34,12 @@ services[], contacts[]}`. Code: `lib/core/content/`.
 
 ## Donations (since 1.0.5)
 
-Apple rule: donations happen OUTSIDE the app. The heart on Prayer and the Donate row on Profile open one iOS
-pull-down menu (`lib/ui/components/pull_down_menu.dart`, hand-made: `pull_down_button` is discontinued and
-`cupertino_ui` needs a newer Flutter). Each item opens the website in Safari (`LaunchMode.externalApplication`);
-never add a form or a web view.
+Apple rule: donations happen OUTSIDE the app. The heart on Prayer and the Donate row on Profile open one
+standard bottom sheet, `showDonateSheet` (`lib/features/donations/donate_sheet.dart`, via `showAppSheet`, styled
+like the Appearance sheet; since 1.0.7, replacing 1.0.5's pull-down menu). Each row closes the sheet and opens
+the website in Safari (`LaunchMode.externalApplication`); never add a form or a web view.
 
-- Items: active `donation_funds` (public read) in `display_order`, `is_active` filtered in the app, `unassigned`
+- Rows: active `donation_funds` (public read) in `display_order`, `is_active` filtered in the app, `unassigned`
   never shown, then "All donation options". Code: `lib/core/donations/`, `lib/features/donations/`.
 - Cached like the content bundle (launch, resume after 15+ minutes); with nothing cached only "All donation
   options" shows.

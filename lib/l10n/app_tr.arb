@@ -299,7 +299,7 @@
   "getInTouch": "İletişim",
   "linksSection": "Bağlantılar",
   "donation": "Bağış yap",
-  "donateMenuTitle": "Web sitemiz Safari'de açılır",
+  "donateSheetNote": "Web sitemiz Safari'de açılır",
   "allDonationOptions": "Tüm bağış seçenekleri",
   "donateRowSubtitle": "Web sitemiz üzerinden bağış yapın",
   "sizeMegabytes": "{size} MB",

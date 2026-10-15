@@ -1894,13 +1894,13 @@ abstract class AppLocalizations {
   /// **'Donate'**
   String get donation;
 
-  /// Grey title line at the top of the donate pull-down menu (Prayer heart, Profile Donate row).
+  /// Grey note under the Donate sheet title (Prayer heart, Profile Donate row).
   ///
   /// In en, this message translates to:
   /// **'Opens our website in Safari'**
-  String get donateMenuTitle;
+  String get donateSheetNote;
 
-  /// Last item of the donate menu: opens the website's donation page without a fund.
+  /// Last row of the Donate sheet: opens the website's donation page without a fund.
   ///
   /// In en, this message translates to:
   /// **'All donation options'**

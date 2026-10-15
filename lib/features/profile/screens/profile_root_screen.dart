@@ -20,7 +20,7 @@ import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
-import '../../donations/donate_menu.dart';
+import '../../donations/donate_sheet.dart';
 import '../../marriage/data/marriage_application.dart';
 import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
@@ -109,15 +109,13 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
                   divided: i > 0,
                   signedIn: user != null,
                 ),
-              Builder(
-                builder: (anchor) => AppListRow(
-                  divided: services.isNotEmpty,
-                  icon: AppIcons.heart,
-                  title: l.donation,
-                  subtitle: l.donateRowSubtitle,
-                  trailing: const RowChevron(),
-                  onTap: () => showDonateMenu(anchor, ref),
-                ),
+              AppListRow(
+                divided: services.isNotEmpty,
+                icon: AppIcons.heart,
+                title: l.donation,
+                subtitle: l.donateRowSubtitle,
+                trailing: const RowChevron(),
+                onTap: () => showDonateSheet(context),
               ),
             ],
           ),

@@ -1127,7 +1127,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get donation => 'Faire un don';
 
   @override
-  String get donateMenuTitle => 'Ouvre notre site web dans Safari';
+  String get donateSheetNote => 'Ouvre notre site web dans Safari';
 
   @override
   String get allDonationOptions => 'Toutes les options de don';

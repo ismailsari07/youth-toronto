@@ -587,6 +587,18 @@
     "description": "Mosque & Contact: the website, donation and social links from the panel."
   },
   "donation": "Donate",
+  "donateMenuTitle": "Opens our website in Safari",
+  "@donateMenuTitle": {
+    "description": "Grey title line at the top of the donate pull-down menu (Prayer heart, Profile Donate row)."
+  },
+  "allDonationOptions": "All donation options",
+  "@allDonationOptions": {
+    "description": "Last item of the donate menu: opens the website's donation page without a fund."
+  },
+  "donateRowSubtitle": "Give through our website",
+  "@donateRowSubtitle": {
+    "description": "Subtitle of the Donate row in Profile > Mosque services."
+  },
   "sizeMegabytes": "{size} MB",
   "@sizeMegabytes": {
     "placeholders": {

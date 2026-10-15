@@ -1115,6 +1115,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get donation => 'Bağış yap';
 
   @override
+  String get donateMenuTitle => 'Web sitemiz Safari\'de açılır';
+
+  @override
+  String get allDonationOptions => 'Tüm bağış seçenekleri';
+
+  @override
+  String get donateRowSubtitle => 'Web sitemiz üzerinden bağış yapın';
+
+  @override
   String sizeMegabytes(String size) {
     return '$size MB';
   }

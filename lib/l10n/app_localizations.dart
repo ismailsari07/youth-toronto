@@ -1894,6 +1894,24 @@ abstract class AppLocalizations {
   /// **'Donate'**
   String get donation;
 
+  /// Grey title line at the top of the donate pull-down menu (Prayer heart, Profile Donate row).
+  ///
+  /// In en, this message translates to:
+  /// **'Opens our website in Safari'**
+  String get donateMenuTitle;
+
+  /// Last item of the donate menu: opens the website's donation page without a fund.
+  ///
+  /// In en, this message translates to:
+  /// **'All donation options'**
+  String get allDonationOptions;
+
+  /// Subtitle of the Donate row in Profile > Mosque services.
+  ///
+  /// In en, this message translates to:
+  /// **'Give through our website'**
+  String get donateRowSubtitle;
+
   /// No description provided for @sizeMegabytes.
   ///
   /// In en, this message translates to:

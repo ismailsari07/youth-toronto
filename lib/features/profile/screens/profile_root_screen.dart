@@ -20,6 +20,7 @@ import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
+import '../../donations/donate_menu.dart';
 import '../../marriage/data/marriage_application.dart';
 import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
@@ -90,29 +91,37 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
           ),
         ),
         // The panel's services in its order; marriage and burial open their
-        // own screens. Hidden entirely when none is visible.
-        if (services.isNotEmpty) ...[
-          const SizedBox(height: AppSpace.cardGapWide),
-          StaggerItem(
-            index: 1,
-            child: SectionHeader(title: l.mosqueServices),
+        // own screens. Donate always closes the list, so it never hides.
+        const SizedBox(height: AppSpace.cardGapWide),
+        StaggerItem(
+          index: 1,
+          child: SectionHeader(title: l.mosqueServices),
+        ),
+        const SizedBox(height: AppSpace.sectionHeaderGap),
+        StaggerItem(
+          index: 1,
+          child: GroupedRows(
+            rows: [
+              for (final (i, service) in services.indexed)
+                _serviceRow(
+                  l,
+                  service,
+                  divided: i > 0,
+                  signedIn: user != null,
+                ),
+              Builder(
+                builder: (anchor) => AppListRow(
+                  divided: services.isNotEmpty,
+                  icon: AppIcons.heart,
+                  title: l.donation,
+                  subtitle: l.donateRowSubtitle,
+                  trailing: const RowChevron(),
+                  onTap: () => showDonateMenu(anchor, ref),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpace.sectionHeaderGap),
-          StaggerItem(
-            index: 1,
-            child: GroupedRows(
-              rows: [
-                for (final (i, service) in services.indexed)
-                  _serviceRow(
-                    l,
-                    service,
-                    divided: i > 0,
-                    signedIn: user != null,
-                  ),
-              ],
-            ),
-          ),
-        ],
+        ),
         if (user != null) ...[
           const SizedBox(height: AppSpace.cardGapWide),
           StaggerItem(

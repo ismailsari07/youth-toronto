@@ -26,6 +26,7 @@ import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
+import '../../donations/donate_menu.dart';
 import '../widgets/community_section.dart';
 import '../widgets/reminders_sheet.dart';
 
@@ -125,8 +126,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   }
 
   /// Who we are, then today, at the top of the hero. Row 1: the app icon's
-  /// mosque on its green, the organisation and the mosque, and the
-  /// reminders bell. Row 2: the Gregorian date and the Hijri date in a
+  /// mosque on its green, the organisation and the mosque, the donate
+  /// heart and (while reminders are on) the reminders bell. Row 2: the Gregorian date and the Hijri date in a
   /// pill, on one line.
   Widget _header(PrayerCachePayload? payload, bool loading) {
     final l = context.l10n;
@@ -171,8 +172,10 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                 ],
               ),
             ),
+            const SizedBox(width: 12),
+            const _DonateHeart(),
             if (kPrayerRemindersEnabled) ...[
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               _ReminderBell(),
             ],
           ],
@@ -560,18 +563,55 @@ class _HijriPill extends StatelessWidget {
   }
 }
 
-/// The reminders bell on the hero: a white glyph in a translucent circle.
-/// Shown only while [kPrayerRemindersEnabled].
+/// The reminders bell on the hero. Shown only while
+/// [kPrayerRemindersEnabled].
 class _ReminderBell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final on =
         ref.watch(reminderSettingsProvider).valueOrNull?.active ?? true;
-    return Semantics(
+    return _HeroCircleButton(
       label: context.l10n.prayerReminders,
+      icon: on ? AppIcons.bell : AppIcons.bellOff,
+      onTap: (_) => showRemindersSheet(context),
+    );
+  }
+}
+
+/// The donate heart on the hero: opens the donate menu below it.
+class _DonateHeart extends ConsumerWidget {
+  const _DonateHeart();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _HeroCircleButton(
+      label: context.l10n.donation,
+      icon: AppIcons.heart,
+      onTap: (anchor) => showDonateMenu(anchor, ref),
+    );
+  }
+}
+
+/// A white glyph in a translucent circle on the hero, 44 pt to tap. [onTap]
+/// gets the circle's own context, for a menu anchored to it.
+class _HeroCircleButton extends StatelessWidget {
+  const _HeroCircleButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final String icon;
+  final void Function(BuildContext anchor) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: label,
       button: true,
       child: Pressable(
-        onTap: () => showRemindersSheet(context),
+        onTap: () => onTap(context),
         child: SizedBox(
           width: 44,
           height: 44,
@@ -584,11 +624,7 @@ class _ReminderBell extends ConsumerWidget {
                 color: context.colors.heroCircleBg,
                 shape: BoxShape.circle,
               ),
-              child: AppIcon(
-                on ? AppIcons.bell : AppIcons.bellOff,
-                size: 21,
-                color: context.colors.onHero,
-              ),
+              child: AppIcon(icon, size: 21, color: context.colors.onHero),
             ),
           ),
         ),

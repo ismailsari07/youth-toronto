@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'core/content/content_repository.dart';
+import 'core/donations/donation_funds.dart';
 import 'core/mosque_time.dart';
 import 'core/notification_service.dart';
 import 'core/prayer_service.dart';
@@ -15,6 +16,7 @@ import 'features/update/screens/update_required_screen.dart';
 import 'l10n/l10n.dart';
 import 'l10n/locale_provider.dart';
 import 'shared/providers/content_provider.dart';
+import 'shared/providers/donations_provider.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_mode_provider.dart';
 
@@ -45,6 +47,7 @@ void main() async {
   // The last good content bundle, else the one shipped in the app. Local
   // only; the network fetch runs after the first frame.
   final content = await ContentRepository.loadLocal();
+  final donationFunds = await DonationFunds.loadCached();
   String? appVersion;
   try {
     appVersion = (await PackageInfo.fromPlatform()).version;
@@ -57,6 +60,7 @@ void main() async {
         savedLocaleProvider.overrideWithValue(savedLocale),
         savedThemeModeProvider.overrideWithValue(savedThemeMode),
         initialContentProvider.overrideWithValue(content),
+        initialDonationFundsProvider.overrideWithValue(donationFunds),
         appVersionProvider.overrideWithValue(appVersion),
       ],
       child: const MytApp(),
@@ -104,6 +108,7 @@ class _MytAppState extends ConsumerState<MytApp> {
       // The panel's content: at every launch, and on resume once it's
       // 15 minutes old. In the background; screens keep what they show.
       ref.read(contentProvider.notifier).refresh(force: true);
+      ref.read(donationFundsProvider.notifier).refresh(force: true);
     });
     _lifecycle = AppLifecycleListener(onResume: _onResume);
   }
@@ -111,6 +116,7 @@ class _MytAppState extends ConsumerState<MytApp> {
   void _onResume() {
     _syncSchedules();
     ref.read(contentProvider.notifier).refresh();
+    ref.read(donationFundsProvider.notifier).refresh();
   }
 
   void _syncSchedules() {

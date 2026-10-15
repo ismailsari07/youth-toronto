@@ -1119,6 +1119,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get donation => 'Donate';
 
   @override
+  String get donateMenuTitle => 'Opens our website in Safari';
+
+  @override
+  String get allDonationOptions => 'All donation options';
+
+  @override
+  String get donateRowSubtitle => 'Give through our website';
+
+  @override
   String sizeMegabytes(String size) {
     return '$size MB';
   }

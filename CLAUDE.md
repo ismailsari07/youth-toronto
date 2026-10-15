@@ -32,6 +32,21 @@ services[], contacts[]}`. Code: `lib/core/content/`.
   data, only with an App Store link, and only when the app's version is below `min_supported_version`.
 - UI strings stay in the ARB files (`lib/l10n/`); only content comes from the database.
 
+## Donations (since 1.0.5)
+
+Apple rule: donations happen OUTSIDE the app. The heart on Prayer and the Donate row on Profile open one iOS
+pull-down menu (`lib/ui/components/pull_down_menu.dart`, hand-made: `pull_down_button` is discontinued and
+`cupertino_ui` needs a newer Flutter). Each item opens the website in Safari (`LaunchMode.externalApplication`);
+never add a form or a web view.
+
+- Items: active `donation_funds` (public read) in `display_order`, `is_active` filtered in the app, `unassigned`
+  never shown, then "All donation options". Code: `lib/core/donations/`, `lib/features/donations/`.
+- Cached like the content bundle (launch, resume after 15+ minutes); with nothing cached only "All donation
+  options" shows.
+- URL: `links.donation` from the bundle, else `https://papemosque.ca/donation`; a fund adds `?fund=<slug>`,
+  which the website turns into that fund's open form.
+- Fund titles are Turkish only (one `title` column); translations wait for the panel's fund module.
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

@@ -68,6 +68,10 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.unreadDot,
     required this.snackBg,
     required this.snackText,
+    required this.menuBg,
+    required this.menuSeparator,
+    required this.menuGap,
+    required this.menuPressed,
     required this.blue,
     required this.blueTint,
     required this.goldText,
@@ -177,6 +181,10 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color unreadDot;
   final Color snackBg;
   final Color snackText;
+  final Color menuBg; // pull-down menu, over a blur (iOS system material)
+  final Color menuSeparator; // hairline between menu items
+  final Color menuGap; // the thick break between menu sections
+  final Color menuPressed; // a menu item under the finger
 
   // Secondary accent — sunrise, announcements
   final Color blue;
@@ -302,6 +310,10 @@ class AppColors extends ThemeExtension<AppColors> {
     unreadDot: Color(0xFFC2453B),
     snackBg: Color(0xFF0F1C17),
     snackText: Color(0xFFFFFFFF),
+    menuBg: Color(0xE6F6F8F7),
+    menuSeparator: Color(0x4A3C3C43),
+    menuGap: Color(0x14000000),
+    menuPressed: Color(0x1A000000),
     blue: Color(0xFF3C6E96),
     blueTint: Color(0xFFEAF2F8),
     goldText: Color(0xFF6B4E0D),
@@ -397,6 +409,10 @@ class AppColors extends ThemeExtension<AppColors> {
     unreadDot: Color(0xFFF07A70),
     snackBg: Color(0xFF2A3833),
     snackText: Color(0xFFEDF3F0),
+    menuBg: Color(0xE0222C28),
+    menuSeparator: Color(0x99545458),
+    menuGap: Color(0x52000000),
+    menuPressed: Color(0x1FFFFFFF),
     blue: Color(0xFF8AB8E0),
     blueTint: Color(0x1F8AB8E0),
     goldText: Color(0xFFE3B964),
@@ -521,6 +537,7 @@ class AppShadows extends ThemeExtension<AppShadows> {
     required this.gold,
     required this.onGradientButton,
     required this.heroBadge,
+    required this.menu,
   });
 
   final List<BoxShadow> card;
@@ -535,6 +552,7 @@ class AppShadows extends ThemeExtension<AppShadows> {
   final List<BoxShadow> gold; // the Jumu'ah / Eid card
   final List<BoxShadow> onGradientButton; // the white button on a gradient
   final List<BoxShadow> heroBadge; // a gradient circle on a photo
+  final List<BoxShadow> menu; // the pull-down menu
 
   static const light = AppShadows(
     card: [
@@ -615,6 +633,9 @@ class AppShadows extends ThemeExtension<AppShadows> {
           blurRadius: 16,
           spreadRadius: -4),
     ],
+    menu: [
+      BoxShadow(color: Color(0x1F0A3222), offset: Offset(0, 8), blurRadius: 40),
+    ],
   );
 
   static const _darkCard = [
@@ -680,6 +701,9 @@ class AppShadows extends ThemeExtension<AppShadows> {
           offset: Offset(0, 6),
           blurRadius: 16,
           spreadRadius: -4),
+    ],
+    menu: [
+      BoxShadow(color: Color(0x66000000), offset: Offset(0, 8), blurRadius: 40),
     ],
   );
 

@@ -1,6 +1,6 @@
-# file_picker_darwin needs iOS 14. The PrayerWidget extension target is
+# iOS 15 is Apple's minimum from April 2027 (ITMS-90068). The PrayerWidget extension target is
 # deliberately absent: it must not link Flutter or any plugin.
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'

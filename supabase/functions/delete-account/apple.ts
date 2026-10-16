@@ -64,8 +64,8 @@ function pemToPkcs8(pem: string): Uint8Array<ArrayBuffer> {
 
 /**
  * The secrets' shape, safe to log: lengths and yes/no facts, never content.
- * An Apple .p8 (P-256 PKCS#8) decodes to 138 bytes; Key and Team IDs are
- * 10 characters.
+ * An Apple .p8 (P-256 PKCS#8 with its public key) decodes to 150 bytes;
+ * Key and Team IDs are 10 characters.
  */
 export function keyShape(cfg: AppleConfig): Record<string, unknown> {
   const pem = cfg.privateKey;

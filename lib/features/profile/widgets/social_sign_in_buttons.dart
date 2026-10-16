@@ -2,26 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../../core/feature_flags.dart';
 import '../../../core/social_auth.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../ui/components/motion.dart';
 
-/// "Continue with Apple" over "Continue with Google", then an "or" line
-/// before the email form, on the sign-in and sign-up screens (since 1.1.0).
-/// Apple comes first and at least as prominent (App Review 4.8): both are
-/// full width, the same height and shape. iOS only; nothing elsewhere.
+/// "Continue with Apple" (over "Continue with Google" once
+/// [kGoogleSignInEnabled]), then an "or" line before the email form, on the
+/// sign-in and sign-up screens (since 1.1.0). Apple comes first and at
+/// least as prominent (App Review 4.8): both are full width, the same
+/// height and shape. iOS only; nothing elsewhere.
 class SocialSignInButtons extends StatelessWidget {
   const SocialSignInButtons({
     super.key,
     required this.onApple,
     required this.onGoogle,
+    this.showGoogle = kGoogleSignInEnabled,
   });
 
   /// Null while a sign-in is running.
   final VoidCallback? onApple;
   final VoidCallback? onGoogle;
+
+  /// [kGoogleSignInEnabled]; a parameter only so tests can check the pair.
+  final bool showGoogle;
 
   static const height = 50.0;
 
@@ -47,8 +53,10 @@ class SocialSignInButtons extends StatelessWidget {
             onPressed: onApple,
           ),
         ),
-        const SizedBox(height: 12),
-        _GoogleButton(label: l.continueWithGoogle, onTap: onGoogle),
+        if (showGoogle) ...[
+          const SizedBox(height: 12),
+          _GoogleButton(label: l.continueWithGoogle, onTap: onGoogle),
+        ],
         const SizedBox(height: 24),
         Row(
           children: [

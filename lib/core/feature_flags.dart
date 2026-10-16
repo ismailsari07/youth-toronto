@@ -6,3 +6,10 @@
 /// rows are hidden. The code and strings stay; set to true to bring it all
 /// back.
 const bool kPrayerRemindersEnabled = false;
+
+/// Sign in with Google is postponed (1.1.0 ships Apple only). The code
+/// stays (AuthService.signInWithGoogle, the button in
+/// SocialSignInButtons); while false the button is hidden. To turn it on:
+/// set this to true and add GIDClientID, GIDServerClientID and the reversed
+/// iOS client ID URL scheme to ios/Runner/Info.plist (see CLAUDE.md).
+const bool kGoogleSignInEnabled = false;

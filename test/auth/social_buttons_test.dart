@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:myt_flutter/core/feature_flags.dart';
 import 'package:myt_flutter/features/profile/screens/sign_in_screen.dart';
 import 'package:myt_flutter/features/profile/screens/sign_up_screen.dart';
 import 'package:myt_flutter/features/profile/widgets/social_sign_in_buttons.dart';
@@ -41,52 +42,59 @@ void main() {
     await tester.pump();
   }
 
-  Widget buttons({VoidCallback? onApple, VoidCallback? onGoogle}) => Scaffold(
+  Widget buttons({
+    VoidCallback? onApple,
+    VoidCallback? onGoogle,
+    bool? showGoogle,
+  }) =>
+      Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(16),
-          child: SocialSignInButtons(onApple: onApple, onGoogle: onGoogle),
+          child: showGoogle == null
+              ? SocialSignInButtons(onApple: onApple, onGoogle: onGoogle)
+              : SocialSignInButtons(
+                  onApple: onApple,
+                  onGoogle: onGoogle,
+                  showGoogle: showGoogle,
+                ),
         ),
       );
 
   final iOS = TargetPlatformVariant.only(TargetPlatform.iOS);
 
+  test('1.1.0 ships Apple only', () {
+    expect(kGoogleSignInEnabled, isFalse);
+  });
+
   group('on iOS', () {
-    testWidgets('Apple first, Google second, the same size', (tester) async {
+    testWidgets('Apple only: no Google button', (tester) async {
       await pump(tester, buttons(onApple: () {}, onGoogle: () {}));
       expect(find.text('Continue with Apple'), findsOneWidget);
-      expect(find.text('Continue with Google'), findsOneWidget);
-      final a = tester.getRect(apple);
-      final g = tester.getRect(google);
-      expect(a.top, lessThan(g.top));
-      expect(a.size, g.size, reason: 'Apple at least as prominent as Google');
-      expect(a.height, SocialSignInButtons.height);
+      expect(google, findsNothing);
+      expect(find.text('Continue with Google'), findsNothing);
+      expect(tester.getRect(apple).height, SocialSignInButtons.height);
     }, variant: iOS);
 
-    testWidgets('taps reach the handlers; disabled while busy', (tester) async {
-      final taps = <String>[];
-      await pump(
-        tester,
-        buttons(onApple: () => taps.add('apple'), onGoogle: () => taps.add('google')),
-      );
+    testWidgets('Apple tap reaches the handler; disabled while busy',
+        (tester) async {
+      var taps = 0;
+      await pump(tester, buttons(onApple: () => taps++));
       await tester.tap(apple);
-      await tester.tap(google);
       await tester.pumpAndSettle();
-      expect(taps, ['apple', 'google']);
+      expect(taps, 1);
 
       await pump(tester, buttons());
       await tester.tap(apple);
-      await tester.tap(google);
       await tester.pumpAndSettle();
-      expect(taps, ['apple', 'google']);
+      expect(taps, 1);
     }, variant: iOS);
 
     testWidgets('Apple button is black in light mode, white in dark',
         (tester) async {
-      await pump(tester, buttons(onApple: () {}, onGoogle: () {}));
+      await pump(tester, buttons(onApple: () {}));
       expect(tester.widget<SignInWithAppleButton>(apple).style,
           SignInWithAppleButtonStyle.black);
-      await pump(tester, buttons(onApple: () {}, onGoogle: () {}),
-          theme: appDarkTheme);
+      await pump(tester, buttons(onApple: () {}), theme: appDarkTheme);
       await tester.pumpAndSettle(); // MaterialApp animates the theme change.
       expect(tester.widget<SignInWithAppleButton>(apple).style,
           SignInWithAppleButtonStyle.white);
@@ -95,33 +103,54 @@ void main() {
     testWidgets('localized in Turkish and French', (tester) async {
       await pump(tester, buttons(), locale: const Locale('tr'));
       expect(find.text('Apple ile devam et'), findsOneWidget);
-      expect(find.text('Google ile devam et'), findsOneWidget);
       expect(find.text('veya'), findsOneWidget);
       await pump(tester, buttons(), locale: const Locale('fr'));
       expect(find.text('Continuer avec Apple'), findsOneWidget);
-      expect(find.text('Continuer avec Google'), findsOneWidget);
+      expect(find.text('ou'), findsOneWidget);
     }, variant: iOS);
 
-    testWidgets('sign-in screen: the buttons sit above the email form',
+    testWidgets('sign-in screen: Apple above the email form, no Google',
         (tester) async {
       await pump(tester, const SignInScreen());
-      expect(apple, findsOneWidget);
-      expect(google, findsOneWidget);
-      expect(tester.getRect(google).bottom,
+      expect(google, findsNothing);
+      expect(tester.getRect(apple).bottom,
           lessThan(tester.getTopLeft(find.text('Email')).dy));
     }, variant: iOS);
 
-    testWidgets('sign-up screen: the buttons sit above the form',
+    testWidgets('sign-up screen: Apple above the form, no Google',
         (tester) async {
       await pump(tester, const SignUpScreen());
-      expect(apple, findsOneWidget);
-      expect(tester.getRect(google).bottom,
+      expect(google, findsNothing);
+      expect(tester.getRect(apple).bottom,
           lessThan(tester.getTopLeft(find.text('Full name')).dy));
+    }, variant: iOS);
+
+    // For the day kGoogleSignInEnabled is turned on (App Review 4.8).
+    testWidgets('with Google on: Apple first, the same size, both tappable',
+        (tester) async {
+      final taps = <String>[];
+      await pump(
+        tester,
+        buttons(
+          onApple: () => taps.add('apple'),
+          onGoogle: () => taps.add('google'),
+          showGoogle: true,
+        ),
+      );
+      final a = tester.getRect(apple);
+      final g = tester.getRect(google);
+      expect(a.top, lessThan(g.top));
+      expect(a.size, g.size, reason: 'Apple at least as prominent as Google');
+      expect(find.text('Continue with Google'), findsOneWidget);
+      await tester.tap(apple);
+      await tester.tap(google);
+      await tester.pumpAndSettle();
+      expect(taps, ['apple', 'google']);
     }, variant: iOS);
   });
 
   testWidgets('hidden on other platforms', (tester) async {
-    await pump(tester, buttons(onApple: () {}, onGoogle: () {}));
+    await pump(tester, buttons(onApple: () {}, onGoogle: () {}, showGoogle: true));
     expect(apple, findsNothing);
     expect(google, findsNothing);
     expect(find.text('or'), findsNothing);

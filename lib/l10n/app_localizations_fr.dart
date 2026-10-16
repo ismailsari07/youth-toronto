@@ -1144,4 +1144,83 @@ class AppLocalizationsFr extends AppLocalizations {
   String sizeKilobytes(String size) {
     return '$size Ko';
   }
+
+  @override
+  String get pushPromptTitle => 'Activez les notifications';
+
+  @override
+  String get pushPromptReason =>
+      'Soyez informé des événements et des nouvelles importantes de la mosquée.';
+
+  @override
+  String get pushPromptAllow => 'Activer les notifications';
+
+  @override
+  String get pushPromptLater => 'Pas maintenant';
+
+  @override
+  String get pushEvents => 'Notifications d\'événements';
+
+  @override
+  String get pushEventsDetail => 'Rappels des événements à venir';
+
+  @override
+  String get pushAnnouncements => 'Annonces et nouvelles importantes';
+
+  @override
+  String get pushAnnouncementsDetail =>
+      'Y compris les avis urgents de la mosquée';
+
+  @override
+  String get pushDenied =>
+      'Les notifications sont désactivées dans les Réglages';
+
+  @override
+  String get pushDeniedDetail =>
+      'Pour les activer, ouvrez Pape Mosque dans Réglages.';
+
+  @override
+  String get pushOpenSettings => 'Ouvrir Réglages';
+
+  @override
+  String get eventNotify => 'M\'avertir pour cet événement';
+
+  @override
+  String get eventNotifyOn => 'Un rappel avant le début';
+
+  @override
+  String get eventNotifyOff => 'Désactivé pour cet événement';
+
+  @override
+  String get eventNotifyEventsOff =>
+      'Les notifications d\'événements sont désactivées';
+
+  @override
+  String get eventGone => 'Cet événement n\'est plus disponible';
+
+  @override
+  String get announcementGone => 'Cette annonce n\'est plus disponible';
+
+  @override
+  String get goneBody => 'Il est peut-être terminé ou a été retiré.';
+
+  @override
+  String get appVersion => 'Version';
+
+  @override
+  String get deviceCode => 'Code de l\'appareil';
+
+  @override
+  String get deviceCodeNote =>
+      'Communiquez ce code si l\'assistance le demande.';
+
+  @override
+  String get copy => 'Copier';
+
+  @override
+  String get copied => 'Copié';
+
+  @override
+  String get saveFailedLater =>
+      'Enregistrement impossible. Réessayez un peu plus tard.';
 }

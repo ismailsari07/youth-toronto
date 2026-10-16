@@ -614,5 +614,29 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pushPromptTitle": "Turn on notifications",
+  "pushPromptReason": "Hear about events and important news from the mosque.",
+  "pushPromptAllow": "Turn on notifications",
+  "pushPromptLater": "Not now",
+  "pushEvents": "Event notifications",
+  "pushEventsDetail": "Reminders for upcoming events",
+  "pushAnnouncements": "Announcements and important news",
+  "pushAnnouncementsDetail": "Includes urgent mosque notices",
+  "pushDenied": "Notifications are off in iPhone Settings",
+  "pushDeniedDetail": "To turn them on, go to Pape Mosque in Settings.",
+  "pushOpenSettings": "Open Settings",
+  "eventNotify": "Notify me about this event",
+  "eventNotifyOn": "A reminder before it starts",
+  "eventNotifyOff": "Off for this event",
+  "eventNotifyEventsOff": "Event notifications are off",
+  "eventGone": "This event is no longer available",
+  "announcementGone": "This announcement is no longer available",
+  "goneBody": "It may have ended or been removed.",
+  "appVersion": "Version",
+  "deviceCode": "Device code",
+  "deviceCodeNote": "Share this code if support asks for it.",
+  "copy": "Copy",
+  "copied": "Copied",
+  "saveFailedLater": "Couldn't save. Try again in a little while."
 }

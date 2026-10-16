@@ -1136,4 +1136,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String sizeKilobytes(String size) {
     return '$size KB';
   }
+
+  @override
+  String get pushPromptTitle => 'Turn on notifications';
+
+  @override
+  String get pushPromptReason =>
+      'Hear about events and important news from the mosque.';
+
+  @override
+  String get pushPromptAllow => 'Turn on notifications';
+
+  @override
+  String get pushPromptLater => 'Not now';
+
+  @override
+  String get pushEvents => 'Event notifications';
+
+  @override
+  String get pushEventsDetail => 'Reminders for upcoming events';
+
+  @override
+  String get pushAnnouncements => 'Announcements and important news';
+
+  @override
+  String get pushAnnouncementsDetail => 'Includes urgent mosque notices';
+
+  @override
+  String get pushDenied => 'Notifications are off in iPhone Settings';
+
+  @override
+  String get pushDeniedDetail =>
+      'To turn them on, go to Pape Mosque in Settings.';
+
+  @override
+  String get pushOpenSettings => 'Open Settings';
+
+  @override
+  String get eventNotify => 'Notify me about this event';
+
+  @override
+  String get eventNotifyOn => 'A reminder before it starts';
+
+  @override
+  String get eventNotifyOff => 'Off for this event';
+
+  @override
+  String get eventNotifyEventsOff => 'Event notifications are off';
+
+  @override
+  String get eventGone => 'This event is no longer available';
+
+  @override
+  String get announcementGone => 'This announcement is no longer available';
+
+  @override
+  String get goneBody => 'It may have ended or been removed.';
+
+  @override
+  String get appVersion => 'Version';
+
+  @override
+  String get deviceCode => 'Device code';
+
+  @override
+  String get deviceCodeNote => 'Share this code if support asks for it.';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get copied => 'Copied';
+
+  @override
+  String get saveFailedLater => 'Couldn\'t save. Try again in a little while.';
 }

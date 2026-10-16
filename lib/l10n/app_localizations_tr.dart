@@ -1132,4 +1132,77 @@ class AppLocalizationsTr extends AppLocalizations {
   String sizeKilobytes(String size) {
     return '$size KB';
   }
+
+  @override
+  String get pushPromptTitle => 'Bildirimleri açın';
+
+  @override
+  String get pushPromptReason =>
+      'Etkinliklerden ve camiden gelen önemli haberlerden haberdar olun.';
+
+  @override
+  String get pushPromptAllow => 'Bildirimleri aç';
+
+  @override
+  String get pushPromptLater => 'Şimdi değil';
+
+  @override
+  String get pushEvents => 'Etkinlik bildirimleri';
+
+  @override
+  String get pushEventsDetail => 'Yaklaşan etkinlikler için hatırlatma';
+
+  @override
+  String get pushAnnouncements => 'Duyurular ve önemli haberler';
+
+  @override
+  String get pushAnnouncementsDetail => 'Acil cami duyuruları dahil';
+
+  @override
+  String get pushDenied => 'Bildirimler iPhone ayarlarında kapalı';
+
+  @override
+  String get pushDeniedDetail => 'Açmak için Ayarlar\'da Pape Mosque\'a gidin.';
+
+  @override
+  String get pushOpenSettings => 'Ayarlar\'ı aç';
+
+  @override
+  String get eventNotify => 'Bu etkinlik için bildirim';
+
+  @override
+  String get eventNotifyOn => 'Etkinlikten önce hatırlatma';
+
+  @override
+  String get eventNotifyOff => 'Bu etkinlik için kapalı';
+
+  @override
+  String get eventNotifyEventsOff => 'Etkinlik bildirimleri kapalı';
+
+  @override
+  String get eventGone => 'Bu etkinlik artık yayında değil';
+
+  @override
+  String get announcementGone => 'Bu duyuru artık yayında değil';
+
+  @override
+  String get goneBody => 'Sona ermiş ya da kaldırılmış olabilir.';
+
+  @override
+  String get appVersion => 'Sürüm';
+
+  @override
+  String get deviceCode => 'Cihaz kodu';
+
+  @override
+  String get deviceCodeNote => 'Destek için sorulursa bu kodu paylaşın.';
+
+  @override
+  String get copy => 'Kopyala';
+
+  @override
+  String get copied => 'Kopyalandı';
+
+  @override
+  String get saveFailedLater => 'Kaydedilemedi. Biraz sonra tekrar deneyin.';
 }

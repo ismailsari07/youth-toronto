@@ -1923,6 +1923,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{size} KB'**
   String sizeKilobytes(String size);
+
+  /// No description provided for @pushPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on notifications'**
+  String get pushPromptTitle;
+
+  /// No description provided for @pushPromptReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Hear about events and important news from the mosque.'**
+  String get pushPromptReason;
+
+  /// No description provided for @pushPromptAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on notifications'**
+  String get pushPromptAllow;
+
+  /// No description provided for @pushPromptLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get pushPromptLater;
+
+  /// No description provided for @pushEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Event notifications'**
+  String get pushEvents;
+
+  /// No description provided for @pushEventsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders for upcoming events'**
+  String get pushEventsDetail;
+
+  /// No description provided for @pushAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements and important news'**
+  String get pushAnnouncements;
+
+  /// No description provided for @pushAnnouncementsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Includes urgent mosque notices'**
+  String get pushAnnouncementsDetail;
+
+  /// No description provided for @pushDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off in iPhone Settings'**
+  String get pushDenied;
+
+  /// No description provided for @pushDeniedDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'To turn them on, go to Pape Mosque in Settings.'**
+  String get pushDeniedDetail;
+
+  /// No description provided for @pushOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get pushOpenSettings;
+
+  /// No description provided for @eventNotify.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify me about this event'**
+  String get eventNotify;
+
+  /// No description provided for @eventNotifyOn.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder before it starts'**
+  String get eventNotifyOn;
+
+  /// No description provided for @eventNotifyOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off for this event'**
+  String get eventNotifyOff;
+
+  /// No description provided for @eventNotifyEventsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Event notifications are off'**
+  String get eventNotifyEventsOff;
+
+  /// No description provided for @eventGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This event is no longer available'**
+  String get eventGone;
+
+  /// No description provided for @announcementGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This announcement is no longer available'**
+  String get announcementGone;
+
+  /// No description provided for @goneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It may have ended or been removed.'**
+  String get goneBody;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get appVersion;
+
+  /// No description provided for @deviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Device code'**
+  String get deviceCode;
+
+  /// No description provided for @deviceCodeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this code if support asks for it.'**
+  String get deviceCodeNote;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get copied;
+
+  /// No description provided for @saveFailedLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Try again in a little while.'**
+  String get saveFailedLater;
 }
 
 class _AppLocalizationsDelegate

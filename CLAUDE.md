@@ -59,7 +59,10 @@ pape-admin (§3 `push_devices`, §5). Code: `lib/core/push/`, `lib/shared/provid
 - `register_device` only when the payload's fingerprint changed or 24 h passed; 1 h pause after a throttle or
   53400. The FCM token comes from `getToken()` (not 17.x's FID API: the sender targets registration tokens).
 - Pre-prompt sheet before the iOS prompt: only while iOS hasn't asked, once per session, 3 days after
-  "Şimdi değil", never on its own after 3 (`push_prompt.dart`). Taps route via `pushRoute()` to
+  "Şimdi değil", never on its own after 3 (`push_prompt.dart`). If it never appears on a test phone, check
+  iOS Settings first: when an earlier build already got permission, iOS has asked, so the sheet correctly
+  stays hidden (seen on the 1.0.8 TestFlight check). To see it, use a phone that hasn't granted or refused
+  the app's notifications. Taps route via `pushRoute()` to
   `/community/event/:id` / `/community/announcement/:id` (loaded by id, published filter), else Community.
 - `AppDelegate` keeps itself as the notification-center delegate, so Firebase doesn't replace it; both
   plugins get every callback. When prayer reminders come back, check that a foreground reminder isn't

@@ -21,11 +21,15 @@ import '../features/profile/screens/service_detail_screen.dart';
 import '../features/profile/screens/settings_screen.dart';
 import '../features/profile/screens/sign_in_screen.dart';
 import '../features/profile/screens/sign_up_screen.dart';
+import '../features/push/item_loader_screens.dart';
 import 'content/content_bundle.dart';
 import 'event_schedule.dart';
 import 'models.dart';
 
 final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
+/// For sheets opened from outside any screen (the launch pre-prompt).
+GlobalKey<NavigatorState> get rootNavigatorKey => _rootKey;
 final _prayerKey = GlobalKey<NavigatorState>(debugLabel: 'prayer');
 final _communityKey = GlobalKey<NavigatorState>(debugLabel: 'community');
 final _profileKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
@@ -79,6 +83,22 @@ final router = GoRouter(
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => AnnouncementDetailScreen(
                     item: state.extra! as Announcement,
+                  ),
+                ),
+                // Tapped notifications: loaded by id (lib/core/push/push_route.dart).
+                GoRoute(
+                  path: 'event/:id',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => EventByIdScreen(
+                    id: state.pathParameters['id']!,
+                    occurrence: state.uri.queryParameters['occurrence'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'announcement/:id',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => AnnouncementByIdScreen(
+                    id: state.pathParameters['id']!,
                   ),
                 ),
               ],

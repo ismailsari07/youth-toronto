@@ -27,6 +27,8 @@ class PrimaryButton extends StatelessWidget {
       child: Container(
         height: height,
         alignment: Alignment.center,
+        // Room around the label when the button is only as wide as it.
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         decoration: BoxDecoration(
           color: context.colors.green,
           borderRadius: BorderRadius.circular(AppRadius.pill),

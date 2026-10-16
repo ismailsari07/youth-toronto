@@ -12,6 +12,7 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
 import '../../../ui/components/motion.dart';
+import '../../push/push_prompt_sheet.dart';
 
 /// The Prayer home's glimpse of Community: the next event and the latest
 /// announcement, with "See all" switching to the Community tab. Built on the
@@ -63,7 +64,10 @@ class CommunitySection extends ConsumerWidget {
             EventCard(
               upcoming: next,
               compact: true,
-              onTap: () => context.push('/community/event', extra: next),
+              onTap: () {
+                context.push('/community/event', extra: next);
+                promptAfterEventTap(context, ref);
+              },
             ),
           if (latest != null)
             AnnouncementCard(

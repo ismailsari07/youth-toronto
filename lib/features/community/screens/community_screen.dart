@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/event_schedule.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
+import '../../../core/push/push_prompt.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/content_provider.dart';
@@ -23,6 +24,7 @@ import '../../../ui/components/event_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
+import '../../push/push_prompt_sheet.dart';
 
 /// Spec §7.3 / §7.4 — Events and Announcements behind one segmented control.
 /// Phase B builds the structure; card detail work lands in phases D and E.
@@ -47,6 +49,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     final visible = TickerMode.of(context);
     if (visible && !_visible && !ref.read(contentProvider).showEvents) {
       _markSeenSoon();
+    }
+    if (visible && !_visible) {
+      // Opening the tab may bring up our notifications pre-prompt (once).
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          maybeShowPushPrompt(context, ref, PromptTrigger.communityVisit);
+        }
+      });
     }
     _visible = visible;
   }
@@ -308,7 +318,10 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           index: 2 + i,
           child: EventCard(
             upcoming: e,
-            onTap: () => context.push('/community/event', extra: e),
+            onTap: () {
+              context.push('/community/event', extra: e);
+              promptAfterEventTap(context, ref);
+            },
             onRegister: () {
               final uri = e.event.registrationUri;
               if (uri != null) _open(uri.toString());

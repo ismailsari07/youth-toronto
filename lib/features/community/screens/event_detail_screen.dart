@@ -17,6 +17,7 @@ import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
 import '../../../ui/components/motion.dart';
+import '../../push/push_widgets.dart';
 
 /// Spec §7.6. Pushed onto the root navigator, so the island is not shown and
 /// the sticky bar owns the bottom of the screen.
@@ -205,6 +206,7 @@ class EventDetailScreen extends ConsumerWidget {
                       ),
                   ],
                 ),
+                EventNotifyCard(eventId: event.id),
                 if (description != null && description.trim().isNotEmpty) ...[
                   const SizedBox(height: AppSpace.cardGapWide),
                   SectionHeader(title: l.aboutThisEvent),

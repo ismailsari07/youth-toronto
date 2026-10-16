@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:myt_flutter/core/push/push_api.dart';
 import 'package:myt_flutter/core/push/push_prompt.dart';
 import 'package:myt_flutter/core/push/push_sync.dart';
+import 'package:myt_flutter/features/profile/screens/profile_root_screen.dart';
 import 'package:myt_flutter/features/profile/screens/settings_screen.dart';
 import 'package:myt_flutter/features/profile/widgets/about_sheet.dart';
 import 'package:myt_flutter/features/push/push_widgets.dart';
@@ -193,6 +194,21 @@ void main() {
     testWidgets('a dash before the first registration', (tester) async {
       await pump(tester, const AboutSheet());
       expect(find.text('—'), findsOneWidget);
+    });
+
+    testWidgets('opens from the About row on Profile', (tester) async {
+      await pump(
+        tester,
+        const ProfileRootScreen(),
+        local: const PushLocal(saved: true, deviceCode: 'K7QM2X9P'),
+      );
+      final row = find.text('About this app');
+      await tester.scrollUntilVisible(row, 200);
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      expect(find.byType(AboutSheet), findsOneWidget);
+      expect(find.text('K7QM2X9P'), findsOneWidget);
+      expect(find.text('Copy'), findsOneWidget);
     });
   });
 }

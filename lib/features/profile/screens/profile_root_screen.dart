@@ -25,6 +25,7 @@ import '../../marriage/data/marriage_application.dart';
 import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
 import '../../marriage/widgets/marriage_widgets.dart';
+import '../widgets/about_sheet.dart';
 import '../widgets/appearance_sheet.dart';
 import '../widgets/language_sheet.dart';
 
@@ -174,6 +175,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
                 title: l.aboutThisApp,
                 subtitle: version == null ? null : l.versionLabel(version),
                 trailing: const RowChevron(),
+                onTap: () => showAboutSheet(context),
               ),
             ],
           ),

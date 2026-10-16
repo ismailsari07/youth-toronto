@@ -1232,4 +1232,8 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get saveName => 'Kaydet';
+
+  @override
+  String get errorAppleRevokeFailed =>
+      'Apple silme işlemini onaylayamadı, bu yüzden hesabınız silinmedi. Lütfen birkaç dakika sonra tekrar deneyin.';
 }

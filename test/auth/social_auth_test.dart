@@ -119,7 +119,8 @@ void main() {
       expect(deleteFailureFor(428, {'error': 'apple_reauth_required'}),
           AuthFailure.appleReauthRequired);
       expect(deleteFailureFor(502, {'error': 'apple_revoke_failed'}),
-          AuthFailure.deleteFailed);
+          AuthFailure.appleRevokeFailed);
+      expect(deleteFailureFor(502, null), AuthFailure.deleteFailed);
       expect(deleteFailureFor(500, {'error': 'delete_failed'}),
           AuthFailure.deleteFailed);
       expect(deleteFailureFor(409, 'not json'), AuthFailure.deleteFailed);
@@ -143,6 +144,10 @@ void main() {
           tr.errorAppleMismatch);
       expect(authErrorText(en, e(AuthFailure.appleReauthRequired)),
           en.errorDeleteFailed);
+      expect(authErrorText(tr, e(AuthFailure.appleRevokeFailed)),
+          tr.errorAppleRevokeFailed);
+      expect(authErrorText(en, e(AuthFailure.appleRevokeFailed)),
+          isNot(en.errorDeleteFailed));
     });
   });
 }

@@ -1237,4 +1237,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveName => 'Save';
+
+  @override
+  String get errorAppleRevokeFailed =>
+      'Apple couldn\'t confirm the deletion, so your account wasn\'t deleted. Please try again in a few minutes.';
 }

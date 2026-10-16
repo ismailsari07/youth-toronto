@@ -646,5 +646,6 @@
   "errorAppleMismatch": "Confirm with the Apple ID you use for this account.",
   "addName": "Add your name",
   "addNameBody": "Shown on your profile. You can set it once; to change it later, contact the mosque office.",
-  "saveName": "Save"
+  "saveName": "Save",
+  "errorAppleRevokeFailed": "Apple couldn't confirm the deletion, so your account wasn't deleted. Please try again in a few minutes."
 }

@@ -335,5 +335,6 @@
   "errorAppleMismatch": "Bu hesapta kullandığınız Apple Kimliği ile onaylayın.",
   "addName": "İsim ekle",
   "addNameBody": "Profilinizde görünür. Bir kez girebilirsiniz; sonradan değiştirmek için cami ofisine başvurun.",
-  "saveName": "Kaydet"
+  "saveName": "Kaydet",
+  "errorAppleRevokeFailed": "Apple silme işlemini onaylayamadı, bu yüzden hesabınız silinmedi. Lütfen birkaç dakika sonra tekrar deneyin."
 }

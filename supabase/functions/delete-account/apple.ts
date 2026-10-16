@@ -20,9 +20,21 @@ export type AppleConfig = {
   privateKey: string;
 };
 
+/** What Apple answered, for the log: its fixed error word and its short
+ * English description. Never a token, code or key. */
+export type AppleAnswer = { status: number; error?: string; description?: string };
+
 export type AppleResult =
   | { ok: true }
-  | { ok: false; error: "apple_mismatch" | "apple_revoke_failed"; reason: string };
+  | {
+    ok: false;
+    error: "apple_mismatch" | "apple_revoke_failed";
+    /** step_status_error, e.g. token_400_invalid_client. */
+    reason: string;
+    apple?: AppleAnswer;
+    /** keyShape(), when the key or IDs are the likely cause. */
+    key?: Record<string, unknown>;
+  };
 
 /** The secrets, or null when any is missing. */
 export function appleConfigFromEnv(get: (k: string) => string | undefined): AppleConfig | null {
@@ -37,12 +49,52 @@ const b64url = (bytes: Uint8Array) =>
   btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const b64urlText = (s: string) => b64url(new TextEncoder().encode(s));
 
+/** The base64 body of the .p8, however it was pasted: real or literal
+ * "\n" / "\r\n", surrounding quotes, with or without the BEGIN/END lines. */
+function pemBody(pem: string): string {
+  return pem
+    .replace(/\\r\\n|\\n|\\r/g, "\n")
+    .replace(/-----(BEGIN|END) [A-Z ]*PRIVATE KEY-----/g, "")
+    .replace(/["'\s]/g, "");
+}
+
 function pemToPkcs8(pem: string): Uint8Array<ArrayBuffer> {
-  const body = pem
-    .replace(/\\n/g, "\n")
-    .replace(/-----(BEGIN|END) PRIVATE KEY-----/g, "")
-    .replace(/\s+/g, "");
-  return Uint8Array.from(atob(body), (c) => c.charCodeAt(0));
+  return Uint8Array.from(atob(pemBody(pem)), (c) => c.charCodeAt(0));
+}
+
+/**
+ * The secrets' shape, safe to log: lengths and yes/no facts, never content.
+ * An Apple .p8 (P-256 PKCS#8) decodes to 138 bytes; Key and Team IDs are
+ * 10 characters.
+ */
+export function keyShape(cfg: AppleConfig): Record<string, unknown> {
+  const pem = cfg.privateKey;
+  let keyBytes: number | null = null;
+  try {
+    keyBytes = atob(pemBody(pem)).length;
+  } catch {
+    // Not base64 after cleaning.
+  }
+  return {
+    pemLength: pem.length,
+    hasBegin: pem.includes("-----BEGIN PRIVATE KEY-----"),
+    hasEnd: pem.includes("-----END PRIVATE KEY-----"),
+    realNewlines: pem.includes("\n"),
+    literalBackslashN: pem.includes("\\n"),
+    quoted: /^\s*["']/.test(pem),
+    keyBytes,
+    keyIdLength: cfg.keyId.length,
+    teamIdLength: cfg.teamId.length,
+  };
+}
+
+/** Apple's error JSON → its fixed word and a short one-line description. */
+async function appleAnswer(res: Response): Promise<AppleAnswer> {
+  const body = await res.json().catch(() => null);
+  const word = (v: unknown) => (typeof v === "string" && /^[a-z_]{1,40}$/.test(v) ? v : undefined);
+  const text = (v: unknown) =>
+    typeof v === "string" ? v.replace(/\s+/g, " ").slice(0, 200) : undefined;
+  return { status: res.status, error: word(body?.error), description: text(body?.error_description) };
 }
 
 /** ES256 client secret for Apple's token and revoke endpoints. */
@@ -105,7 +157,12 @@ export async function revokeApple(
   fetchFn: typeof fetch = fetch,
   nowSeconds = Math.floor(Date.now() / 1000),
 ): Promise<AppleResult> {
-  const fail = (reason: string): AppleResult => ({ ok: false, error: "apple_revoke_failed", reason });
+  const fail = (reason: string, apple?: AppleAnswer): AppleResult => {
+    const result: AppleResult = { ok: false, error: "apple_revoke_failed", reason };
+    if (apple) result.apple = apple;
+    if (reason === "bad_key" || apple?.error === "invalid_client") result.key = keyShape(cfg);
+    return result;
+  };
   let secret: string;
   try {
     secret = await appleClientSecret(cfg, nowSeconds);
@@ -123,9 +180,8 @@ export async function revokeApple(
     }));
     if (!res.ok) {
       // Apple's error is a fixed word (invalid_grant, invalid_client…).
-      const body = await res.json().catch(() => null);
-      const err = typeof body?.error === "string" ? body.error : "unknown";
-      return fail(`token_${res.status}_${err}`);
+      const answer = await appleAnswer(res);
+      return fail(`token_${res.status}_${answer.error ?? "unknown"}`, answer);
     }
     tokens = await res.json();
   } catch {
@@ -150,7 +206,10 @@ export async function revokeApple(
       token,
       token_type_hint: refresh ? "refresh_token" : "access_token",
     }));
-    if (!res.ok) return fail(`revoke_${res.status}`);
+    if (!res.ok) {
+      const answer = await appleAnswer(res);
+      return fail(`revoke_${res.status}_${answer.error ?? "unknown"}`, answer);
+    }
   } catch {
     return fail("revoke_network");
   }

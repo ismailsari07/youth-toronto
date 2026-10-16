@@ -22,6 +22,8 @@ enum AuthFailure {
   providerFailed,
   /// Deleting an Apple account was confirmed with a different Apple ID.
   appleMismatch,
+  /// Apple couldn't confirm the token revocation; nothing was deleted.
+  appleRevokeFailed,
   /// delete-account needs a fresh Apple code (handled inside deleteAccount).
   appleReauthRequired,
   unexpected,
@@ -44,6 +46,7 @@ AuthFailure deleteFailureFor(int status, Object? details) {
     (409, 'admin_account') => AuthFailure.adminAccount,
     (409, 'apple_mismatch') => AuthFailure.appleMismatch,
     (428, 'apple_reauth_required') => AuthFailure.appleReauthRequired,
+    (502, 'apple_revoke_failed') => AuthFailure.appleRevokeFailed,
     _ => AuthFailure.deleteFailed,
   };
 }

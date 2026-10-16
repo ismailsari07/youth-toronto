@@ -79,16 +79,24 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     const code = await appleCode(req);
     if (!code) return json({ error: "apple_reauth_required" }, 428);
     if (!deps.revokeApple) {
-      deps.log("error", "delete-account apple not configured", { userId: user.id });
+      deps.log("error", "delete-account apple not configured (a secret is missing)", { userId: user.id });
       return json({ error: "apple_revoke_failed" }, 502);
     }
     const result = await deps.revokeApple(code, sub);
     if (!result.ok) {
-      deps.log("error", "delete-account apple revoke failed", { userId: user.id, reason: result.reason });
+      // Step, Apple's error word and description, the key's shape: never
+      // the code, a token, the key or the client secret.
+      deps.log("error", "delete-account apple revoke failed", {
+        userId: user.id,
+        reason: result.reason,
+        ...(result.apple ? { apple: result.apple } : {}),
+        ...(result.key ? { key: result.key } : {}),
+      });
       return result.error === "apple_mismatch"
         ? json({ error: "apple_mismatch" }, 409)
         : json({ error: "apple_revoke_failed" }, 502);
     }
+    deps.log("log", "delete-account apple revoked", { userId: user.id });
   }
 
   // 4. Marriage-service document and application, before the account: if

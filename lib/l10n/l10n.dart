@@ -107,6 +107,7 @@ String authErrorText(AppLocalizations l, AuthError error) =>
       AuthFailure.cancelled => '',
       AuthFailure.providerFailed => l.errorProviderFailed,
       AuthFailure.appleMismatch => l.errorAppleMismatch,
+      AuthFailure.appleRevokeFailed => l.errorAppleRevokeFailed,
       AuthFailure.appleReauthRequired => l.errorDeleteFailed,
       AuthFailure.unexpected =>
         l.localeName == 'en' ? error.serverMessage ?? l.errorUnexpected

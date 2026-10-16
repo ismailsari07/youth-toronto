@@ -335,5 +335,6 @@
   "errorAppleMismatch": "Confirmez avec l'identifiant Apple utilisé pour ce compte.",
   "addName": "Ajouter votre nom",
   "addNameBody": "Affiché sur votre profil. Vous pouvez le saisir une fois ; pour le modifier ensuite, contactez le bureau de la mosquée.",
-  "saveName": "Enregistrer"
+  "saveName": "Enregistrer",
+  "errorAppleRevokeFailed": "Apple n'a pas pu confirmer la suppression : votre compte n'a donc pas été supprimé. Veuillez réessayer dans quelques minutes."
 }

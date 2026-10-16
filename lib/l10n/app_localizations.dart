@@ -2115,6 +2115,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get saveName;
+
+  /// No description provided for @errorAppleRevokeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple couldn\'t confirm the deletion, so your account wasn\'t deleted. Please try again in a few minutes.'**
+  String get errorAppleRevokeFailed;
 }
 
 class _AppLocalizationsDelegate

@@ -1,6 +1,6 @@
 // deno test supabase/functions/delete-account/
 import assert from "node:assert/strict";
-import { APPLE_CLIENT_ID, appleClientSecret, appleConfigFromEnv, revokeApple } from "./apple.ts";
+import { APPLE_CLIENT_ID, appleClientSecret, appleConfigFromEnv, keyShape, revokeApple } from "./apple.ts";
 import type { AppleConfig } from "./apple.ts";
 
 const NOW = 1_800_000_000;
@@ -127,21 +127,87 @@ Deno.test("revoke: failures → apple_revoke_failed with a reason that carries n
     [{ token: { status: 200, body: { refresh_token: "r" } } }, "token_bad_id_token"],
     [{ token: { status: 200, body: { id_token: fakeJwt({ aud: "other.app", sub: "apple-sub-1" }), refresh_token: "r" } } }, "token_bad_id_token"],
     [{ token: { status: 200, body: { id_token: fakeJwt({ aud: APPLE_CLIENT_ID, sub: "apple-sub-1" }) } } }, "token_missing"],
-    [{ token: goodTokens(), revoke: { status: 400 } }, "revoke_400"],
+    [{ token: goodTokens(), revoke: { status: 400 } }, "revoke_400_unknown"],
     [{ token: goodTokens(), revoke: "throw" }, "revoke_network"],
   ];
   for (const [opts, reason] of cases) {
     const apple = fakeApple(opts);
     const result = await revokeApple("secret-code", "apple-sub-1", await config(), apple.fetchFn, NOW);
-    assert.deepEqual(result, { ok: false, error: "apple_revoke_failed", reason }, reason);
-    assert.ok(!reason.includes("secret-code") && !reason.includes("ref"));
+    assert.equal(result.ok, false);
+    assert.equal(!result.ok && result.error, "apple_revoke_failed");
+    assert.equal(!result.ok && result.reason, reason);
+    assert.ok(!JSON.stringify(result).includes("secret-code"), "never the code");
+    assert.ok(!JSON.stringify(result).includes('"ref"'), "never a token");
   }
 });
 
 Deno.test("revoke: an unusable key → bad_key, Apple never called", async () => {
   const apple = fakeApple({ token: goodTokens(), revoke: { status: 200 } });
   const cfg = { teamId: "T", keyId: "K", privateKey: "-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----" };
-  assert.deepEqual(await revokeApple("c", "apple-sub-1", cfg, apple.fetchFn, NOW),
-    { ok: false, error: "apple_revoke_failed", reason: "bad_key" });
+  const result = await revokeApple("c", "apple-sub-1", cfg, apple.fetchFn, NOW);
+  assert.equal(!result.ok && result.reason, "bad_key");
+  assert.equal(!result.ok && result.key?.keyBytes, 3, "the shape says why");
   assert.equal(apple.calls.length, 0);
+});
+
+Deno.test("client secret: quoted, CRLF or spaced pastes of the key work", async () => {
+  const { pem, publicKey } = await testKey();
+  const variants = [
+    `"${pem}"`,
+    `'${pem.trim()}'`,
+    pem.replace(/\n/g, "\r\n"),
+    pem.replace(/\n/g, "\\r\\n"),
+    `  ${pem.replace(/\n/g, " ")}  `,
+    pem.replace(/\n/g, ""), // tr -d '\n' < AuthKey.p8
+    pem.split("\n").filter((l) => !l.startsWith("-----")).join(""), // body only
+  ];
+  for (const privateKey of variants) {
+    const jwt = await appleClientSecret({ teamId: "T", keyId: "K", privateKey }, NOW);
+    const [h, p, s] = jwt.split(".");
+    assert.ok(await crypto.subtle.verify(
+      { name: "ECDSA", hash: "SHA-256" }, publicKey, fromB64url(s), new TextEncoder().encode(`${h}.${p}`),
+    ));
+  }
+});
+
+Deno.test("keyShape: lengths and yes/no facts only, never the key", async () => {
+  const { pem } = await testKey();
+  const shape = keyShape({ teamId: "TEAM123456", keyId: "KEY1234567", privateKey: pem });
+  assert.deepEqual(shape, {
+    pemLength: pem.length,
+    hasBegin: true,
+    hasEnd: true,
+    realNewlines: true,
+    literalBackslashN: false,
+    quoted: false,
+    keyBytes: 138,
+    keyIdLength: 10,
+    teamIdLength: 10,
+  });
+  const body = pem.split("\n")[1];
+  assert.ok(!JSON.stringify(shape).includes(body.slice(0, 12)));
+  assert.equal(keyShape({ teamId: "T", keyId: "K", privateKey: pem.replace(/\n/g, "\\n") }).literalBackslashN, true);
+});
+
+Deno.test("invalid_client: Apple's word, description and the key's shape are kept", async () => {
+  const apple = fakeApple({
+    token: { status: 400, body: { error: "invalid_client", error_description: "Client authentication failed." } },
+  });
+  const result = await revokeApple("c", "apple-sub-1", await config(), apple.fetchFn, NOW);
+  assert.equal(result.ok, false);
+  if (result.ok) return;
+  assert.equal(result.reason, "token_400_invalid_client");
+  assert.deepEqual(result.apple, { status: 400, error: "invalid_client", description: "Client authentication failed." });
+  assert.equal(result.key?.keyBytes, 138);
+});
+
+Deno.test("Apple's answer: odd error words dropped, long descriptions cut", async () => {
+  const apple = fakeApple({
+    token: { status: 400, body: { error: "Not A Word!", error_description: "x".repeat(500) } },
+  });
+  const result = await revokeApple("c", "apple-sub-1", await config(), apple.fetchFn, NOW);
+  assert.equal(!result.ok && result.reason, "token_400_unknown");
+  assert.equal(!result.ok && result.apple?.error, undefined);
+  assert.equal(!result.ok && result.apple?.description?.length, 200);
+  assert.equal(!result.ok && result.key, undefined);
 });

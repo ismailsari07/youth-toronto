@@ -1250,4 +1250,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get saveName => 'Enregistrer';
+
+  @override
+  String get errorAppleRevokeFailed =>
+      'Apple n\'a pas pu confirmer la suppression : votre compte n\'a donc pas été supprimé. Veuillez réessayer dans quelques minutes.';
 }

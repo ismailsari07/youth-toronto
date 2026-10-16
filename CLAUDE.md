@@ -47,6 +47,25 @@ the website in Safari (`LaunchMode.externalApplication`); never add a form or a 
   which the website turns into that fund's open form.
 - Fund titles are Turkish only (one `title` column); translations wait for the panel's fund module.
 
+## Push notifications (since 1.0.8)
+
+FCM, iOS only (no Android Firebase config on purpose; `PushPlatform.start()` returns the unsupported
+platform elsewhere, and every push UI hides itself). The server side (`push_devices`, the sender) lives in
+pape-admin (§3 `push_devices`, §5). Code: `lib/core/push/`, `lib/shared/providers/push_provider.dart`,
+`lib/features/push/`.
+
+- Per device, no login: `install_id` + secret in the Keychain (`first_unlock`; survives reinstall), never
+  logged. RPCs `register_device`, `set_event_notifications`, `device_settings`; error codes in `push_api.dart`.
+- `register_device` only when the payload's fingerprint changed or 24 h passed; 1 h pause after a throttle or
+  53400. The FCM token comes from `getToken()` (not 17.x's FID API: the sender targets registration tokens).
+- Pre-prompt sheet before the iOS prompt: only while iOS hasn't asked, once per session, 3 days after
+  "Şimdi değil", never on its own after 3 (`push_prompt.dart`). Taps route via `pushRoute()` to
+  `/community/event/:id` / `/community/announcement/:id` (loaded by id, published filter), else Community.
+- `AppDelegate` keeps itself as the notification-center delegate, so Firebase doesn't replace it; both
+  plugins get every callback. When prayer reminders come back, check that a foreground reminder isn't
+  presented twice (both plugins answer `willPresent` for local notifications).
+- Firebase pinned to `firebase_core` 4.x / `firebase_messaging` 16.x; 17.0 (Firebase iOS SDK 13) is untested.
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

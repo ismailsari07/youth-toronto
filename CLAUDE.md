@@ -69,6 +69,24 @@ pape-admin (§3 `push_devices`, §5). Code: `lib/core/push/`, `lib/shared/provid
   presented twice (both plugins answer `willPresent` for local notifications).
 - Firebase pinned to `firebase_core` 4.x / `firebase_messaging` 16.x; 17.0 (Firebase iOS SDK 13) is untested.
 
+## Sign in with Apple and Google (since 1.1.0)
+
+Native only, iOS only (`socialSignInSupported`), both through `signInWithIdToken` with a fresh nonce (SHA-256 to
+Apple/Google, raw to Supabase; Google's `initialize(nonce:)` is called per sign-in). Never a web redirect. Code:
+`lib/core/auth_service.dart`, `lib/core/social_auth.dart`, `lib/features/profile/widgets/social_sign_in_buttons.dart`.
+
+- Buttons above the email form on sign-in and sign-up: Apple first, same size as Google (App Review 4.8). Social
+  sign-ups have no phone or date of birth (the marriage flow asks for the date of birth).
+- Apple sends the name only on the first authorization. It goes to `set_my_initial_name()` and waits in the Keychain
+  (`PendingAppleName`) until saved; retried at launch. An Apple account without a name has `full_name = ''`; Profile
+  shows "İsim ekle" while the name is still automatic (`isAutomaticName`, same rule as the RPC).
+- Same verified email → Supabase links to the existing account (pape-admin CLAUDE.md §5, incl. the risk until SMTP).
+- Delete: an Apple account gets 428 from `delete-account`, confirms with Apple once more, and the function revokes
+  the Apple tokens before deleting (secrets `APPLE_TEAM_ID`, `APPLE_SIWA_KEY_ID`, `APPLE_SIWA_PRIVATE_KEY`; Deno tests
+  in `supabase/functions/delete-account/`, run with `npx deno@2.5.6 test supabase/functions/delete-account/`).
+- iOS config: `com.apple.developer.applesignin` in `Runner.entitlements`; `GIDClientID`, `GIDServerClientID` and the
+  reversed iOS client ID URL scheme in `Info.plist` (GCP project `pape-mosquee`; client IDs aren't secrets).
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

@@ -1223,4 +1223,31 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get saveFailedLater =>
       'Enregistrement impossible. Réessayez un peu plus tard.';
+
+  @override
+  String get continueWithApple => 'Continuer avec Apple';
+
+  @override
+  String get continueWithGoogle => 'Continuer avec Google';
+
+  @override
+  String get orDivider => 'ou';
+
+  @override
+  String get errorProviderFailed =>
+      'La connexion n\'a pas pu aboutir. Veuillez réessayer.';
+
+  @override
+  String get errorAppleMismatch =>
+      'Confirmez avec l\'identifiant Apple utilisé pour ce compte.';
+
+  @override
+  String get addName => 'Ajouter votre nom';
+
+  @override
+  String get addNameBody =>
+      'Affiché sur votre profil. Vous pouvez le saisir une fois ; pour le modifier ensuite, contactez le bureau de la mosquée.';
+
+  @override
+  String get saveName => 'Enregistrer';
 }

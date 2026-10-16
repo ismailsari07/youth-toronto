@@ -17,7 +17,7 @@ final userProfileProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
   try {
     return await Supabase.instance.client
         .from('user_profiles')
-        .select('full_name, notifications_enabled, created_at, phone, date_of_birth')
+        .select('full_name, email, notifications_enabled, created_at, phone, date_of_birth')
         .eq('id', user.id)
         .maybeSingle();
   } catch (_) {

@@ -327,5 +327,13 @@
   "deviceCodeNote": "Destek için sorulursa bu kodu paylaşın.",
   "copy": "Kopyala",
   "copied": "Kopyalandı",
-  "saveFailedLater": "Kaydedilemedi. Biraz sonra tekrar deneyin."
+  "saveFailedLater": "Kaydedilemedi. Biraz sonra tekrar deneyin.",
+  "continueWithApple": "Apple ile devam et",
+  "continueWithGoogle": "Google ile devam et",
+  "orDivider": "veya",
+  "errorProviderFailed": "Giriş tamamlanamadı. Lütfen tekrar deneyin.",
+  "errorAppleMismatch": "Bu hesapta kullandığınız Apple Kimliği ile onaylayın.",
+  "addName": "İsim ekle",
+  "addNameBody": "Profilinizde görünür. Bir kez girebilirsiniz; sonradan değiştirmek için cami ofisine başvurun.",
+  "saveName": "Kaydet"
 }

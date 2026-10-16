@@ -638,5 +638,13 @@
   "deviceCodeNote": "Share this code if support asks for it.",
   "copy": "Copy",
   "copied": "Copied",
-  "saveFailedLater": "Couldn't save. Try again in a little while."
+  "saveFailedLater": "Couldn't save. Try again in a little while.",
+  "continueWithApple": "Continue with Apple",
+  "continueWithGoogle": "Continue with Google",
+  "orDivider": "or",
+  "errorProviderFailed": "Sign-in couldn't be completed. Please try again.",
+  "errorAppleMismatch": "Confirm with the Apple ID you use for this account.",
+  "addName": "Add your name",
+  "addNameBody": "Shown on your profile. You can set it once; to change it later, contact the mosque office.",
+  "saveName": "Save"
 }

@@ -1210,4 +1210,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveFailedLater => 'Couldn\'t save. Try again in a little while.';
+
+  @override
+  String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get orDivider => 'or';
+
+  @override
+  String get errorProviderFailed =>
+      'Sign-in couldn\'t be completed. Please try again.';
+
+  @override
+  String get errorAppleMismatch =>
+      'Confirm with the Apple ID you use for this account.';
+
+  @override
+  String get addName => 'Add your name';
+
+  @override
+  String get addNameBody =>
+      'Shown on your profile. You can set it once; to change it later, contact the mosque office.';
+
+  @override
+  String get saveName => 'Save';
 }

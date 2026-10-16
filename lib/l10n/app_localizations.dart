@@ -2067,6 +2067,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t save. Try again in a little while.'**
   String get saveFailedLater;
+
+  /// No description provided for @continueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get continueWithApple;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @orDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orDivider;
+
+  /// No description provided for @errorProviderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in couldn\'t be completed. Please try again.'**
+  String get errorProviderFailed;
+
+  /// No description provided for @errorAppleMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm with the Apple ID you use for this account.'**
+  String get errorAppleMismatch;
+
+  /// No description provided for @addName.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your name'**
+  String get addName;
+
+  /// No description provided for @addNameBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown on your profile. You can set it once; to change it later, contact the mosque office.'**
+  String get addNameBody;
+
+  /// No description provided for @saveName.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveName;
 }
 
 class _AppLocalizationsDelegate

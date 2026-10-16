@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
 import '../../../l10n/l10n.dart';
+import '../../../shared/providers/auth_provider.dart';
 import '../../../shared/formatters.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -11,9 +13,12 @@ import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_field.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
+import '../widgets/social_sign_in_buttons.dart';
 
 /// Spec §7.13. Collects what the office needs; the call itself is the existing
-/// AuthService.signUpWithEmail.
+/// AuthService.signUpWithEmail. Since 1.1.0 Apple / Google sit above the
+/// form; they create the account without phone or date of birth (Profile
+/// shows "Not added"; the marriage service asks for the date of birth).
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -90,6 +95,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (error == null) context.pop();
   }
 
+  /// Apple or Google. A closed sheet shows nothing.
+  Future<void> _social(Future<AuthError?> Function() signIn) async {
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    final error = await signIn();
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _error = error == null || error.kind == AuthFailure.cancelled
+          ? null
+          : (l) => authErrorText(l, error);
+    });
+    if (error == null) {
+      // An Apple name may have been saved after the profile was fetched.
+      ProviderScope.containerOf(context).invalidate(userProfileProvider);
+      context.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -113,6 +139,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 40,
               ),
               children: [
+                SocialSignInButtons(
+                  onApple: _busy
+                      ? null
+                      : () => _social(AuthService.signInWithApple),
+                  onGoogle: _busy
+                      ? null
+                      : () => _social(AuthService.signInWithGoogle),
+                ),
                 FieldGroup(
                   children: [
                     AppField(

@@ -15,7 +15,8 @@ import '../../../ui/components/app_scaffolding.dart';
 /// Spec §7.11, on the working deletion flow: AuthService.deleteAccount() calls
 /// the `delete-account` edge function, which deletes any marriage-service
 /// document and application, then the auth user (and the profile row with
-/// it), and then clears the local session.
+/// it), and then clears the local session. Apple accounts confirm once more
+/// with Apple first, so their Apple tokens can be revoked (since 1.1.0).
 class DeleteAccountScreen extends StatefulWidget {
   const DeleteAccountScreen({super.key});
 
@@ -66,7 +67,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     }
     setState(() {
       _busy = false;
-      _error = error;
+      // Closing Apple's confirmation sheet just cancels.
+      _error = error.kind == AuthFailure.cancelled ? null : error;
     });
   }
 

@@ -327,5 +327,13 @@
   "deviceCodeNote": "Communiquez ce code si l'assistance le demande.",
   "copy": "Copier",
   "copied": "Copié",
-  "saveFailedLater": "Enregistrement impossible. Réessayez un peu plus tard."
+  "saveFailedLater": "Enregistrement impossible. Réessayez un peu plus tard.",
+  "continueWithApple": "Continuer avec Apple",
+  "continueWithGoogle": "Continuer avec Google",
+  "orDivider": "ou",
+  "errorProviderFailed": "La connexion n'a pas pu aboutir. Veuillez réessayer.",
+  "errorAppleMismatch": "Confirmez avec l'identifiant Apple utilisé pour ce compte.",
+  "addName": "Ajouter votre nom",
+  "addNameBody": "Affiché sur votre profil. Vous pouvez le saisir une fois ; pour le modifier ensuite, contactez le bureau de la mosquée.",
+  "saveName": "Enregistrer"
 }

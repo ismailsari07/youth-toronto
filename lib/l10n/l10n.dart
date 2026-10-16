@@ -103,6 +103,11 @@ String authErrorText(AppLocalizations l, AuthError error) =>
       AuthFailure.sessionExpired => l.errorSessionExpired,
       AuthFailure.adminAccount => l.errorAdminAccount,
       AuthFailure.deleteFailed => l.errorDeleteFailed,
+      // The screens show nothing for a closed Apple/Google sheet.
+      AuthFailure.cancelled => '',
+      AuthFailure.providerFailed => l.errorProviderFailed,
+      AuthFailure.appleMismatch => l.errorAppleMismatch,
+      AuthFailure.appleReauthRequired => l.errorDeleteFailed,
       AuthFailure.unexpected =>
         l.localeName == 'en' ? error.serverMessage ?? l.errorUnexpected
             : l.errorUnexpected,

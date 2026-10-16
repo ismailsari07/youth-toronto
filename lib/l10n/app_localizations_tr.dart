@@ -1205,4 +1205,31 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get saveFailedLater => 'Kaydedilemedi. Biraz sonra tekrar deneyin.';
+
+  @override
+  String get continueWithApple => 'Apple ile devam et';
+
+  @override
+  String get continueWithGoogle => 'Google ile devam et';
+
+  @override
+  String get orDivider => 'veya';
+
+  @override
+  String get errorProviderFailed =>
+      'Giriş tamamlanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errorAppleMismatch =>
+      'Bu hesapta kullandığınız Apple Kimliği ile onaylayın.';
+
+  @override
+  String get addName => 'İsim ekle';
+
+  @override
+  String get addNameBody =>
+      'Profilinizde görünür. Bir kez girebilirsiniz; sonradan değiştirmek için cami ofisine başvurun.';
+
+  @override
+  String get saveName => 'Kaydet';
 }

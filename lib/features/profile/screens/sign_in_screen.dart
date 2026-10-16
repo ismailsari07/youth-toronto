@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
 import '../../../l10n/l10n.dart';
+import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -11,8 +13,10 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_field.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/motion.dart';
+import '../widgets/social_sign_in_buttons.dart';
 
-/// Spec §7.12. The auth logic is unchanged: AuthService.signInWithEmail.
+/// Spec §7.12: AuthService.signInWithEmail, and since 1.1.0 Sign in with
+/// Apple / Google above the form (SocialSignInButtons).
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -50,6 +54,25 @@ class _SignInScreenState extends State<SignInScreen> {
     if (error == null) context.pop();
   }
 
+  /// Apple or Google. A closed sheet shows nothing.
+  Future<void> _social(Future<AuthError?> Function() signIn) async {
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    final error = await signIn();
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _error = error?.kind == AuthFailure.cancelled ? null : error;
+    });
+    if (error == null) {
+      // An Apple name may have been saved after the profile was fetched.
+      ProviderScope.containerOf(context).invalidate(userProfileProvider);
+      context.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -73,6 +96,14 @@ class _SignInScreenState extends State<SignInScreen> {
                 40,
               ),
               children: [
+                SocialSignInButtons(
+                  onApple: _busy
+                      ? null
+                      : () => _social(AuthService.signInWithApple),
+                  onGoogle: _busy
+                      ? null
+                      : () => _social(AuthService.signInWithGoogle),
+                ),
                 FieldGroup(
                   children: [
                     AppField(

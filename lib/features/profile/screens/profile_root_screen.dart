@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/content/content_bundle.dart';
 import '../../../core/feature_flags.dart';
+import '../../../core/social_auth.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/auth_provider.dart';
@@ -26,6 +27,7 @@ import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
 import '../../marriage/widgets/marriage_widgets.dart';
 import '../widgets/about_sheet.dart';
+import '../widgets/add_name_sheet.dart';
 import '../widgets/appearance_sheet.dart';
 import '../widgets/language_sheet.dart';
 
@@ -295,9 +297,13 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     User user,
     Map<String, dynamic>? profile,
   ) {
-    final name = (profile?['full_name'] as String?) ??
-        user.email?.split('@').first ??
-        l.member;
+    final stored = profile?['full_name'] as String?;
+    // '' = an Apple account that shared no name (see "İsim ekle").
+    final name = stored == null
+        ? user.email?.split('@').first ?? l.member
+        : stored.isEmpty
+            ? l.member
+            : stored;
     final since = _memberSince(l, profile?['created_at'] as String?);
     return Row(
       children: [
@@ -379,14 +385,26 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     String? phone,
     String? dob,
   ) {
+    final fullName = profile?['full_name'] as String?;
     return GroupedRows(
       key: ValueKey(profile == null),
       rows: [
         AppListRow(
           icon: AppIcons.person,
-          title: (profile?['full_name'] as String?) ?? '—',
+          title: fullName == null || fullName.isEmpty ? '—' : fullName,
           subtitle: l.name,
         ),
+        // Only while the name is still the automatic one; set once.
+        if (isAutomaticName(fullName, profile?['email'] as String?))
+          AppListRow(
+            key: const Key('add-name'),
+            divided: true,
+            icon: AppIcons.person,
+            title: l.addName,
+            titleStyle: AppText.rowTitle.c(context.colors.green),
+            trailing: const RowChevron(),
+            onTap: () => showAddNameSheet(context),
+          ),
         AppListRow(
           divided: true,
           icon: AppIcons.mail,

@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'core/auth_service.dart';
 import 'core/content/content_repository.dart';
 import 'core/donations/donation_funds.dart';
 import 'core/mosque_time.dart';
@@ -19,6 +20,7 @@ import 'features/push/push_prompt_sheet.dart';
 import 'features/update/screens/update_required_screen.dart';
 import 'l10n/l10n.dart';
 import 'l10n/locale_provider.dart';
+import 'shared/providers/auth_provider.dart';
 import 'shared/providers/content_provider.dart';
 import 'shared/providers/donations_provider.dart';
 import 'shared/providers/push_provider.dart';
@@ -130,6 +132,10 @@ class _MytAppState extends ConsumerState<MytApp> {
       ref.read(contentProvider.notifier).refresh(force: true);
       ref.read(donationFundsProvider.notifier).refresh(force: true);
       ref.read(pushProvider.notifier).start(navigate: _openFromNotification);
+      // An Apple name whose save failed at sign-in (Apple never resends it).
+      AuthService.flushPendingName().then((saved) {
+        if (saved && mounted) ref.invalidate(userProfileProvider);
+      });
       // From the second launch on, our pre-prompt may ask (once).
       Future<void>.delayed(const Duration(milliseconds: 1200), () {
         final context = rootNavigatorKey.currentContext;

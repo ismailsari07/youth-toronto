@@ -65,6 +65,10 @@
 	     picks from the library, so this is never shown. -->
 	<key>NSCameraUsageDescription</key>
 	<string>Pape Mosque doesn't use the camera. Documents are chosen from your photo library or files.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Choose a photo of a document to share privately with the mosque. Only the photo you pick is used.</string>
 </dict>

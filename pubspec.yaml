@@ -52,6 +52,11 @@ dependencies:
   image: ^4.10.1
   pdfrx: ^2.2.24
   package_info_plus: ^10.2.2
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
+  flutter_secure_storage: ^11.2.0
+  crypto: ^3.0.7
+  uuid: ^4.6.0
 
 dev_dependencies:
   flutter_test:

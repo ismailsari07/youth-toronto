@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F920D70D2C86089A40134DF1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DDEAB9068ED444C47640F233 /* GoogleService-Info.plist */; };
 		1E739838DC3FC3737F6C9225 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */; };
 		972C15353E728D9C3DB298EE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3CC7BDA0F3E35BCE3B70C3FC /* PrivacyInfo.xcprivacy */; };
 		965AA8CB101F12E9DD898EF0 /* PrayerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 629F6601F1B8D6FF28C523B6 /* PrayerWidget.swift */; };
@@ -64,6 +65,7 @@
 /* Begin PBXFileReference section */
 		218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3CC7BDA0F3E35BCE3B70C3FC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		DDEAB9068ED444C47640F233 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		24FB9E3ED0A135B0505F06C6 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		85F4A95D2ED55F8FC13DE296 /* PrayerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PrayerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F9237264383CEDE8EC31077 /* PrayerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrayerWidget.entitlements; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 				97C147021CF9000F007C117D /* Info.plist */,
 				24FB9E3ED0A135B0505F06C6 /* Runner.entitlements */,
 				218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */,
+				DDEAB9068ED444C47640F233 /* GoogleService-Info.plist */,
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
@@ -301,6 +304,7 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				1E739838DC3FC3737F6C9225 /* PrivacyInfo.xcprivacy in Resources */,
+				F920D70D2C86089A40134DF1 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

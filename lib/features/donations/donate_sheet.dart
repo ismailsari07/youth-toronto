@@ -12,7 +12,7 @@ import '../../theme/app_tokens.dart';
 import '../../ui/components/app_row.dart';
 import '../../ui/components/app_sheet.dart';
 
-/// The donate sheet, opened by the heart on Prayer and the Donate row on
+/// The donate sheet, opened by the Donate pill on Prayer and the Donate row on
 /// Profile: one row per active fund, then "All donation options". Every row
 /// closes the sheet and opens the website in Safari; Apple requires
 /// donations to happen outside the app, so there is no form or web view

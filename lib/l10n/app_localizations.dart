@@ -1894,7 +1894,7 @@ abstract class AppLocalizations {
   /// **'Donate'**
   String get donation;
 
-  /// Grey note under the Donate sheet title (Prayer heart, Profile Donate row).
+  /// Grey note under the Donate sheet title (Prayer Donate pill, Profile Donate row).
   ///
   /// In en, this message translates to:
   /// **'Opens our website in Safari'**
@@ -1911,6 +1911,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Give through our website'**
   String get donateRowSubtitle;
+
+  /// Label of the Donate pill in the Prayer hero (heart + label). Must fit next to the organisation name on an iPhone SE; VoiceOver reads `donation` instead.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate'**
+  String get donatePill;
 
   /// No description provided for @sizeMegabytes.
   ///

@@ -302,6 +302,7 @@
   "donateSheetNote": "Ouvre notre site web dans Safari",
   "allDonationOptions": "Toutes les options de don",
   "donateRowSubtitle": "Donnez via notre site web",
+  "donatePill": "Donner",
   "sizeMegabytes": "{size} Mo",
   "sizeKilobytes": "{size} Ko",
   "pushPromptTitle": "Activez les notifications",

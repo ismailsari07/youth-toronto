@@ -13,7 +13,6 @@ import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
-import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -26,8 +25,8 @@ import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
-import '../../donations/donate_sheet.dart';
 import '../widgets/community_section.dart';
+import '../widgets/hero_identity_row.dart';
 import '../widgets/reminders_sheet.dart';
 
 /// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
@@ -125,10 +124,9 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     );
   }
 
-  /// Who we are, then today, at the top of the hero. Row 1: the app icon's
-  /// mosque on its green, the organisation and the mosque, the donate
-  /// heart and (while reminders are on) the reminders bell. Row 2: the Gregorian date and the Hijri date in a
-  /// pill, on one line.
+  /// Who we are, then today, at the top of the hero. Row 1: [HeroIdentityRow]
+  /// (the brand, the Donate pill, the reminders bell while reminders are on).
+  /// Row 2: the Gregorian date and the Hijri date in a pill, on one line.
   Widget _header(PrayerCachePayload? payload, bool loading) {
     final l = context.l10n;
     final colors = context.colors;
@@ -136,50 +134,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            const _BrandTile(),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // One line always: on a narrow phone the name scales down
-                  // a touch rather than wrapping.
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Text(
-                      l.organisationName,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.2,
-                        height: 1.25,
-                      ).c(colors.onHero),
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    l.homeMosqueLine,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13, height: 1.3)
-                        .c(colors.onHeroSecondary),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            const _DonateHeart(),
-            if (kPrayerRemindersEnabled) ...[
-              const SizedBox(width: 8),
-              _ReminderBell(),
-            ],
-          ],
-        ),
+        const HeroIdentityRow(),
         const SizedBox(height: 16),
         // Always one line, so the moon sits at the same height in every
         // language: the date keeps 20pt when it fits and only shrinks (to
@@ -511,30 +466,6 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   }
 }
 
-/// The app icon's mosque, cream on the icon's green, as a small tile.
-class _BrandTile extends StatelessWidget {
-  const _BrandTile();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: context.colors.brandTile,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Image.asset(
-        'assets/brand/mosque-mark.png',
-        width: 24,
-        height: 24,
-        excludeFromSemantics: true,
-      ),
-    );
-  }
-}
-
 class _HijriPill extends StatelessWidget {
   const _HijriPill(this.text, {super.key});
 
@@ -557,75 +488,6 @@ class _HijriPill extends StatelessWidget {
           maxLines: 1,
           style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)
               .c(context.colors.onHero),
-        ),
-      ),
-    );
-  }
-}
-
-/// The reminders bell on the hero. Shown only while
-/// [kPrayerRemindersEnabled].
-class _ReminderBell extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final on =
-        ref.watch(reminderSettingsProvider).valueOrNull?.active ?? true;
-    return _HeroCircleButton(
-      label: context.l10n.prayerReminders,
-      icon: on ? AppIcons.bell : AppIcons.bellOff,
-      onTap: () => showRemindersSheet(context),
-    );
-  }
-}
-
-/// The donate heart on the hero: opens the donate sheet.
-class _DonateHeart extends StatelessWidget {
-  const _DonateHeart();
-
-  @override
-  Widget build(BuildContext context) {
-    return _HeroCircleButton(
-      label: context.l10n.donation,
-      icon: AppIcons.heart,
-      onTap: () => showDonateSheet(context),
-    );
-  }
-}
-
-/// A white glyph in a translucent circle on the hero, 44 pt to tap.
-class _HeroCircleButton extends StatelessWidget {
-  const _HeroCircleButton({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String label;
-  final String icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: label,
-      button: true,
-      child: Pressable(
-        onTap: onTap,
-        child: SizedBox(
-          width: 44,
-          height: 44,
-          child: Center(
-            child: Container(
-              width: 42,
-              height: 42,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: context.colors.heroCircleBg,
-                shape: BoxShape.circle,
-              ),
-              child: AppIcon(icon, size: 21, color: context.colors.onHero),
-            ),
-          ),
         ),
       ),
     );

@@ -1136,6 +1136,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get donateRowSubtitle => 'Donnez via notre site web';
 
   @override
+  String get donatePill => 'Donner';
+
+  @override
   String sizeMegabytes(String size) {
     return '$size Mo';
   }

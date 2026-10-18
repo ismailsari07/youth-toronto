@@ -589,7 +589,7 @@
   "donation": "Donate",
   "donateSheetNote": "Opens our website in Safari",
   "@donateSheetNote": {
-    "description": "Grey note under the Donate sheet title (Prayer heart, Profile Donate row)."
+    "description": "Grey note under the Donate sheet title (Prayer Donate pill, Profile Donate row)."
   },
   "allDonationOptions": "All donation options",
   "@allDonationOptions": {
@@ -598,6 +598,10 @@
   "donateRowSubtitle": "Give through our website",
   "@donateRowSubtitle": {
     "description": "Subtitle of the Donate row in Profile > Mosque services."
+  },
+  "donatePill": "Donate",
+  "@donatePill": {
+    "description": "Label of the Donate pill in the Prayer hero (heart + label). Must fit next to the organisation name on an iPhone SE; VoiceOver reads `donation` instead."
   },
   "sizeMegabytes": "{size} MB",
   "@sizeMegabytes": {

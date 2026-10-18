@@ -14,7 +14,7 @@ void main() {
     DonationFund(slug: 'sadaka', title: 'Sadaka'),
   ];
 
-  /// Opens the sheet the way the heart and the Donate row do.
+  /// Opens the sheet the way the Donate pill and the Donate row do.
   Future<void> open(
     WidgetTester tester,
     List<DonationFund> funds, {

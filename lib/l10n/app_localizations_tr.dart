@@ -1124,6 +1124,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get donateRowSubtitle => 'Web sitemiz üzerinden bağış yapın';
 
   @override
+  String get donatePill => 'Bağış yap';
+
+  @override
   String sizeMegabytes(String size) {
     return '$size MB';
   }

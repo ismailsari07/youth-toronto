@@ -302,6 +302,7 @@
   "donateSheetNote": "Web sitemiz Safari'de açılır",
   "allDonationOptions": "Tüm bağış seçenekleri",
   "donateRowSubtitle": "Web sitemiz üzerinden bağış yapın",
+  "donatePill": "Bağış yap",
   "sizeMegabytes": "{size} MB",
   "sizeKilobytes": "{size} KB",
   "pushPromptTitle": "Bildirimleri açın",

@@ -72,7 +72,7 @@ class Question {
   final num? max;
 
   /// number only. A missing key means decimals, as the server reads it
-  /// (§10's "default true" is wrong; decided 2026-10-18, D1).
+  /// (D1; pape-admin §10).
   final bool integer;
 
   /// Above this many options a single choice opens a sheet instead of radios.

@@ -112,8 +112,8 @@ Contract: pape-admin CLAUDE.md §10 (the server enforces everything; the app's c
   "Son kayıt tarihi: …" (no Turkish suffix, D3), on the mosque's clock. Kill switch off hides everything except a
   member's own "Kayıtlısın" (D4). Unknown status = closed; an unknown required question type blocks sending with
   "update the app", an unknown optional one is skipped (D6).
-- A number question without `integer` allows decimals: the server reads a missing key as false, §10's text says
-  true (D1). `test/fixtures/registration-forms.json` is a copy of pape-admin's shared fixture: refresh it when the
+- A number question without `integer` allows decimals, as the server reads it (D1; §10 fixed to match in
+  pape-admin 3bc50b0). `test/fixtures/registration-forms.json` is a copy of pape-admin's shared fixture: refresh it when the
   server's form rules change (the test compares the app's parse with the server's signature).
 - Nothing personal on disk: state in Riverpod memory, the draft (D8) in a session-only provider cleared on success
   and on member change.

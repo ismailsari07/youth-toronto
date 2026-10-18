@@ -123,7 +123,31 @@ class EventCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(upcoming.event.title, style: AppText.cardTitle.c(context.colors.ink)),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                upcoming.event.title,
+                style: AppText.cardTitle.c(context.colors.ink),
+              ),
+            ),
+            // Registers in the app (D7: no button here; the page knows
+            // whether places are left).
+            if (upcoming.event.hasForm) ...[
+              const SizedBox(width: 8),
+              AppBadge(
+                label: context.l10n.regBadge,
+                fill: context.colors.iconCircle,
+                textColor: context.colors.selectedDark,
+                height: 22,
+                fontSize: 11,
+                letterSpacing: 0.2,
+                horizontalPadding: 9,
+              ),
+            ],
+          ],
+        ),
         const SizedBox(height: 5),
         EventWhenLine(upcoming: upcoming),
         if (location != null && location.trim().isNotEmpty) ...[

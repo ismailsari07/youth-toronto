@@ -22,6 +22,7 @@ import '../features/profile/screens/settings_screen.dart';
 import '../features/profile/screens/sign_in_screen.dart';
 import '../features/profile/screens/sign_up_screen.dart';
 import '../features/push/item_loader_screens.dart';
+import '../features/registration/registration_screen.dart';
 import 'content/content_bundle.dart';
 import 'event_schedule.dart';
 import 'models.dart';
@@ -77,6 +78,12 @@ final router = GoRouter(
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) =>
                       EventDetailScreen(upcoming: state.extra! as UpcomingEvent),
+                ),
+                GoRoute(
+                  path: 'event/register',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) =>
+                      RegistrationScreen(upcoming: state.extra! as UpcomingEvent),
                 ),
                 GoRoute(
                   path: 'announcement',

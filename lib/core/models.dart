@@ -136,6 +136,13 @@ class YouthEvent {
   /// When set, the event begins after that prayer's jama'ah (spec §7.3).
   final String? startsAfterPrayer;
 
+  /// The in-app registration form (pape-admin CLAUDE.md §10), or null. Only
+  /// tells the list that the event takes registrations: the event page
+  /// always reads the form from event_registration_state.
+  final Object? registrationForm;
+
+  bool get hasForm => registrationForm != null;
+
   const YouthEvent({
     required this.id,
     required this.title,
@@ -151,6 +158,7 @@ class YouthEvent {
     required this.recurrence,
     required this.isPublished,
     this.startsAfterPrayer,
+    this.registrationForm,
   });
 
   EventRecurrence get repeats => EventRecurrence.parse(recurrence);
@@ -186,6 +194,7 @@ class YouthEvent {
         recurrence: json['recurrence'] as String? ?? '',
         isPublished: json['is_published'] as bool? ?? false,
         startsAfterPrayer: _prayerKey(json['starts_after_prayer'] as String?),
+        registrationForm: json['registration_form'],
       );
 
   static const prayerKeys = {'fajr', 'dhuhr', 'asr', 'maghrib', 'isha'};

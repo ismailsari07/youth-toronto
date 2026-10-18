@@ -78,9 +78,15 @@ class PushDeniedCard extends ConsumerWidget {
 /// device. Disabled, with the reason, while iOS has notifications off or
 /// the "Event notifications" switch is off. Hidden where push doesn't run.
 class EventNotifyCard extends ConsumerWidget {
-  const EventNotifyCard({super.key, required this.eventId});
+  const EventNotifyCard({super.key, required this.eventId, this.locked = false});
 
   final String eventId;
+
+  /// The member is registered: reminders come whenever push can arrive, and
+  /// the event can't be muted (set_event_notifications answers P0001
+  /// registered). Shown on and locked; the rows above still say when push is
+  /// off (D5).
+  final bool locked;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -123,6 +129,13 @@ class EventNotifyCard extends ConsumerWidget {
           child: AppSwitch(value: enabled),
         ),
         onTap: () => context.push('/profile/settings'),
+      );
+    } else if (locked) {
+      row = AppListRow(
+        icon: AppIcons.bell,
+        title: l.eventNotify,
+        subtitle: l.regNotifyLocked,
+        trailing: const Opacity(opacity: 0.45, child: AppSwitch(value: true)),
       );
     } else {
       row = AppListRow(

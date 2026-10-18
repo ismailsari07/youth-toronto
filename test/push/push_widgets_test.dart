@@ -120,6 +120,35 @@ void main() {
       expect(tester.widget<AppSwitch>(find.byType(AppSwitch)).value, isFalse);
     });
 
+    testWidgets('registered: on and locked, even if muted before', (tester) async {
+      await pump(
+        tester,
+        const EventNotifyCard(eventId: eventId, locked: true),
+        local: const PushLocal(saved: true, muted: {eventId}),
+      );
+      expect(find.text("On because you're registered"), findsOneWidget);
+      final toggle = tester.widget<AppSwitch>(find.byType(AppSwitch));
+      expect((toggle.value, toggle.onChanged), (true, null));
+    });
+
+    testWidgets('locked still says when push is off (D5)', (tester) async {
+      await pump(
+        tester,
+        const EventNotifyCard(eventId: eventId, locked: true),
+        permission: PushPermission.denied,
+      );
+      expect(find.text("On because you're registered"), findsNothing);
+    });
+
+    testWidgets("muting answers 'registered': snaps back on, no error", (tester) async {
+      final api = FakePushApi()..eventErrors.add(PushError.registered);
+      await pump(tester, const EventNotifyCard(eventId: eventId), api: api);
+      await tester.tap(find.byType(AppSwitch));
+      await tester.pumpAndSettle();
+      expect(tester.widget<AppSwitch>(find.byType(AppSwitch)).value, isTrue);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+
     testWidgets('disabled while Event notifications is off', (tester) async {
       await pump(
         tester,

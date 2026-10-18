@@ -1244,4 +1244,196 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorAppleRevokeFailed =>
       'Apple couldn\'t confirm the deletion, so your account wasn\'t deleted. Please try again in a few minutes.';
+
+  @override
+  String get regBadge => 'Registration';
+
+  @override
+  String get regOpen => 'Registration open';
+
+  @override
+  String get regSignInToRegister => 'Sign in to register';
+
+  @override
+  String get regSignInNote => 'You need to sign in to register.';
+
+  @override
+  String regPlacesLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Last $count places',
+      one: 'Last place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String regViews(int count) {
+    return '$count people viewed';
+  }
+
+  @override
+  String get regFull => 'Registration is full';
+
+  @override
+  String get regDeadlinePassed => 'Registration has ended';
+
+  @override
+  String regDeadlineWas(String when) {
+    return 'Registration closed on $when';
+  }
+
+  @override
+  String regDeadlineIs(String when) {
+    return 'Register by $when';
+  }
+
+  @override
+  String get regClosed => 'Registration is closed';
+
+  @override
+  String get regNotAccepting => 'This event no longer takes registrations.';
+
+  @override
+  String get regNoProfile => 'This account can\'t register for events.';
+
+  @override
+  String get regStateFailed => 'Couldn\'t load registration details.';
+
+  @override
+  String get regRegistered => 'You\'re registered';
+
+  @override
+  String regRegisteredOn(String when) {
+    return 'Registered on $when';
+  }
+
+  @override
+  String get regSubmitted => 'What you sent';
+
+  @override
+  String get regNotifyLocked => 'On because you\'re registered';
+
+  @override
+  String get regRecurringNote =>
+      'This registration covers the whole programme.';
+
+  @override
+  String get regEyebrow => 'REGISTRATION';
+
+  @override
+  String get regYourDetails => 'Your details';
+
+  @override
+  String get regQuestions => 'Questions';
+
+  @override
+  String get regFullName => 'Full name';
+
+  @override
+  String get regEmail => 'Email';
+
+  @override
+  String get regPhone => 'Phone';
+
+  @override
+  String get regSavedToProfile => 'Saved to your profile';
+
+  @override
+  String get regSubmit => 'Send registration';
+
+  @override
+  String get regNoCancel => 'A registration can\'t be cancelled in the app.';
+
+  @override
+  String get regOffline => 'No internet connection. Registering needs one.';
+
+  @override
+  String get regFormChanged => 'The form was updated. Check it and send again.';
+
+  @override
+  String get regFixBelow => 'Check the fields below.';
+
+  @override
+  String get regAnswersRejected =>
+      'Your answers couldn\'t be sent. Update the app and try again.';
+
+  @override
+  String get regUpdateApp => 'Update the app to answer this question.';
+
+  @override
+  String get regDone => 'You\'re registered';
+
+  @override
+  String get regYes => 'Yes';
+
+  @override
+  String get regNo => 'No';
+
+  @override
+  String get regChoose => 'Choose';
+
+  @override
+  String get regPickDate => 'Choose a date';
+
+  @override
+  String get regWholeNumber => 'Whole number';
+
+  @override
+  String regRange(String min, String max) {
+    return 'Between $min and $max';
+  }
+
+  @override
+  String regAtLeast(String min) {
+    return 'At least $min';
+  }
+
+  @override
+  String regAtMost(String max) {
+    return 'At most $max';
+  }
+
+  @override
+  String get regChooseAny => 'Choose all that apply';
+
+  @override
+  String get regRequired => 'Required';
+
+  @override
+  String get regErrNameRequired => 'Enter your name.';
+
+  @override
+  String get regErrNameInvalid => 'At most 120 characters.';
+
+  @override
+  String get regErrPhoneRequired => 'Enter your phone number.';
+
+  @override
+  String get regErrPhoneInvalid => 'Enter a valid phone number.';
+
+  @override
+  String get regErrRequired => 'This question is required.';
+
+  @override
+  String get regErrTooLong => 'This answer is too long.';
+
+  @override
+  String get regErrNotANumber => 'Enter a number.';
+
+  @override
+  String get regErrNotAnInteger => 'Enter a whole number.';
+
+  @override
+  String get regErrOutOfRange => 'Enter a number in the allowed range.';
+
+  @override
+  String get regErrUnknownOption => 'That option is gone. Choose again.';
+
+  @override
+  String get regErrInvalidDate => 'Choose a valid date.';
+
+  @override
+  String get regErrRejected => 'This answer wasn\'t accepted. Update the app.';
 }

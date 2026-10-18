@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 
 import 'core/auth_service.dart';
 import 'core/content/content_repository.dart';
@@ -145,6 +146,14 @@ class _MytAppState extends ConsumerState<MytApp> {
       });
     });
     _lifecycle = AppLifecycleListener(onResume: _onResume);
+    // The server links this device to whoever registered it last
+    // (push_devices.user_id): tell it after every sign-in and sign-out.
+    ref.listenManual(authStateProvider, (_, next) {
+      final event = next.valueOrNull?.event;
+      if (event == AuthChangeEvent.signedIn || event == AuthChangeEvent.signedOut) {
+        ref.read(pushProvider.notifier).onAuthChanged();
+      }
+    });
   }
 
   void _onResume() {

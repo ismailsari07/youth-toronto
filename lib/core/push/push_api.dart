@@ -22,6 +22,10 @@ enum PushError {
   /// 22023: the server refused the input. A bug on our side.
   invalid,
 
+  /// P0001 registered: the member is registered for the event, so this
+  /// device can't mute it (pape-admin CLAUDE.md §10.6).
+  registered,
+
   /// No answer (offline, timeout) or anything unexpected.
   network,
 }
@@ -37,6 +41,8 @@ class PushException implements Exception {
         PostgrestException(code: 'P0002') => PushError.notFound,
         PostgrestException(code: '53400') => PushError.limited,
         PostgrestException(code: '22023') => PushError.invalid,
+        PostgrestException(code: 'P0001', message: 'registered') =>
+          PushError.registered,
         _ => PushError.network,
       };
 

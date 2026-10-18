@@ -17,13 +17,17 @@ import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
 import '../../../ui/components/event_card.dart';
 import '../../../ui/components/motion.dart';
+import '../../../shared/providers/registration_provider.dart';
 import '../../push/push_widgets.dart';
+import '../../registration/event_registration_section.dart';
 
 /// Spec §7.6. Pushed onto the root navigator, so the island is not shown and
 /// the sticky bar owns the bottom of the screen.
 ///
-/// Registration is external: the mosque publishes a link and we open it in the
-/// browser. There is no in-app registration flow and no attendance count.
+/// Registration: an event with a form registers in the app (pape-admin
+/// CLAUDE.md §10; the section and bottom bar come from
+/// event_registration_section.dart). Otherwise the mosque may publish a link
+/// and we open it in the browser. There is no attendance count.
 class EventDetailScreen extends ConsumerWidget {
   const EventDetailScreen({super.key, required this.upcoming});
 
@@ -128,6 +132,9 @@ class EventDetailScreen extends ConsumerWidget {
     final location = event.location;
     final mosque = ref.watch(contentProvider.select((c) => c.mosque));
     final l = context.l10n;
+    final form = event.hasForm;
+    final regState = form ? ref.watch(registrationStateProvider(event.id)) : null;
+    final hasBar = form ? RegistrationBar.shown(regState!) : registration != null;
 
     return Scaffold(
       backgroundColor: context.colors.ground,
@@ -148,7 +155,7 @@ class EventDetailScreen extends ConsumerWidget {
                 AppSpace.pageGutter,
                 18,
                 AppSpace.pageGutter,
-                registration == null ? 40 : 120,
+                hasBar ? 140 : 40,
               ),
               children: [
                 AppCard(
@@ -198,7 +205,7 @@ class EventDetailScreen extends ConsumerWidget {
                     // No registration link: a drop-in session. (A weekly
                     // reminder action is a later task, so there is no
                     // sticky button in this case.)
-                    if (registration == null)
+                    if (registration == null && !form)
                       AppListRow(
                         divided: true,
                         icon: AppIcons.check,
@@ -206,7 +213,11 @@ class EventDetailScreen extends ConsumerWidget {
                       ),
                   ],
                 ),
-                EventNotifyCard(eventId: event.id),
+                if (form) EventRegistrationSection(upcoming: upcoming),
+                EventNotifyCard(
+                  eventId: event.id,
+                  locked: regState?.valueOrNull?.registered ?? false,
+                ),
                 if (description != null && description.trim().isNotEmpty) ...[
                   const SizedBox(height: AppSpace.cardGapWide),
                   SectionHeader(title: l.aboutThisEvent),
@@ -243,7 +254,9 @@ class EventDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar: registration == null
+      bottomNavigationBar: form
+          ? RegistrationBar(upcoming: upcoming)
+          : registration == null
           ? null
           : StickyBottomBar(
               child: PrimaryButton(

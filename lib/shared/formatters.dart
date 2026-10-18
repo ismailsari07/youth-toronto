@@ -221,6 +221,12 @@ String shortDate(AppLocalizations l, DateTime dt) =>
 String nextShort(AppLocalizations l, DateTime dt) =>
     l.nextOn(shortDate(l, dt));
 
+/// "4 May 2010", "4 Mayıs 2010", "4 mai 2010": a date whose year matters
+/// (a registration answer, the day someone registered). The same order in
+/// all three languages.
+String dayMonthYear(AppLocalizations l, DateTime dt) =>
+    _format(l, 'd MMMM y', dt);
+
 /// "30 September".
 String dayMonthLong(AppLocalizations l, DateTime dt) =>
     _format(l, l.datePatternDayMonth, dt);

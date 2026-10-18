@@ -1,0 +1,70 @@
+{
+  "forms": [
+    { "name": "every type", "valid": true,
+      "signature": "q_AAAAAAA2:short_text:1::::;q_BBBBBBB3:single_choice:1::::o_AAAAA2,o_BBBBB3;q_CCCCCCC4:multiple_choice:0::::o_CCCCC4,o_DDDDD5,o_EEEEE6;q_DDDDDDD5:number:0:1:6:1:;q_EEEEEEE6:yes_no:1::::;q_FFFFFFF7:date:0::::;q_GGGGGGG8:phone:0::::;q_HHHHHHH9:long_text:0::::",
+      "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "tr": "Öğrencinin adı", "en": "Student name" } },
+        { "id": "q_BBBBBBB3", "type": "single_choice", "required": true, "label": { "tr": "Seviye", "en": "Level" },
+          "options": [ { "id": "o_AAAAA2", "label": { "tr": "Elif-Ba" } }, { "id": "o_BBBBB3", "label": { "tr": "Kur’an", "fr": "Coran" } } ] },
+        { "id": "q_CCCCCCC4", "type": "multiple_choice", "required": false, "label": { "tr": "Günler" },
+          "options": [ { "id": "o_CCCCC4", "label": { "tr": "Cumartesi" } }, { "id": "o_DDDDD5", "label": { "tr": "Pazar" } },
+                       { "id": "o_EEEEE6", "label": { "tr": "Pazartesi" } } ] },
+        { "id": "q_DDDDDDD5", "type": "number", "required": false, "label": { "tr": "Kardeş sayısı" }, "min": 1, "max": 6, "integer": true },
+        { "id": "q_EEEEEEE6", "type": "yes_no", "required": true, "label": { "tr": "Servis ister misiniz?" } },
+        { "id": "q_FFFFFFF7", "type": "date", "required": false, "label": { "tr": "Doğum tarihi" } },
+        { "id": "q_GGGGGGG8", "type": "phone", "required": false, "label": { "tr": "Veli telefonu" } },
+        { "id": "q_HHHHHHH9", "type": "long_text", "required": false, "label": { "tr": "Not" } } ] } },
+    { "name": "no questions", "valid": true, "signature": "", "form": { "questions": [] } },
+    { "name": "number without bounds, decimal bounds trimmed", "valid": true,
+      "signature": "q_JJJJJJJ2:number:0:::0:;q_KKKKKKK3:number:1:0.5:2.25:0:",
+      "form": { "questions": [
+        { "id": "q_JJJJJJJ2", "type": "number", "required": false, "label": { "tr": "Sayı" } },
+        { "id": "q_KKKKKKK3", "type": "number", "required": true, "label": { "tr": "Kilo" }, "min": 0.50, "max": 2.25, "integer": false } ] } },
+    { "name": "label fix keeps the signature", "valid": true,
+      "signature": "q_AAAAAAA2:short_text:1::::",
+      "form": { "questions": [ { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "tr": "Öğrencinin adı soyadı", "fr": "Nom de l’élève" } } ] } },
+    { "name": "not an object", "valid": false, "form": [] },
+    { "name": "unknown top-level key", "valid": false, "form": { "questions": [], "title": "x" } },
+    { "name": "questions not an array", "valid": false, "form": { "questions": {} } },
+    { "name": "duplicate question id", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "tr": "A" } },
+        { "id": "q_AAAAAAA2", "type": "long_text", "required": true, "label": { "tr": "B" } } ] } },
+    { "name": "id with a forbidden letter (O)", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAAO", "type": "short_text", "required": true, "label": { "tr": "A" } } ] } },
+    { "name": "lowercase id", "valid": false, "form": { "questions": [
+        { "id": "q_aaaaaaa2", "type": "short_text", "required": true, "label": { "tr": "A" } } ] } },
+    { "name": "missing required flag", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "label": { "tr": "A" } } ] } },
+    { "name": "label without tr", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "en": "A" } } ] } },
+    { "name": "empty en label (omit instead)", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "tr": "A", "en": "" } } ] } },
+    { "name": "label over 200", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "tr": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" } } ] } },
+    { "name": "unknown type (file)", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "file", "required": true, "label": { "tr": "A" } } ] } },
+    { "name": "extra key on a text question", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "tr": "A" }, "help": { "tr": "x" } } ] } },
+    { "name": "yes_no with options", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "yes_no", "required": true, "label": { "tr": "A" },
+          "options": [ { "id": "o_AAAAA2", "label": { "tr": "x" } }, { "id": "o_BBBBB3", "label": { "tr": "y" } } ] } ] } },
+    { "name": "choice with one option", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "single_choice", "required": true, "label": { "tr": "A" },
+          "options": [ { "id": "o_AAAAA2", "label": { "tr": "x" } } ] } ] } },
+    { "name": "duplicate option id", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "multiple_choice", "required": true, "label": { "tr": "A" },
+          "options": [ { "id": "o_AAAAA2", "label": { "tr": "x" } }, { "id": "o_AAAAA2", "label": { "tr": "y" } } ] } ] } },
+    { "name": "option label over 100", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "single_choice", "required": true, "label": { "tr": "A" },
+          "options": [ { "id": "o_AAAAA2", "label": { "tr": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" } },
+                       { "id": "o_BBBBB3", "label": { "tr": "y" } } ] } ] } },
+    { "name": "number min above max", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "number", "required": true, "label": { "tr": "A" }, "min": 5, "max": 1 } ] } },
+    { "name": "number min null", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "number", "required": true, "label": { "tr": "A" }, "min": null } ] } },
+    { "name": "number min as text", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "number", "required": true, "label": { "tr": "A" }, "min": "1" } ] } },
+    { "name": "min on a text question", "valid": false, "form": { "questions": [
+        { "id": "q_AAAAAAA2", "type": "short_text", "required": true, "label": { "tr": "A" }, "min": 1 } ] } }
+  ]
+}

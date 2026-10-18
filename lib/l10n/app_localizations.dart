@@ -2127,6 +2127,342 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apple couldn\'t confirm the deletion, so your account wasn\'t deleted. Please try again in a few minutes.'**
   String get errorAppleRevokeFailed;
+
+  /// Badge on an event card whose event takes registrations in the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration'**
+  String get regBadge;
+
+  /// Event page: registration card title while open.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration open'**
+  String get regOpen;
+
+  /// Event page button when signed out.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to register'**
+  String get regSignInToRegister;
+
+  /// Under the signed-out button.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to sign in to register.'**
+  String get regSignInNote;
+
+  /// Badge when 5 or fewer places remain.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Last place} other{Last {count} places}}'**
+  String regPlacesLeft(int count);
+
+  /// Under the registration card; only from 25 views.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} people viewed'**
+  String regViews(int count);
+
+  /// Registration state and disabled button: no places left.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration is full'**
+  String get regFull;
+
+  /// Registration state and disabled button: deadline passed.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration has ended'**
+  String get regDeadlinePassed;
+
+  /// Under 'Registration has ended'. {when} is a date and time.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration closed on {when}'**
+  String regDeadlineWas(String when);
+
+  /// Under 'Registration open'. {when} is a date and time.
+  ///
+  /// In en, this message translates to:
+  /// **'Register by {when}'**
+  String regDeadlineIs(String when);
+
+  /// Registration state and disabled button: closed by the mosque.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration is closed'**
+  String get regClosed;
+
+  /// Event page when the event has no form any more.
+  ///
+  /// In en, this message translates to:
+  /// **'This event no longer takes registrations.'**
+  String get regNotAccepting;
+
+  /// An admin account without a member profile.
+  ///
+  /// In en, this message translates to:
+  /// **'This account can\'t register for events.'**
+  String get regNoProfile;
+
+  /// Event page when the registration state didn't load.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load registration details.'**
+  String get regStateFailed;
+
+  /// Event page once registered.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re registered'**
+  String get regRegistered;
+
+  /// Under 'You're registered'. {when} is a date.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered on {when}'**
+  String regRegisteredOn(String when);
+
+  /// Section title: the member's own registration.
+  ///
+  /// In en, this message translates to:
+  /// **'What you sent'**
+  String get regSubmitted;
+
+  /// Event notification row, locked on.
+  ///
+  /// In en, this message translates to:
+  /// **'On because you\'re registered'**
+  String get regNotifyLocked;
+
+  /// Recurring event: what the registration is for.
+  ///
+  /// In en, this message translates to:
+  /// **'This registration covers the whole programme.'**
+  String get regRecurringNote;
+
+  /// Eyebrow of the registration screen.
+  ///
+  /// In en, this message translates to:
+  /// **'REGISTRATION'**
+  String get regEyebrow;
+
+  /// Registration screen: name, email, phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your details'**
+  String get regYourDetails;
+
+  /// Registration screen: the event's questions.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions'**
+  String get regQuestions;
+
+  /// Registration screen field.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get regFullName;
+
+  /// Registration screen field.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get regEmail;
+
+  /// Registration screen field.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get regPhone;
+
+  /// Under the phone field when the profile has none.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your profile'**
+  String get regSavedToProfile;
+
+  /// Registration screen button.
+  ///
+  /// In en, this message translates to:
+  /// **'Send registration'**
+  String get regSubmit;
+
+  /// Under the send button.
+  ///
+  /// In en, this message translates to:
+  /// **'A registration can\'t be cancelled in the app.'**
+  String get regNoCancel;
+
+  /// Banner when sending failed for lack of a connection.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Registering needs one.'**
+  String get regOffline;
+
+  /// Banner after form_changed.
+  ///
+  /// In en, this message translates to:
+  /// **'The form was updated. Check it and send again.'**
+  String get regFormChanged;
+
+  /// Banner when fields have errors.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the fields below.'**
+  String get regFixBelow;
+
+  /// Banner when the server refused the answers as a whole.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers couldn\'t be sent. Update the app and try again.'**
+  String get regAnswersRejected;
+
+  /// A question type this version can't show.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the app to answer this question.'**
+  String get regUpdateApp;
+
+  /// Snack bar after registering.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re registered'**
+  String get regDone;
+
+  /// Yes/no question.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get regYes;
+
+  /// Yes/no question.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get regNo;
+
+  /// Single choice with many options, nothing chosen yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get regChoose;
+
+  /// Date question, nothing chosen yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a date'**
+  String get regPickDate;
+
+  /// Number question hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole number'**
+  String get regWholeNumber;
+
+  /// Number question hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Between {min} and {max}'**
+  String regRange(String min, String max);
+
+  /// Number question hint.
+  ///
+  /// In en, this message translates to:
+  /// **'At least {min}'**
+  String regAtLeast(String min);
+
+  /// Number question hint.
+  ///
+  /// In en, this message translates to:
+  /// **'At most {max}'**
+  String regAtMost(String max);
+
+  /// Multiple choice hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose all that apply'**
+  String get regChooseAny;
+
+  /// Read by VoiceOver after a required field's label.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get regRequired;
+
+  /// Field error: full_name required.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name.'**
+  String get regErrNameRequired;
+
+  /// Field error: full_name invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'At most 120 characters.'**
+  String get regErrNameInvalid;
+
+  /// Field error: phone required.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your phone number.'**
+  String get regErrPhoneRequired;
+
+  /// Field error: phone invalid, or a phone question's invalid_phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid phone number.'**
+  String get regErrPhoneInvalid;
+
+  /// Field error: required.
+  ///
+  /// In en, this message translates to:
+  /// **'This question is required.'**
+  String get regErrRequired;
+
+  /// Field error: too_long.
+  ///
+  /// In en, this message translates to:
+  /// **'This answer is too long.'**
+  String get regErrTooLong;
+
+  /// Field error: not_a_number.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number.'**
+  String get regErrNotANumber;
+
+  /// Field error: not_an_integer.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number.'**
+  String get regErrNotAnInteger;
+
+  /// Field error: out_of_range.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number in the allowed range.'**
+  String get regErrOutOfRange;
+
+  /// Field error: unknown_option.
+  ///
+  /// In en, this message translates to:
+  /// **'That option is gone. Choose again.'**
+  String get regErrUnknownOption;
+
+  /// Field error: invalid_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a valid date.'**
+  String get regErrInvalidDate;
+
+  /// Field error: wrong_type, unknown_question or anything new.
+  ///
+  /// In en, this message translates to:
+  /// **'This answer wasn\'t accepted. Update the app.'**
+  String get regErrRejected;
 }
 
 class _AppLocalizationsDelegate

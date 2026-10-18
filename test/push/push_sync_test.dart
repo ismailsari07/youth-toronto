@@ -272,5 +272,53 @@ void main() {
       expect(of('08006'), PushError.network);
       expect(PushException.classify(Exception('offline')), PushError.network);
     });
+
+    test("P0001 'registered' (§10.6), and only that message", () {
+      expect(
+        PushException.classify(const PostgrestException(message: 'registered', code: 'P0001')),
+        PushError.registered,
+      );
+      expect(
+        PushException.classify(const PostgrestException(message: 'other', code: 'P0001')),
+        PushError.network,
+      );
+    });
+  });
+
+  group('registered members (§10.6)', () {
+    test('muting a registered event: stays on, local mute forgotten', () async {
+      SharedPreferences.setMockInitialValues({'push_muted_events': ['e1']});
+      api.eventErrors.add(PushError.registered);
+      expect(
+        await sync.setEvent('e1', enabled: false, payload: payload),
+        MuteOutcome.registered,
+      );
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getStringList('push_muted_events'), isEmpty);
+    });
+
+    test('a new identity drops registered events instead of retrying them', () async {
+      SharedPreferences.setMockInitialValues({'push_muted_events': ['e1', 'e2']});
+      api.registerErrors.add(PushError.wrongSecret);
+      api.eventErrors.add(PushError.registered);
+      await sync.register(payload);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getStringList('push_muted_events'), ['e2']);
+    });
+
+    test('forgetMute after registering', () async {
+      SharedPreferences.setMockInitialValues({'push_muted_events': ['e1', 'e2']});
+      await sync.forgetMute('e1');
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getStringList('push_muted_events'), ['e2']);
+    });
+
+    test('force registers again with an unchanged payload (sign-in, sign-out)', () async {
+      await sync.register(payload);
+      await sync.register(payload);
+      expect(api.calls, ['register']);
+      await sync.register(payload, force: true);
+      expect(api.calls, ['register', 'register']);
+    });
   });
 }

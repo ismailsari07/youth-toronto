@@ -337,5 +337,120 @@
   "addName": "Ajouter votre nom",
   "addNameBody": "Affiché sur votre profil. Vous pouvez le saisir une fois ; pour le modifier ensuite, contactez le bureau de la mosquée.",
   "saveName": "Enregistrer",
-  "errorAppleRevokeFailed": "Apple n'a pas pu confirmer la suppression : votre compte n'a donc pas été supprimé. Veuillez réessayer dans quelques minutes."
+  "errorAppleRevokeFailed": "Apple n'a pas pu confirmer la suppression : votre compte n'a donc pas été supprimé. Veuillez réessayer dans quelques minutes.",
+  "regBadge": "Inscription",
+  "regOpen": "Inscriptions ouvertes",
+  "regSignInToRegister": "Se connecter pour s'inscrire",
+  "regSignInNote": "Connectez-vous pour vous inscrire.",
+  "regPlacesLeft": "{count, plural, =1{Dernière place} other{{count} dernières places}}",
+  "@regPlacesLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regViews": "{count} personnes ont consulté",
+  "@regViews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regFull": "Complet",
+  "regDeadlinePassed": "Inscriptions terminées",
+  "regDeadlineWas": "Fin des inscriptions : {when}",
+  "@regDeadlineWas": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regDeadlineIs": "Inscription jusqu'au {when}",
+  "@regDeadlineIs": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regClosed": "Inscriptions fermées",
+  "regNotAccepting": "Cet événement n'accepte plus d'inscriptions.",
+  "regNoProfile": "Ce compte ne peut pas s'inscrire aux événements.",
+  "regStateFailed": "Impossible de charger l'inscription.",
+  "regRegistered": "Vous êtes inscrit",
+  "regRegisteredOn": "Inscrit le {when}",
+  "@regRegisteredOn": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regSubmitted": "Vos réponses",
+  "regNotifyLocked": "Activé car vous êtes inscrit",
+  "regRecurringNote": "L'inscription vaut pour tout le programme.",
+  "regEyebrow": "INSCRIPTION",
+  "regYourDetails": "Vos informations",
+  "regQuestions": "Questions",
+  "regFullName": "Nom complet",
+  "regEmail": "E-mail",
+  "regPhone": "Téléphone",
+  "regSavedToProfile": "Enregistré dans votre profil",
+  "regSubmit": "Envoyer l'inscription",
+  "regNoCancel": "Une inscription ne peut pas être annulée dans l'application.",
+  "regOffline": "Pas de connexion. L'inscription en nécessite une.",
+  "regFormChanged": "Le formulaire a changé. Vérifiez-le et renvoyez.",
+  "regFixBelow": "Vérifiez les champs ci-dessous.",
+  "regAnswersRejected": "Vos réponses n'ont pas pu être envoyées. Mettez l'application à jour et réessayez.",
+  "regUpdateApp": "Mettez l'application à jour pour répondre.",
+  "regDone": "Inscription envoyée",
+  "regYes": "Oui",
+  "regNo": "Non",
+  "regChoose": "Choisir",
+  "regPickDate": "Choisir une date",
+  "regWholeNumber": "Nombre entier",
+  "regRange": "Entre {min} et {max}",
+  "@regRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "regAtLeast": "Au moins {min}",
+  "@regAtLeast": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "regAtMost": "Au plus {max}",
+  "@regAtMost": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "regChooseAny": "Plusieurs choix possibles",
+  "regRequired": "Obligatoire",
+  "regErrNameRequired": "Saisissez votre nom.",
+  "regErrNameInvalid": "120 caractères au maximum.",
+  "regErrPhoneRequired": "Saisissez votre numéro.",
+  "regErrPhoneInvalid": "Saisissez un numéro valide.",
+  "regErrRequired": "Cette question est obligatoire.",
+  "regErrTooLong": "Réponse trop longue.",
+  "regErrNotANumber": "Saisissez un nombre.",
+  "regErrNotAnInteger": "Saisissez un nombre entier.",
+  "regErrOutOfRange": "Saisissez un nombre dans la plage autorisée.",
+  "regErrUnknownOption": "Cette option n'existe plus. Choisissez à nouveau.",
+  "regErrInvalidDate": "Choisissez une date valide.",
+  "regErrRejected": "Réponse refusée. Mettez l'application à jour."
 }

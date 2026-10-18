@@ -651,5 +651,272 @@
   "addName": "Add your name",
   "addNameBody": "Shown on your profile. You can set it once; to change it later, contact the mosque office.",
   "saveName": "Save",
-  "errorAppleRevokeFailed": "Apple couldn't confirm the deletion, so your account wasn't deleted. Please try again in a few minutes."
+  "errorAppleRevokeFailed": "Apple couldn't confirm the deletion, so your account wasn't deleted. Please try again in a few minutes.",
+  "regBadge": "Registration",
+  "@regBadge": {
+    "description": "Badge on an event card whose event takes registrations in the app."
+  },
+  "regOpen": "Registration open",
+  "@regOpen": {
+    "description": "Event page: registration card title while open."
+  },
+  "regSignInToRegister": "Sign in to register",
+  "@regSignInToRegister": {
+    "description": "Event page button when signed out."
+  },
+  "regSignInNote": "You need to sign in to register.",
+  "@regSignInNote": {
+    "description": "Under the signed-out button."
+  },
+  "regPlacesLeft": "{count, plural, =1{Last place} other{Last {count} places}}",
+  "@regPlacesLeft": {
+    "description": "Badge when 5 or fewer places remain.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regViews": "{count} people viewed",
+  "@regViews": {
+    "description": "Under the registration card; only from 25 views.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regFull": "Registration is full",
+  "@regFull": {
+    "description": "Registration state and disabled button: no places left."
+  },
+  "regDeadlinePassed": "Registration has ended",
+  "@regDeadlinePassed": {
+    "description": "Registration state and disabled button: deadline passed."
+  },
+  "regDeadlineWas": "Registration closed on {when}",
+  "@regDeadlineWas": {
+    "description": "Under 'Registration has ended'. {when} is a date and time.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regDeadlineIs": "Register by {when}",
+  "@regDeadlineIs": {
+    "description": "Under 'Registration open'. {when} is a date and time.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regClosed": "Registration is closed",
+  "@regClosed": {
+    "description": "Registration state and disabled button: closed by the mosque."
+  },
+  "regNotAccepting": "This event no longer takes registrations.",
+  "@regNotAccepting": {
+    "description": "Event page when the event has no form any more."
+  },
+  "regNoProfile": "This account can't register for events.",
+  "@regNoProfile": {
+    "description": "An admin account without a member profile."
+  },
+  "regStateFailed": "Couldn't load registration details.",
+  "@regStateFailed": {
+    "description": "Event page when the registration state didn't load."
+  },
+  "regRegistered": "You're registered",
+  "@regRegistered": {
+    "description": "Event page once registered."
+  },
+  "regRegisteredOn": "Registered on {when}",
+  "@regRegisteredOn": {
+    "description": "Under 'You're registered'. {when} is a date.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regSubmitted": "What you sent",
+  "@regSubmitted": {
+    "description": "Section title: the member's own registration."
+  },
+  "regNotifyLocked": "On because you're registered",
+  "@regNotifyLocked": {
+    "description": "Event notification row, locked on."
+  },
+  "regRecurringNote": "This registration covers the whole programme.",
+  "@regRecurringNote": {
+    "description": "Recurring event: what the registration is for."
+  },
+  "regEyebrow": "REGISTRATION",
+  "@regEyebrow": {
+    "description": "Eyebrow of the registration screen."
+  },
+  "regYourDetails": "Your details",
+  "@regYourDetails": {
+    "description": "Registration screen: name, email, phone."
+  },
+  "regQuestions": "Questions",
+  "@regQuestions": {
+    "description": "Registration screen: the event's questions."
+  },
+  "regFullName": "Full name",
+  "@regFullName": {
+    "description": "Registration screen field."
+  },
+  "regEmail": "Email",
+  "@regEmail": {
+    "description": "Registration screen field."
+  },
+  "regPhone": "Phone",
+  "@regPhone": {
+    "description": "Registration screen field."
+  },
+  "regSavedToProfile": "Saved to your profile",
+  "@regSavedToProfile": {
+    "description": "Under the phone field when the profile has none."
+  },
+  "regSubmit": "Send registration",
+  "@regSubmit": {
+    "description": "Registration screen button."
+  },
+  "regNoCancel": "A registration can't be cancelled in the app.",
+  "@regNoCancel": {
+    "description": "Under the send button."
+  },
+  "regOffline": "No internet connection. Registering needs one.",
+  "@regOffline": {
+    "description": "Banner when sending failed for lack of a connection."
+  },
+  "regFormChanged": "The form was updated. Check it and send again.",
+  "@regFormChanged": {
+    "description": "Banner after form_changed."
+  },
+  "regFixBelow": "Check the fields below.",
+  "@regFixBelow": {
+    "description": "Banner when fields have errors."
+  },
+  "regAnswersRejected": "Your answers couldn't be sent. Update the app and try again.",
+  "@regAnswersRejected": {
+    "description": "Banner when the server refused the answers as a whole."
+  },
+  "regUpdateApp": "Update the app to answer this question.",
+  "@regUpdateApp": {
+    "description": "A question type this version can't show."
+  },
+  "regDone": "You're registered",
+  "@regDone": {
+    "description": "Snack bar after registering."
+  },
+  "regYes": "Yes",
+  "@regYes": {
+    "description": "Yes/no question."
+  },
+  "regNo": "No",
+  "@regNo": {
+    "description": "Yes/no question."
+  },
+  "regChoose": "Choose",
+  "@regChoose": {
+    "description": "Single choice with many options, nothing chosen yet."
+  },
+  "regPickDate": "Choose a date",
+  "@regPickDate": {
+    "description": "Date question, nothing chosen yet."
+  },
+  "regWholeNumber": "Whole number",
+  "@regWholeNumber": {
+    "description": "Number question hint."
+  },
+  "regRange": "Between {min} and {max}",
+  "@regRange": {
+    "description": "Number question hint.",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "regAtLeast": "At least {min}",
+  "@regAtLeast": {
+    "description": "Number question hint.",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "regAtMost": "At most {max}",
+  "@regAtMost": {
+    "description": "Number question hint.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "regChooseAny": "Choose all that apply",
+  "@regChooseAny": {
+    "description": "Multiple choice hint."
+  },
+  "regRequired": "Required",
+  "@regRequired": {
+    "description": "Read by VoiceOver after a required field's label."
+  },
+  "regErrNameRequired": "Enter your name.",
+  "@regErrNameRequired": {
+    "description": "Field error: full_name required."
+  },
+  "regErrNameInvalid": "At most 120 characters.",
+  "@regErrNameInvalid": {
+    "description": "Field error: full_name invalid."
+  },
+  "regErrPhoneRequired": "Enter your phone number.",
+  "@regErrPhoneRequired": {
+    "description": "Field error: phone required."
+  },
+  "regErrPhoneInvalid": "Enter a valid phone number.",
+  "@regErrPhoneInvalid": {
+    "description": "Field error: phone invalid, or a phone question's invalid_phone."
+  },
+  "regErrRequired": "This question is required.",
+  "@regErrRequired": {
+    "description": "Field error: required."
+  },
+  "regErrTooLong": "This answer is too long.",
+  "@regErrTooLong": {
+    "description": "Field error: too_long."
+  },
+  "regErrNotANumber": "Enter a number.",
+  "@regErrNotANumber": {
+    "description": "Field error: not_a_number."
+  },
+  "regErrNotAnInteger": "Enter a whole number.",
+  "@regErrNotAnInteger": {
+    "description": "Field error: not_an_integer."
+  },
+  "regErrOutOfRange": "Enter a number in the allowed range.",
+  "@regErrOutOfRange": {
+    "description": "Field error: out_of_range."
+  },
+  "regErrUnknownOption": "That option is gone. Choose again.",
+  "@regErrUnknownOption": {
+    "description": "Field error: unknown_option."
+  },
+  "regErrInvalidDate": "Choose a valid date.",
+  "@regErrInvalidDate": {
+    "description": "Field error: invalid_date."
+  },
+  "regErrRejected": "This answer wasn't accepted. Update the app.",
+  "@regErrRejected": {
+    "description": "Field error: wrong_type, unknown_question or anything new."
+  }
 }

@@ -50,6 +50,9 @@ enum MuteOutcome {
 
   /// Couldn't save: put the toggle back and say so.
   failed,
+
+  /// The member is registered for the event: it stays on, say nothing.
+  registered,
 }
 
 /// Keeps the server's copy of this device in step with the app, within
@@ -239,7 +242,10 @@ class PushSync {
         await api.setEventNotifications(id, eventId, enabled: false);
         kept.add(eventId);
       } on PushException catch (e) {
-        if (e.error != PushError.notFound) kept.add(eventId);
+        // Gone, or registered (can't be muted any more): dropped.
+        if (e.error != PushError.notFound && e.error != PushError.registered) {
+          kept.add(eventId);
+        }
       }
     }
     await prefs.setStringList(_muted, kept);
@@ -267,6 +273,9 @@ class PushSync {
       } on PushException catch (e) {
         _log('set_event_notifications', e.error);
         switch (e.error) {
+          case PushError.registered:
+            await forgetMute(eventId);
+            return MuteOutcome.registered;
           case PushError.notFound when attempt == 0:
             await register(payload, force: true);
             id = await identity();
@@ -281,6 +290,15 @@ class PushSync {
       }
     }
     return MuteOutcome.failed;
+  }
+
+  /// The server dropped this device's mute for [eventId] (the member
+  /// registered for it): drop the local copy too.
+  Future<void> forgetMute(String eventId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final muted = prefs.getStringList(_muted) ?? const [];
+    if (!muted.contains(eventId)) return;
+    await prefs.setStringList(_muted, [...muted]..remove(eventId));
   }
 
   static void _log(String rpc, PushError error) {

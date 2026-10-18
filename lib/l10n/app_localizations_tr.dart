@@ -510,10 +510,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get announcementEyebrow => 'DUYURU';
 
   @override
-  String get register => 'Kaydol';
+  String get register => 'Kayıt ol';
 
   @override
-  String get registerFree => 'Kaydol · ücretsiz';
+  String get registerFree => 'Kayıt ol · ücretsiz';
 
   @override
   String get aboutThisEvent => 'Etkinlik hakkında';
@@ -1239,4 +1239,195 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorAppleRevokeFailed =>
       'Apple silme işlemini onaylayamadı, bu yüzden hesabınız silinmedi. Lütfen birkaç dakika sonra tekrar deneyin.';
+
+  @override
+  String get regBadge => 'Kayıt';
+
+  @override
+  String get regOpen => 'Kayıt açık';
+
+  @override
+  String get regSignInToRegister => 'Giriş yap ve kayıt ol';
+
+  @override
+  String get regSignInNote => 'Kayıt için hesabınla giriş yapman gerekir.';
+
+  @override
+  String regPlacesLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Son $count yer',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String regViews(int count) {
+    return '$count kişi görüntüledi';
+  }
+
+  @override
+  String get regFull => 'Kontenjan doldu';
+
+  @override
+  String get regDeadlinePassed => 'Kayıt kapandı';
+
+  @override
+  String regDeadlineWas(String when) {
+    return 'Son kayıt tarihi: $when';
+  }
+
+  @override
+  String regDeadlineIs(String when) {
+    return 'Son kayıt: $when';
+  }
+
+  @override
+  String get regClosed => 'Kayıt kapalı';
+
+  @override
+  String get regNotAccepting => 'Bu etkinlik artık kayıt almıyor.';
+
+  @override
+  String get regNoProfile => 'Bu hesapla etkinliğe kayıt olunamaz.';
+
+  @override
+  String get regStateFailed => 'Kayıt bilgisi yüklenemedi.';
+
+  @override
+  String get regRegistered => 'Kayıtlısın';
+
+  @override
+  String regRegisteredOn(String when) {
+    return 'Kayıt tarihi: $when';
+  }
+
+  @override
+  String get regSubmitted => 'Gönderdiğin bilgiler';
+
+  @override
+  String get regNotifyLocked => 'Kayıtlı olduğun için açık';
+
+  @override
+  String get regRecurringNote => 'Kayıt tüm program için geçerlidir.';
+
+  @override
+  String get regEyebrow => 'KAYIT';
+
+  @override
+  String get regYourDetails => 'Bilgilerin';
+
+  @override
+  String get regQuestions => 'Sorular';
+
+  @override
+  String get regFullName => 'Ad soyad';
+
+  @override
+  String get regEmail => 'E-posta';
+
+  @override
+  String get regPhone => 'Telefon';
+
+  @override
+  String get regSavedToProfile => 'Profiline kaydedilir';
+
+  @override
+  String get regSubmit => 'Kaydı gönder';
+
+  @override
+  String get regNoCancel => 'Kayıt uygulamadan iptal edilemez.';
+
+  @override
+  String get regOffline =>
+      'İnternet bağlantısı yok. Kayıt için bağlantı gerekir.';
+
+  @override
+  String get regFormChanged => 'Form güncellendi, kontrol edip tekrar gönder.';
+
+  @override
+  String get regFixBelow => 'Aşağıdaki alanları kontrol et.';
+
+  @override
+  String get regAnswersRejected =>
+      'Yanıtlar gönderilemedi. Uygulamayı güncelleyip tekrar dene.';
+
+  @override
+  String get regUpdateApp => 'Bu soruyu yanıtlamak için uygulamayı güncelle.';
+
+  @override
+  String get regDone => 'Kaydın alındı';
+
+  @override
+  String get regYes => 'Evet';
+
+  @override
+  String get regNo => 'Hayır';
+
+  @override
+  String get regChoose => 'Seç';
+
+  @override
+  String get regPickDate => 'Tarih seç';
+
+  @override
+  String get regWholeNumber => 'Tam sayı';
+
+  @override
+  String regRange(String min, String max) {
+    return '$min–$max arası';
+  }
+
+  @override
+  String regAtLeast(String min) {
+    return 'En az $min';
+  }
+
+  @override
+  String regAtMost(String max) {
+    return 'En çok $max';
+  }
+
+  @override
+  String get regChooseAny => 'Birden fazla seçebilirsin';
+
+  @override
+  String get regRequired => 'Zorunlu';
+
+  @override
+  String get regErrNameRequired => 'Adını yaz.';
+
+  @override
+  String get regErrNameInvalid => 'En fazla 120 karakter.';
+
+  @override
+  String get regErrPhoneRequired => 'Telefon numaranı yaz.';
+
+  @override
+  String get regErrPhoneInvalid => 'Geçerli bir telefon numarası yaz.';
+
+  @override
+  String get regErrRequired => 'Bu soru zorunlu.';
+
+  @override
+  String get regErrTooLong => 'Yanıt çok uzun.';
+
+  @override
+  String get regErrNotANumber => 'Bir sayı yaz.';
+
+  @override
+  String get regErrNotAnInteger => 'Tam sayı yaz.';
+
+  @override
+  String get regErrOutOfRange => 'İzin verilen aralıkta bir sayı yaz.';
+
+  @override
+  String get regErrUnknownOption => 'Bu seçenek artık yok, yeniden seç.';
+
+  @override
+  String get regErrInvalidDate => 'Geçerli bir tarih seç.';
+
+  @override
+  String get regErrRejected => 'Bu yanıt kabul edilmedi. Uygulamayı güncelle.';
 }

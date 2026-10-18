@@ -97,6 +97,31 @@ Apple/Google, raw to Supabase; Google's `initialize(nonce:)` is called per sign-
   `GIDServerClientID` and the reversed iOS client ID URL scheme in `Info.plist` (GCP project `pape-mosquee`; client
   IDs aren't secrets). Not there in 1.1.0.
 
+## Event registration (since 1.2.0)
+
+Contract: pape-admin CLAUDE.md §10 (the server enforces everything; the app's checks only warn earlier). Decided
+2026-10-18 (D1–D8, plan with screenshots: https://claude.ai/artifact/SuzywhUZgD5KgZG4HP4FmL). Code:
+`lib/core/registration/`, `lib/shared/providers/registration_provider.dart`, `lib/features/registration/`.
+
+- An event with `registration_form` gets a "Kayıt" badge on its card (no button: the list doesn't know the state)
+  and registers in the app; `registration_link` events are unchanged. The page calls `event_registration_state`
+  (always the source of the form and `form_version`, refetched on sign-in/out) and `record_event_view` (once per
+  event per session, device credentials, errors ignored; "X kişi görüntüledi" only when `views` isn't null).
+- What shows per state, and every error's text (TR/EN/FR ARB keys `reg*`): `event_registration_section.dart`,
+  `registration_errors.dart`, `registration_text.dart`. `no_profile` has its own text (D2). Deadlines read
+  "Son kayıt tarihi: …" (no Turkish suffix, D3), on the mosque's clock. Kill switch off hides everything except a
+  member's own "Kayıtlısın" (D4). Unknown status = closed; an unknown required question type blocks sending with
+  "update the app", an unknown optional one is skipped (D6).
+- A number question without `integer` allows decimals: the server reads a missing key as false, §10's text says
+  true (D1). `test/fixtures/registration-forms.json` is a copy of pape-admin's shared fixture: refresh it when the
+  server's form rules change (the test compares the app's parse with the server's signature).
+- Nothing personal on disk: state in Riverpod memory, the draft (D8) in a session-only provider cleared on success
+  and on member change.
+- Push link: `register_device` is forced after every sign-in/sign-out (`main.dart`), because the payload's
+  fingerprint has no member. After registering, the event leaves the local mute list (the server dropped its
+  mute); `set_event_notifications` answering `P0001 registered` is `PushError.registered` (toggle stays on). The
+  event's notification row is on and locked only while push can arrive (D5).
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

@@ -154,6 +154,41 @@ class PushController extends Notifier<PushState> {
     }
   }
 
+  /// Sign-in and sign-out: the server links a device to the member who
+  /// registered it last (`push_devices.user_id`), so register again even
+  /// though the payload didn't change.
+  Future<void> onAuthChanged() async {
+    final payload = _payload();
+    if (!_started || payload == null) return;
+    final code = await _sync.register(payload, force: true);
+    if (code != null && code != state.deviceCode) {
+      state = state.copyWith(local: state.local.copyWith(deviceCode: code));
+    }
+  }
+
+  /// This device's push identity for the registration RPCs, or null where
+  /// push isn't supported. Never logged.
+  Future<({String installId, String secret})?> credentials() async {
+    if (!state.supported) return null;
+    try {
+      final id = await _sync.identity();
+      return (installId: id.installId, secret: id.secret);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The member registered for [eventId]: the server removed this device's
+  /// mute, so the toggle shows on again.
+  Future<void> registeredFor(String eventId) async {
+    if (state.local.muted.contains(eventId)) {
+      state = state.copyWith(
+        local: state.local.copyWith(muted: {...state.local.muted}..remove(eventId)),
+      );
+    }
+    await _sync.forgetMute(eventId);
+  }
+
   /// Quick toggling sends one call.
   void _registerSoon() {
     _debounce?.cancel();
@@ -204,7 +239,11 @@ class PushController extends Notifier<PushState> {
     apply(enabled);
     final outcome =
         await _sync.setEvent(eventId, enabled: enabled, payload: payload);
-    if (outcome != MuteOutcome.saved) apply(!enabled);
+    if (outcome == MuteOutcome.registered) {
+      apply(true);
+    } else if (outcome != MuteOutcome.saved) {
+      apply(!enabled);
+    }
     return outcome;
   }
 

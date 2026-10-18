@@ -112,8 +112,8 @@
   "notifyMe": "Yeni bir şey paylaşılınca bana haber ver",
   "newBadge": "Yeni",
   "announcementEyebrow": "DUYURU",
-  "register": "Kaydol",
-  "registerFree": "Kaydol · ücretsiz",
+  "register": "Kayıt ol",
+  "registerFree": "Kayıt ol · ücretsiz",
   "aboutThisEvent": "Etkinlik hakkında",
   "shareThisEvent": "Etkinliği paylaş",
   "shareThisAnnouncement": "Duyuruyu paylaş",
@@ -337,5 +337,120 @@
   "addName": "İsim ekle",
   "addNameBody": "Profilinizde görünür. Bir kez girebilirsiniz; sonradan değiştirmek için cami ofisine başvurun.",
   "saveName": "Kaydet",
-  "errorAppleRevokeFailed": "Apple silme işlemini onaylayamadı, bu yüzden hesabınız silinmedi. Lütfen birkaç dakika sonra tekrar deneyin."
+  "errorAppleRevokeFailed": "Apple silme işlemini onaylayamadı, bu yüzden hesabınız silinmedi. Lütfen birkaç dakika sonra tekrar deneyin.",
+  "regBadge": "Kayıt",
+  "regOpen": "Kayıt açık",
+  "regSignInToRegister": "Giriş yap ve kayıt ol",
+  "regSignInNote": "Kayıt için hesabınla giriş yapman gerekir.",
+  "regPlacesLeft": "{count, plural, other{Son {count} yer}}",
+  "@regPlacesLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regViews": "{count} kişi görüntüledi",
+  "@regViews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regFull": "Kontenjan doldu",
+  "regDeadlinePassed": "Kayıt kapandı",
+  "regDeadlineWas": "Son kayıt tarihi: {when}",
+  "@regDeadlineWas": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regDeadlineIs": "Son kayıt: {when}",
+  "@regDeadlineIs": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regClosed": "Kayıt kapalı",
+  "regNotAccepting": "Bu etkinlik artık kayıt almıyor.",
+  "regNoProfile": "Bu hesapla etkinliğe kayıt olunamaz.",
+  "regStateFailed": "Kayıt bilgisi yüklenemedi.",
+  "regRegistered": "Kayıtlısın",
+  "regRegisteredOn": "Kayıt tarihi: {when}",
+  "@regRegisteredOn": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "regSubmitted": "Gönderdiğin bilgiler",
+  "regNotifyLocked": "Kayıtlı olduğun için açık",
+  "regRecurringNote": "Kayıt tüm program için geçerlidir.",
+  "regEyebrow": "KAYIT",
+  "regYourDetails": "Bilgilerin",
+  "regQuestions": "Sorular",
+  "regFullName": "Ad soyad",
+  "regEmail": "E-posta",
+  "regPhone": "Telefon",
+  "regSavedToProfile": "Profiline kaydedilir",
+  "regSubmit": "Kaydı gönder",
+  "regNoCancel": "Kayıt uygulamadan iptal edilemez.",
+  "regOffline": "İnternet bağlantısı yok. Kayıt için bağlantı gerekir.",
+  "regFormChanged": "Form güncellendi, kontrol edip tekrar gönder.",
+  "regFixBelow": "Aşağıdaki alanları kontrol et.",
+  "regAnswersRejected": "Yanıtlar gönderilemedi. Uygulamayı güncelleyip tekrar dene.",
+  "regUpdateApp": "Bu soruyu yanıtlamak için uygulamayı güncelle.",
+  "regDone": "Kaydın alındı",
+  "regYes": "Evet",
+  "regNo": "Hayır",
+  "regChoose": "Seç",
+  "regPickDate": "Tarih seç",
+  "regWholeNumber": "Tam sayı",
+  "regRange": "{min}–{max} arası",
+  "@regRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "regAtLeast": "En az {min}",
+  "@regAtLeast": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "regAtMost": "En çok {max}",
+  "@regAtMost": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "regChooseAny": "Birden fazla seçebilirsin",
+  "regRequired": "Zorunlu",
+  "regErrNameRequired": "Adını yaz.",
+  "regErrNameInvalid": "En fazla 120 karakter.",
+  "regErrPhoneRequired": "Telefon numaranı yaz.",
+  "regErrPhoneInvalid": "Geçerli bir telefon numarası yaz.",
+  "regErrRequired": "Bu soru zorunlu.",
+  "regErrTooLong": "Yanıt çok uzun.",
+  "regErrNotANumber": "Bir sayı yaz.",
+  "regErrNotAnInteger": "Tam sayı yaz.",
+  "regErrOutOfRange": "İzin verilen aralıkta bir sayı yaz.",
+  "regErrUnknownOption": "Bu seçenek artık yok, yeniden seç.",
+  "regErrInvalidDate": "Geçerli bir tarih seç.",
+  "regErrRejected": "Bu yanıt kabul edilmedi. Uygulamayı güncelle."
 }

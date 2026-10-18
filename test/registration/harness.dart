@@ -17,6 +17,7 @@ import 'package:myt_flutter/shared/providers/content_provider.dart';
 import 'package:myt_flutter/shared/providers/push_provider.dart';
 import 'package:myt_flutter/shared/providers/registration_provider.dart';
 import 'package:myt_flutter/theme/app_theme.dart';
+import 'package:myt_flutter/ui/components/app_text_input.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../push/fakes.dart';
@@ -204,6 +205,7 @@ Future<GoRouter> pumpRegistration(
           GlobalCupertinoLocalizations.delegate,
         ],
         routerConfig: router,
+        builder: (_, child) => KeyboardAccessoryHost(child: child!),
       ),
     ),
   );

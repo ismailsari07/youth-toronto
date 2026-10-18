@@ -80,6 +80,23 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
 
   GlobalKey _key(String field) => _fieldKeys.putIfAbsent(field, GlobalKey.new);
 
+  /// The last field typed into, in screen order: its return key says Done.
+  String? _lastTextField(RegistrationState s) {
+    final me = s.me;
+    const typed = {
+      QuestionType.shortText,
+      QuestionType.longText,
+      QuestionType.number,
+      QuestionType.phone,
+    };
+    return [
+      if (me != null && me.nameMissing) 'full_name',
+      if (me != null && s.requirePhone && me.phoneMissing) 'phone',
+      for (final q in s.questions)
+        if (typed.contains(q.type)) q.id,
+    ].lastOrNull;
+  }
+
   void _saveDraft() => ref.read(registrationDraftsProvider.notifier).save(
         _eventId,
         RegistrationDraft(
@@ -223,6 +240,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                 // Not lazy: ten questions at most, and every field's key
                 // must exist to scroll to the first error.
                 : SingleChildScrollView(
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: const EdgeInsets.fromLTRB(
                       AppSpace.pageGutter,
                       18,
@@ -253,6 +271,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                                 question: q,
                                 value: _answers[q.id],
                                 controller: _controller(q.id),
+                                last: q.id == _lastTextField(s),
                                 error: switch (_errors[q.id]) {
                                   final code? => registrationErrorText(l, q.id, code),
                                   null => null,
@@ -266,11 +285,9 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                     ),
                   ),
           ),
-        ],
-      ),
-      bottomNavigationBar: s == null
-          ? null
-          : StickyBottomBar(
+          // In the body, not bottomNavigationBar: it rides above the keyboard.
+          if (s != null)
+            StickyBottomBar(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -282,15 +299,20 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                       label: l.regSubmit,
                       onTap: _sending ? null : () => _submit(s),
                     ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l.regNoCancel,
-                    textAlign: TextAlign.center,
-                    style: AppText.caption.c(context.colors.ink3),
-                  ),
+                  // Hidden while typing: on an iPhone SE the field needs the room.
+                  if (MediaQuery.viewInsetsOf(context).bottom == 0) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l.regNoCancel,
+                      textAlign: TextAlign.center,
+                      style: AppText.caption.c(context.colors.ink3),
+                    ),
+                  ],
                 ],
               ),
             ),
+        ],
+      ),
     );
   }
 
@@ -347,6 +369,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
               const SizedBox(height: 10),
               BoxInput(
                 controller: controller,
+                last: field == _lastTextField(s),
                 hint: hint,
                 keyboardType: keyboard,
                 maxLength: field == 'full_name' ? 120 : 40,

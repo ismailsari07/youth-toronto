@@ -84,6 +84,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           PlainNavBar(eyebrow: l.accountEyebrow, title: l.deleteAccount),
           Expanded(
             child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.fromLTRB(
                 AppSpace.pageGutter,
                 18,
@@ -155,6 +156,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       label: l.typeWordToConfirm(l.deleteConfirmWord),
                       controller: _confirm,
                       hint: l.deleteConfirmWord,
+                      // Done only closes the keyboard: deleting stays a deliberate tap.
+                      last: true,
                     ),
                   ],
                 ),

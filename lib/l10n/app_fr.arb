@@ -452,5 +452,8 @@
   "regErrOutOfRange": "Saisissez un nombre dans la plage autorisée.",
   "regErrUnknownOption": "Cette option n'existe plus. Choisissez à nouveau.",
   "regErrInvalidDate": "Choisissez une date valide.",
-  "regErrRejected": "Réponse refusée. Mettez l'application à jour."
+  "regErrRejected": "Réponse refusée. Mettez l'application à jour.",
+  "keyboardDone": "Terminé",
+  "keyboardPrevious": "Champ précédent",
+  "keyboardNext": "Champ suivant"
 }

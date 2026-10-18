@@ -1430,4 +1430,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get regErrRejected => 'Bu yanıt kabul edilmedi. Uygulamayı güncelle.';
+
+  @override
+  String get keyboardDone => 'Bitti';
+
+  @override
+  String get keyboardPrevious => 'Önceki alan';
+
+  @override
+  String get keyboardNext => 'Sonraki alan';
 }

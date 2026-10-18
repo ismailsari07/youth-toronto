@@ -10,6 +10,7 @@ import '../../theme/app_tokens.dart';
 import '../../ui/components/app_card.dart';
 import '../../ui/components/app_row.dart';
 import '../../ui/components/app_sheet.dart';
+import '../../ui/components/app_text_input.dart';
 import '../../ui/components/motion.dart';
 import 'registration_text.dart';
 
@@ -103,6 +104,7 @@ class BoxInput extends StatelessWidget {
     this.formatters,
     this.onChanged,
     this.semanticLabel,
+    this.last = false,
   });
 
   final TextEditingController controller;
@@ -118,6 +120,9 @@ class BoxInput extends StatelessWidget {
   final List<TextInputFormatter>? formatters;
   final ValueChanged<String>? onChanged;
   final String? semanticLabel;
+
+  /// The screen's last field (see [AppTextInput.last]).
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
@@ -135,8 +140,9 @@ class BoxInput extends StatelessWidget {
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: TextField(
+          child: AppTextInput(
             controller: controller,
+            last: last,
             keyboardType: keyboardType,
             minLines: minLines,
             maxLines: maxLines,
@@ -185,6 +191,7 @@ class QuestionField extends StatelessWidget {
     required this.onChanged,
     required this.controller,
     this.error,
+    this.last = false,
   });
 
   final Question question;
@@ -192,6 +199,9 @@ class QuestionField extends StatelessWidget {
   final ValueChanged<Object?> onChanged;
   final TextEditingController controller;
   final String? error;
+
+  /// The screen's last text field: return closes the keyboard.
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
@@ -251,6 +261,7 @@ class QuestionField extends StatelessWidget {
       case QuestionType.shortText:
         return BoxInput(
           controller: controller,
+          last: last,
           maxLength: Question.shortMax,
           error: hasError,
           onChanged: onChanged,
@@ -583,6 +594,7 @@ class OptionSheet extends StatelessWidget {
             const SizedBox(height: 18),
             Flexible(
               child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 child: GroupedRows(
                   rows: [
                     for (final (i, o) in question.options.indexed)

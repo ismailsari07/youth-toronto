@@ -452,5 +452,8 @@
   "regErrOutOfRange": "İzin verilen aralıkta bir sayı yaz.",
   "regErrUnknownOption": "Bu seçenek artık yok, yeniden seç.",
   "regErrInvalidDate": "Geçerli bir tarih seç.",
-  "regErrRejected": "Bu yanıt kabul edilmedi. Uygulamayı güncelle."
+  "regErrRejected": "Bu yanıt kabul edilmedi. Uygulamayı güncelle.",
+  "keyboardDone": "Bitti",
+  "keyboardPrevious": "Önceki alan",
+  "keyboardNext": "Sonraki alan"
 }

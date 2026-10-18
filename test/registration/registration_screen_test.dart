@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myt_flutter/features/registration/question_fields.dart';
 import 'package:myt_flutter/features/registration/registration_screen.dart';
+import 'package:myt_flutter/ui/components/app_scaffolding.dart';
+import 'package:myt_flutter/ui/components/app_text_input.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,8 +20,9 @@ void main() {
     WidgetTester tester,
     List<Object> states, {
     Locale locale = const Locale('en'),
+    Size size = const Size(430, 3200),
   }) async {
-    tester.view.physicalSize = const Size(430 * 3, 3200 * 3);
+    tester.view.physicalSize = size * 3;
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     results = [];
@@ -240,6 +243,123 @@ void main() {
     await open(tester, [stateJson(me: member(), formJson: f)]);
     expect(find.text('Update the app to answer this question.'), findsOneWidget);
     expect(find.byKey(const Key('registration-submit')), findsNothing);
+  });
+
+  group('keyboard on an iPhone SE', () {
+    final ios = TargetPlatformVariant.only(TargetPlatform.iOS);
+    const se = Size(375, 667);
+    const keyboard = 216.0;
+
+    Future<FakeRegistrationApi> openSe(WidgetTester tester) async {
+      final api = await open(
+        tester,
+        [stateJson(me: member(nameMissing: true), requirePhone: true)],
+        size: se,
+      );
+      tester.view.padding = const FakeViewPadding(top: 20 * 3);
+      tester.view.viewInsets = const FakeViewPadding(bottom: keyboard * 3);
+      await tester.pumpAndSettle();
+      return api;
+    }
+
+    Future<void> focus(WidgetTester tester, Finder field) async {
+      await tester.ensureVisible(field);
+      await tester.pumpAndSettle();
+      await tester.tap(field);
+      await tester.pumpAndSettle();
+    }
+
+    bool typing() =>
+        FocusManager.instance.primaryFocus?.context?.findAncestorWidgetOfExactType<EditableText>() !=
+        null;
+
+    Rect visible(WidgetTester tester) => Rect.fromLTRB(
+          0,
+          tester.getBottomLeft(find.byType(PlainNavBar)).dy,
+          se.width,
+          tester.getTopLeft(find.byType(StickyBottomBar)).dy,
+        );
+
+    testWidgets('the last field (multi-line) and Send stay above the keyboard and the bar', (
+      tester,
+    ) async {
+      await openSe(tester);
+      final note = textIn(question('Note'));
+      await focus(tester, note);
+      expect(find.byKey(const Key('keyboard-accessory')), findsOneWidget);
+      final barTop = se.height - keyboard - KeyboardAccessoryHost.height;
+      expect(tester.getTopLeft(find.byKey(const Key('keyboard-accessory'))).dy, barTop);
+      // The no-cancel line makes room while typing.
+      expect(find.text("A registration can't be cancelled in the app."), findsNothing);
+      // Send rides on top of the Done bar, whole.
+      final submit = tester.getRect(find.byKey(const Key('registration-submit')));
+      expect(submit.bottom, lessThanOrEqualTo(barTop));
+      expect(submit.top, greaterThan(tester.getBottomLeft(find.byType(PlainNavBar)).dy));
+      // The focused field's top line is between the nav bar and Send.
+      final field = tester.getRect(note);
+      final area = visible(tester);
+      expect(field.top, greaterThanOrEqualTo(area.top));
+      expect(field.bottom, lessThanOrEqualTo(area.bottom));
+    }, variant: ios);
+
+    testWidgets('a field near the top stays visible too', (tester) async {
+      await openSe(tester);
+      final age = textIn(question('Age'));
+      await focus(tester, age);
+      final field = tester.getRect(age);
+      final area = visible(tester);
+      expect(field.top, greaterThanOrEqualTo(area.top));
+      expect(field.bottom, lessThanOrEqualTo(area.bottom));
+      // A number pad: the Done bar closes it.
+      await tester.tap(find.byKey(const Key('keyboard-done')));
+      await tester.pumpAndSettle();
+      expect(typing(), isFalse);
+    }, variant: ios);
+
+    testWidgets('dragging the form closes the keyboard', (tester) async {
+      await openSe(tester);
+      final school = textIn(question('School *'));
+      await focus(tester, school);
+      expect(typing(), isTrue);
+      await tester.drag(school, const Offset(0, -150));
+      await tester.pumpAndSettle();
+      expect(typing(), isFalse);
+    }, variant: ios);
+
+    testWidgets('tapping an option while typing closes the keyboard and picks it', (
+      tester,
+    ) async {
+      await openSe(tester);
+      await focus(tester, textIn(question('School *')));
+      final no = find.descendant(of: question('Shuttle? *'), matching: find.text('No'));
+      await tester.ensureVisible(no);
+      await tester.pumpAndSettle();
+      // ensureVisible scrolls programmatically: still typing.
+      expect(typing(), isTrue);
+      await tester.tap(no);
+      await tester.pumpAndSettle();
+      expect(typing(), isFalse);
+      expect(tester.getSemantics(no), containsSemantics(isSelected: true));
+    }, variant: ios);
+
+    testWidgets('return: Next through the details, Done only on the last text field', (
+      tester,
+    ) async {
+      await openSe(tester);
+      TextInputAction? action(Finder f) =>
+          tester.widget<EditableText>(find.descendant(of: f, matching: find.byType(EditableText))).textInputAction;
+      expect(action(find.byKey(const ValueKey('field-full_name'))), TextInputAction.next);
+      expect(action(question('School *')), TextInputAction.next);
+      expect(action(question('Note')), TextInputAction.newline);
+      await focus(tester, textIn(find.byKey(const ValueKey('field-full_name'))));
+      await tester.testTextInput.receiveAction(TextInputAction.next);
+      await tester.pumpAndSettle();
+      final phone = find.descendant(
+        of: find.byKey(const ValueKey('field-phone')),
+        matching: find.byType(EditableText),
+      );
+      expect(tester.widget<EditableText>(phone).focusNode.hasPrimaryFocus, isTrue);
+    }, variant: ios);
   });
 
   testWidgets('Turkish', (tester) async {

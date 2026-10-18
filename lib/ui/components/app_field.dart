@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_tokens.dart';
+import 'app_text_input.dart';
 
 /// Spec §7.7's field row: padding 12/18, an optional 34×34 icon tile, the
 /// label above the input.
@@ -18,6 +19,8 @@ class AppField extends StatelessWidget {
     this.divided = false,
     this.readOnly = false,
     this.onTap,
+    this.last = false,
+    this.onSubmit,
   });
 
   final String label;
@@ -29,6 +32,10 @@ class AppField extends StatelessWidget {
   final bool divided;
   final bool readOnly;
   final VoidCallback? onTap;
+
+  /// See [AppTextInput.last] and [AppTextInput.onSubmit].
+  final bool last;
+  final VoidCallback? onSubmit;
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +71,10 @@ class AppField extends StatelessWidget {
                     letterSpacing: 0.4,
                   ).c(context.colors.ink3),
                 ),
-                TextField(
+                AppTextInput(
                   controller: controller,
+                  last: last,
+                  onSubmit: onSubmit,
                   obscureText: obscure,
                   keyboardType: keyboardType,
                   readOnly: readOnly,

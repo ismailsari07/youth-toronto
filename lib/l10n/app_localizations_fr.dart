@@ -1453,4 +1453,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get regErrRejected => 'Réponse refusée. Mettez l\'application à jour.';
+
+  @override
+  String get keyboardDone => 'Terminé';
+
+  @override
+  String get keyboardPrevious => 'Champ précédent';
+
+  @override
+  String get keyboardNext => 'Champ suivant';
 }

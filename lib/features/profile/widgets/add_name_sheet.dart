@@ -116,6 +116,8 @@ class _AddNameSheetState extends ConsumerState<_AddNameSheet> {
                     icon: AppIcons.person,
                     controller: _name,
                     hint: l.yourName,
+                    last: true,
+                    onSubmit: _busy ? null : _save,
                   ),
                 ],
               ),

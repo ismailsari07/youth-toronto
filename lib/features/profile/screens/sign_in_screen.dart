@@ -89,6 +89,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
           Expanded(
             child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.fromLTRB(
                 AppSpace.pageGutter,
                 18,
@@ -119,6 +120,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       controller: _password,
                       obscure: true,
                       divided: true,
+                      last: true,
+                      onSubmit: _busy ? null : _submit,
                     ),
                   ],
                 ),

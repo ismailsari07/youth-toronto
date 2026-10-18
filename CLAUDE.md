@@ -122,6 +122,23 @@ Contract: pape-admin CLAUDE.md §10 (the server enforces everything; the app's c
   mute); `set_event_notifications` answering `P0001 registered` is `PushError.registered` (toggle stays on). The
   event's notification row is on and locked only while push can arrive (D5).
 
+## Keyboard (since 1.2.1)
+
+The keyboard always has a way out (TestFlight 1.2.0: number, phone and multi-line fields had none). Code:
+`lib/ui/components/app_text_input.dart`; tests `test/widget/keyboard_test.dart` and the iPhone SE group in
+`test/registration/registration_screen_test.dart`.
+
+- Every text field is an `AppTextInput` (`AppField` and `BoxInput` use it; a test fails on a raw `TextField`). A tap
+  outside closes the keyboard (Flutter only does this on desktop/web) without eating the tap. One-line fields
+  say Next (moves to the next field on the screen, skipping read-only ones) or, with `last: true`, Done (runs
+  `onSubmit`: sign in, create account, save name; delete-account and the registration form only close).
+- `KeyboardAccessoryHost` (MaterialApp.builder) shows "Bitti / Done / Terminé" with up/down arrows on top of the iOS
+  keyboard for number, phone and multi-line fields, and adds its 44 pt to `viewInsets` so scaffolds and sheets clear it.
+- Scroll views holding fields set `keyboardDismissBehavior: onDrag` (a test checks every feature file).
+- A submit button that must stay visible while typing lives in the body, not `bottomNavigationBar` (the keyboard covers
+  that slot). The registration form does this and hides its "can't be cancelled" line while the keyboard is up: on an
+  iPhone SE that leaves about 150 pt of form between the nav bar and Send.
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

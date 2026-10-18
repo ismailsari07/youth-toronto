@@ -2463,6 +2463,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This answer wasn\'t accepted. Update the app.'**
   String get regErrRejected;
+
+  /// Keyboard accessory bar above the iOS keyboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get keyboardDone;
+
+  /// VoiceOver label of an arrow on the keyboard accessory bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous field'**
+  String get keyboardPrevious;
+
+  /// VoiceOver label of an arrow on the keyboard accessory bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Next field'**
+  String get keyboardNext;
 }
 
 class _AppLocalizationsDelegate

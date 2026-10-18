@@ -1436,4 +1436,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regErrRejected => 'This answer wasn\'t accepted. Update the app.';
+
+  @override
+  String get keyboardDone => 'Done';
+
+  @override
+  String get keyboardPrevious => 'Previous field';
+
+  @override
+  String get keyboardNext => 'Next field';
 }

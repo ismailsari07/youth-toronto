@@ -918,5 +918,17 @@
   "regErrRejected": "This answer wasn't accepted. Update the app.",
   "@regErrRejected": {
     "description": "Field error: wrong_type, unknown_question or anything new."
+  },
+  "keyboardDone": "Done",
+  "@keyboardDone": {
+    "description": "Keyboard accessory bar above the iOS keyboard."
+  },
+  "keyboardPrevious": "Previous field",
+  "@keyboardPrevious": {
+    "description": "VoiceOver label of an arrow on the keyboard accessory bar."
+  },
+  "keyboardNext": "Next field",
+  "@keyboardNext": {
+    "description": "VoiceOver label of an arrow on the keyboard accessory bar."
   }
 }

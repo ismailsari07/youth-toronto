@@ -27,6 +27,7 @@ import 'shared/providers/donations_provider.dart';
 import 'shared/providers/push_provider.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_mode_provider.dart';
+import 'ui/components/app_text_input.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -206,11 +207,14 @@ class _MytAppState extends ConsumerState<MytApp> {
       // replaces the whole app; nothing else is reachable.
       // Status-bar icons follow the theme: dark over the light ground,
       // light over the dark one (the Prayer hero sets its own).
+      // The keyboard's Done bar (iOS) sits over every screen and sheet.
       builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: statusBarOver(Theme.of(context).brightness),
-        child: ref.watch(updateRequiredProvider)
-            ? const UpdateRequiredScreen()
-            : child!,
+        child: KeyboardAccessoryHost(
+          child: ref.watch(updateRequiredProvider)
+              ? const UpdateRequiredScreen()
+              : child!,
+        ),
       ),
       debugShowCheckedModeBanner: false,
     );

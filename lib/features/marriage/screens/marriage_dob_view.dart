@@ -90,6 +90,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
           ),
           Expanded(
             child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.fromLTRB(
                 AppSpace.pageGutter,
                 18,

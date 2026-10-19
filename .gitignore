@@ -60,3 +60,6 @@ key.properties
 
 # Supabase CLI scratch state
 supabase/.temp/
+
+# App Store screenshots (screenshots/take.sh)
+screenshots/out/

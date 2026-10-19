@@ -40,6 +40,9 @@ class ReminderSync {
   static Future<bool?> Function() permissionGranted =
       NotificationService.notificationsAllowed;
 
+  /// [permissionGranted], for the reminders sheet.
+  static Future<bool?> notificationsAllowed() => permissionGranted();
+
   /// Shows the iOS prompt the first time, then returns the stored answer.
   /// Replaced in tests.
   @visibleForTesting

@@ -172,6 +172,14 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
 - No bell on the Prayer hero: next to the Donate pill it cut the mosque line on an iPhone SE. Reminders open from the
   row under the prayer times, Profile and Settings.
 
+## App Store screenshots (branch `screenshots`)
+
+6.9" (1320×2868), en + tr, made on Codemagic's macOS machines by a second, yaml-configured Codemagic app (workflow
+`screenshots` in `codemagic.yaml`; the release app stays in the Workflow Editor and ignores that file). It builds
+`screenshots/main.dart` for the simulator (no signing) and `screenshots/take.sh` launches it once per shot on an iPhone 16
+Pro Max with a 9:41 status bar. The entry point runs the real app through `startApp()` (`lib/main.dart`) on live data,
+signed out, and never writes to the database (no `register_device`, no `record_event_view`). PNGs are build artifacts.
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

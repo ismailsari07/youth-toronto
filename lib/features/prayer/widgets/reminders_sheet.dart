@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/notification_service.dart';
 import '../../../core/notification_sounds.dart';
 import '../../../core/reminder_settings.dart';
+import '../../../core/reminder_sync.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -92,7 +92,7 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
   }
 
   Future<void> _checkPermission() async {
-    final allowed = await NotificationService.notificationsAllowed();
+    final allowed = await ReminderSync.notificationsAllowed();
     if (mounted) setState(() => _allowed = allowed);
   }
 

@@ -28,7 +28,18 @@ import 'theme/app_theme.dart';
 import 'theme/theme_mode_provider.dart';
 import 'ui/components/app_text_input.dart';
 
-void main() async {
+void main() => startApp();
+
+/// Everything [main] does, so the App Store screenshot run
+/// (screenshots/main.dart) starts exactly the same app. [locale] and
+/// [themeMode] stand in for the saved choices when given; [overrides] are
+/// added to the app's own and must not repeat them. The release app passes
+/// nothing.
+Future<void> startApp({
+  Locale? locale,
+  ThemeMode? themeMode,
+  List<Override> overrides = const [],
+}) async {
   WidgetsFlutterBinding.ensureInitialized();
   _silencePdfViewerLogs();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -78,8 +89,8 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
-        savedLocaleProvider.overrideWithValue(savedLocale),
-        savedThemeModeProvider.overrideWithValue(savedThemeMode),
+        savedLocaleProvider.overrideWithValue(locale ?? savedLocale),
+        savedThemeModeProvider.overrideWithValue(themeMode ?? savedThemeMode),
         initialContentProvider.overrideWithValue(content),
         initialDonationFundsProvider.overrideWithValue(donationFunds),
         appVersionProvider.overrideWithValue(appVersion),
@@ -87,6 +98,7 @@ void main() async {
         initialPushPermissionProvider.overrideWithValue(pushPermission),
         initialPushLocalProvider.overrideWithValue(pushLocal),
         launchCountProvider.overrideWithValue(launchCount),
+        ...overrides,
       ],
       child: const MytApp(),
     ),

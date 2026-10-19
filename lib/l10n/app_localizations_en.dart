@@ -1451,4 +1451,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderJumuahSoon => 'Jumu\'ah in 5 minutes';
+
+  @override
+  String get remindersEndingNotice =>
+      'Your prayer reminders will stop tomorrow. Open Pape Mosque once to keep them coming at the right times.';
+
+  @override
+  String get lastBackgroundRefresh => 'Last background refresh';
 }

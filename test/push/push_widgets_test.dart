@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:myt_flutter/core/prayer_refresh.dart';
 import 'package:myt_flutter/core/push/push_api.dart';
 import 'package:myt_flutter/core/push/push_prompt.dart';
 import 'package:myt_flutter/core/push/push_sync.dart';
@@ -222,7 +223,42 @@ void main() {
 
     testWidgets('a dash before the first registration', (tester) async {
       await pump(tester, const AboutSheet());
+      // The device code, and the background refresh that never happened.
+      expect(find.text('—'), findsNWidgets(2));
+    });
+
+    testWidgets('last background refresh: a dash, then its date and time', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const AboutSheet(),
+        local: const PushLocal(saved: true, deviceCode: 'K7QM2X9P'),
+      );
+      expect(find.text('Last background refresh'), findsOneWidget);
       expect(find.text('—'), findsOneWidget);
+
+      // Stored in UTC, shown in the phone's time.
+      final at = DateTime(2026, 10, 19, 14, 32);
+      await tester.runAsync(() => BackgroundRefreshLog.record(at));
+      await pump(tester, const SizedBox());
+      await pump(
+        tester,
+        const AboutSheet(),
+        local: const PushLocal(saved: true, deviceCode: 'K7QM2X9P'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Mon 19 Oct · 2:32 PM'), findsOneWidget);
+      expect(find.text('—'), findsNothing);
+    });
+
+    testWidgets('no line where push is unsupported', (tester) async {
+      await pump(
+        tester,
+        const AboutSheet(),
+        permission: PushPermission.unsupported,
+      );
+      expect(find.text('Last background refresh'), findsNothing);
     });
 
     testWidgets('opens from the About row on Profile', (tester) async {

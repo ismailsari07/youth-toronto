@@ -457,5 +457,7 @@
   "keyboardPrevious": "Önceki alan",
   "keyboardNext": "Sonraki alan",
   "reminderJumuahNow": "Cuma namazı vakti",
-  "reminderJumuahSoon": "Cuma namazına 5 dakika kaldı"
+  "reminderJumuahSoon": "Cuma namazına 5 dakika kaldı",
+  "remindersEndingNotice": "Namaz hatırlatmalarınız yarın duracak. Doğru saatte gelmeye devam etmeleri için Pape Mosque'u bir kez açmanız yeterli.",
+  "lastBackgroundRefresh": "Son arka plan yenileme"
 }

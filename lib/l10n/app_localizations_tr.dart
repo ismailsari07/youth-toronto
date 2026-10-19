@@ -1445,4 +1445,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reminderJumuahSoon => 'Cuma namazına 5 dakika kaldı';
+
+  @override
+  String get remindersEndingNotice =>
+      'Namaz hatırlatmalarınız yarın duracak. Doğru saatte gelmeye devam etmeleri için Pape Mosque\'u bir kez açmanız yeterli.';
+
+  @override
+  String get lastBackgroundRefresh => 'Son arka plan yenileme';
 }

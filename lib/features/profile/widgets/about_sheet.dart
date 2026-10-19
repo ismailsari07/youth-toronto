@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../../shared/formatters.dart';
 import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/push_provider.dart';
+import '../../../shared/providers/reminders_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_tokens.dart';
@@ -14,8 +16,9 @@ import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_sheet.dart';
 import '../../../ui/components/motion.dart';
 
-/// Settings → About this app: the version, and the device code the mosque
-/// uses to send this phone a test notification.
+/// Settings → About this app: the version, the device code the mosque uses
+/// to send this phone a test notification, and when a prayer_refresh silent
+/// push last rescheduled the reminders in the background (for testing it).
 Future<void> showAboutSheet(BuildContext context) {
   return showAppSheet<void>(
     context: context,
@@ -56,6 +59,7 @@ class _AboutSheetState extends ConsumerState<AboutSheet> {
     final version = ref.watch(appVersionProvider);
     final push = ref.watch(pushProvider);
     final code = push.deviceCode;
+    final lastRefresh = ref.watch(lastBackgroundRefreshProvider).valueOrNull;
 
     return Container(
       decoration: BoxDecoration(
@@ -103,6 +107,14 @@ class _AboutSheetState extends ConsumerState<AboutSheet> {
                     code: code,
                     copied: _copied,
                     onCopy: code == null ? null : () => _copy(code),
+                  ),
+                if (push.supported)
+                  AppListRow(
+                    icon: AppIcons.clock,
+                    title: l.lastBackgroundRefresh,
+                    subtitle:
+                        lastRefresh == null ? '—' : heroDateTime(l, lastRefresh),
+                    divided: true,
                   ),
               ],
             ),

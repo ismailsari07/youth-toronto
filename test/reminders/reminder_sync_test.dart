@@ -7,13 +7,36 @@ import 'package:myt_flutter/core/notification_service.dart';
 import 'package:myt_flutter/core/prayer_days.dart';
 import 'package:myt_flutter/core/prayer_refresh.dart';
 import 'package:myt_flutter/core/prayer_service.dart';
+import 'package:myt_flutter/core/reminder_settings.dart';
 import 'package:myt_flutter/core/reminder_sync.dart';
 import 'package:myt_flutter/shared/providers/reminders_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/timezone.dart' as tz;
 
-PrayerDay _today() {
+PrayerDay _today() => _day(0);
+
+/// A row [offset] days from today with all five prayers at 00:01–00:05
+/// (iqamah a minute later), except today, which keeps one late Isha.
+PrayerDay _day(int offset) {
   final now = mosqueNow();
-  final day = DateTime(now.year, now.month, now.day);
+  final day = DateTime(now.year, now.month, now.day + offset);
+  if (offset > 0) {
+    return (
+      date: mosqueDateKey(day),
+      payload: PrayerCachePayload(
+        dailyPrayerTimes: const [
+          DailyPrayerItem(name: 'Fajr', time: '00:01', iqamah: '00:02'),
+          DailyPrayerItem(name: 'Dhuhr', time: '12:01', iqamah: '12:02'),
+          DailyPrayerItem(name: 'Asr', time: '15:01', iqamah: '15:02'),
+          DailyPrayerItem(name: 'Maghrib', time: '18:01', iqamah: '18:02'),
+          DailyPrayerItem(name: 'Isha', time: '21:01', iqamah: '21:02'),
+        ],
+        hijriDate: '',
+        gregorianDate: diyanetDate(day),
+        jumaaPrayerTime: '13:30',
+      ),
+    );
+  }
   return (
     date: mosqueDateKey(day),
     payload: PrayerCachePayload(
@@ -36,6 +59,7 @@ void main() {
   late int asked, checked;
   late List<(int, int)> fetched;
   late List<List<Reminder>> scheduled;
+  late List<Reminder?> notices;
   late bool? granted;
   late Object fetchResult;
 
@@ -44,6 +68,7 @@ void main() {
     asked = checked = 0;
     fetched = [];
     scheduled = [];
+    notices = [];
     granted = true;
     fetchResult = [_today()];
     ReminderSync.askPermission = () async {
@@ -60,8 +85,9 @@ void main() {
       if (r is Exception) throw r;
       return r as List<PrayerDay>;
     };
-    ReminderSync.schedule = (reminders, {required channelName}) async {
+    ReminderSync.schedule = (reminders, {required channelName, notice}) async {
       scheduled.add(reminders);
+      notices.add(notice);
     };
   });
 
@@ -103,15 +129,54 @@ void main() {
   });
 
   group('data', () {
-    test('asks prayer_cache for today and the next 4 days only', () async {
-      await ReminderSync.sync();
-      expect(fetched.single, (0, 4));
+    test('asks prayer_cache for as many days as the budget could use', () async {
+      expect(await ReminderSync.sync(), isTrue);
+      expect(fetched.single, (0, 89));
       expect(scheduled.single, isNotEmpty);
+    });
+
+    test('never more than 64 pending, notice included', () async {
+      fetchResult = [for (var i = 0; i < 80; i++) _day(i)];
+      for (final prayers in [
+        ReminderSettings.allPrayers,
+        {'Fajr', 'Asr', 'Isha'},
+        {'Asr'},
+        {'Dhuhr'}, // Fridays: Jumu'ah
+      ]) {
+        await ReminderSync.saveSettings(ReminderSettings(prayers: prayers));
+        await ReminderSync.sync();
+        final pending = scheduled.last.length + (notices.last == null ? 0 : 1);
+        expect(pending, lessThanOrEqualTo(iosPendingLimit), reason: '$prayers');
+        expect(scheduled.last.length, lessThanOrEqualTo(reminderBudget));
+        expect(notices.last, isNotNull);
+      }
+      // One prayer a day fills the budget exactly: 63 + the notice = 64.
+      expect(scheduled.last.length + 1, 64);
+    });
+
+    test('every reschedule moves the notice to the new last day', () async {
+      fetchResult = [for (var i = 0; i < 3; i++) _day(i)];
+      await ReminderSync.sync();
+      fetchResult = [for (var i = 0; i < 6; i++) _day(i)];
+      await ReminderSync.sync();
+      final today = mosqueNow();
+      final days = notices.map((n) => n!.at.difference(
+            tz.TZDateTime(mosqueTz, today.year, today.month, today.day),
+          ).inDays);
+      expect(days, [2, 5]);
+      expect(notices.every((n) => n!.at.hour == 10 && n.id == noticeId), isTrue);
+    });
+
+    test('reminders off: nothing scheduled, so no notice', () async {
+      SharedPreferences.setMockInitialValues({'prayer_reminders_enabled': false});
+      expect(await ReminderSync.sync(), isFalse);
+      expect(scheduled, isEmpty);
+      expect(notices, isEmpty);
     });
 
     test('a failed fetch keeps what is scheduled (it came from real rows)', () async {
       fetchResult = Exception('offline');
-      await ReminderSync.sync();
+      expect(await ReminderSync.sync(), isFalse);
       expect(scheduled, isEmpty);
     });
 
@@ -119,6 +184,7 @@ void main() {
       fetchResult = <PrayerDay>[];
       await ReminderSync.sync();
       expect(scheduled.single, isEmpty);
+      expect(notices.single, isNull);
     });
 
     test('a change during a sync runs one more sync afterwards', () async {
@@ -134,7 +200,10 @@ void main() {
     late int refreshes;
     setUp(() {
       refreshes = 0;
-      prayerRefresh = () async => refreshes++;
+      prayerRefresh = () async {
+        refreshes++;
+        return true;
+      };
     });
 
     test('open app: refreshes', () async {
@@ -157,8 +226,40 @@ void main() {
     test('runs the reminder sync', () async {
       prayerRefresh = refreshPrayerSchedules;
       await handlePushData({'type': 'prayer_refresh'});
-      expect(fetched.single, (0, 4));
+      expect(fetched.single, (0, 89));
       expect(asked, 0);
+    });
+
+    group('last background refresh (About sheet)', () {
+      test('never: null', () async {
+        expect(await BackgroundRefreshLog.load(), isNull);
+      });
+
+      test('recorded when a background push rescheduled', () async {
+        final before = DateTime.now().subtract(const Duration(seconds: 1));
+        await onBackgroundPush(const RemoteMessage(data: {'type': 'prayer_refresh'}));
+        final at = await BackgroundRefreshLog.load();
+        expect(at, isNotNull);
+        expect(at!.isAfter(before), isTrue);
+        expect(at.isUtc, isFalse); // shown in the phone's time
+      });
+
+      test('not when it did not reschedule, in the foreground, or for other pushes',
+          () async {
+        prayerRefresh = () async => false;
+        await onBackgroundPush(const RemoteMessage(data: {'type': 'prayer_refresh'}));
+        prayerRefresh = () async => true;
+        await handlePushData({'type': 'prayer_refresh'});
+        await onBackgroundPush(const RemoteMessage(data: {'type': 'event', 'id': 'x'}));
+        expect(await BackgroundRefreshLog.load(), isNull);
+      });
+
+      test('a real sync that fails to fetch is not recorded', () async {
+        prayerRefresh = refreshPrayerSchedules;
+        fetchResult = Exception('offline');
+        await onBackgroundPush(const RemoteMessage(data: {'type': 'prayer_refresh'}));
+        expect(await BackgroundRefreshLog.load(), isNull);
+      });
     });
   });
 }

@@ -22,10 +22,16 @@ typedef Reminder = ({
   ReminderSound sound,
 });
 
+/// The payload of the "open the app" notice: tapping it opens Prayer.
+const openPrayerPayload = 'open_prayer';
+
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
 
-  static Future<void> initialize() async {
+  /// [onOpenPrayer] runs when the notice is tapped while the app is running
+  /// or in the background. A tap that launches the app needs nothing: the
+  /// app starts on Prayer.
+  static Future<void> initialize({void Function()? onOpenPrayer}) async {
     initMosqueTime();
 
     // Permissions are requested later via requestPermissions(), not here:
@@ -40,6 +46,9 @@ class NotificationService {
           requestBadgePermission: false,
         ),
       ),
+      onDidReceiveNotificationResponse: (response) {
+        if (response.payload == openPrayerPayload) onOpenPrayer?.call();
+      },
     );
   }
 
@@ -87,8 +96,9 @@ class NotificationService {
     }
   }
 
-  /// Replaces every pending reminder with [reminders]. All date/time logic
-  /// lives in ReminderSync; this only talks to the plugin.
+  /// Replaces every pending reminder with [reminders] and the "open the app"
+  /// [notice], if any. All date/time logic and the 64-slot budget live in
+  /// ReminderSync; this only talks to the plugin.
   ///
   /// [channelName] is what Android shows for these notifications in the
   /// system settings; re-creating the channel with the same id renames it
@@ -96,6 +106,7 @@ class NotificationService {
   static Future<void> scheduleReminders(
     List<Reminder> reminders, {
     required String channelName,
+    Reminder? notice,
   }) async {
     await cancelAll();
 
@@ -125,6 +136,17 @@ class NotificationService {
         scheduledDate: r.at,
         notificationDetails: _details(r.sound, channelName),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    }
+    if (notice != null) {
+      await _plugin.zonedSchedule(
+        id: notice.id,
+        title: notice.title,
+        body: notice.body,
+        scheduledDate: notice.at,
+        notificationDetails: _details(notice.sound, channelName),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: openPrayerPayload,
       );
     }
   }

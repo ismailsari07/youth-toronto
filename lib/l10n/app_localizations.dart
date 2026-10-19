@@ -2493,6 +2493,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Jumu\'ah in 5 minutes'**
   String get reminderJumuahSoon;
+
+  /// Local notification on the last day with scheduled prayer reminders (title: prayerReminders). Moved forward every time the app syncs.
+  ///
+  /// In en, this message translates to:
+  /// **'Your prayer reminders will stop tomorrow. Open Pape Mosque once to keep them coming at the right times.'**
+  String get remindersEndingNotice;
+
+  /// About this app: when a prayer_refresh silent push last rescheduled the reminders in the background; the value is a date and time, or a dash if never.
+  ///
+  /// In en, this message translates to:
+  /// **'Last background refresh'**
+  String get lastBackgroundRefresh;
 }
 
 class _AppLocalizationsDelegate

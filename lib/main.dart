@@ -45,7 +45,9 @@ void main() async {
     debugPrint('Supabase init failed: $e');
   }
   try {
-    await NotificationService.initialize();
+    await NotificationService.initialize(
+      onOpenPrayer: () => router.go('/prayer'),
+    );
   } catch (e) {
     // Reminders are optional — never let them stop the app from opening.
     debugPrint('Notification init failed: $e');
@@ -121,7 +123,7 @@ class _MytAppState extends ConsumerState<MytApp> {
   @override
   void initState() {
     super.initState();
-    // Keep the 5-day reminder window and the iOS widget's two weeks of
+    // Keep the reminders (up to 63 ahead) and the iOS widget's two weeks of
     // times fresh: once the first frame is up, on every resume, on a pull
     // on Prayer and on a prayer_refresh silent push (see prayer_refresh.dart;
     // in the background it arrives at onBackgroundPush instead).

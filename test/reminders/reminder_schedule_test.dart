@@ -67,8 +67,10 @@ void main() {
     ReminderSettings settings, {
     AppLocalizations? l,
     ReminderSound sound = ReminderSound.standard,
+    int budget = reminderBudget,
   }) =>
-      buildReminders(days, settings, l ?? en, now: now, sound: sound);
+      buildReminders(days, settings, l ?? en,
+          now: now, sound: sound, budget: budget);
 
   const atAthan = ReminderSettings(timing: ReminderTiming.atAthan);
 
@@ -93,21 +95,16 @@ void main() {
       expect(today.every((r) => r.sound == ReminderSound.silent), isTrue);
     });
 
-    test('5 days (Sun 4 – Thu 8 Oct), at most 25, Toronto time, all ahead', () {
-      expect(reminderDays, 5);
+    test('Toronto time, all ahead, unique ids', () {
       final all = build(const ReminderSettings());
-      expect(all, hasLength(25));
-      expect(all.map((r) => r.at.day).toSet(), {4, 5, 6, 7, 8});
       expect(all.every((r) => r.at.location == mosqueTz), isTrue);
       expect(all.every((r) => r.at.isAfter(now)), isTrue);
-      expect(all.map((r) => r.id).toSet(), hasLength(25));
-      expect(build(atAthan), hasLength(25));
+      expect(all.map((r) => r.id).toSet(), hasLength(all.length));
     });
-
     test('only the chosen prayers', () {
       final some = build(const ReminderSettings(prayers: {'Fajr', 'Isha'}));
       expect(some.map((r) => r.title).toSet(), {'Fajr', 'Isha'});
-      expect(some, hasLength(10));
+      expect(some.where((r) => r.at.day == 4), hasLength(2));
     });
 
     test('nothing when the master switch is off or no prayer is chosen', () {
@@ -130,6 +127,191 @@ void main() {
       );
       final dhuhr = build(atAthan).firstWhere((r) => r.title == 'Dhuhr');
       expect(dhuhr.body, "It's time for Dhuhr prayer");
+    });
+  });
+
+  group('budget: whole days into 63 of iOS\'s 64 slots', () {
+    Set<int> daysOf(List<Reminder> r) => r.map((x) => x.at.day).toSet();
+    Set<int> range(int from, int to) => {for (var d = from; d <= to; d++) d};
+
+    test('63 for reminders, 1 for the notice, nothing else local', () {
+      expect(iosPendingLimit, 64);
+      expect(otherLocalNotifications, 0);
+      expect(reminderBudget, 63);
+      expect(reminderBudget + noticeSlots + otherLocalNotifications, 64);
+    });
+
+    test('all five prayers: 12 days (Sun 4 – Thu 15 Oct), 60 reminders', () {
+      final all = build(const ReminderSettings());
+      expect(all, hasLength(60));
+      expect(daysOf(all), range(4, 15));
+      expect(build(atAthan), hasLength(60));
+    });
+
+    test('three prayers: 21 days, exactly 63', () {
+      final all = build(const ReminderSettings(prayers: {'Fajr', 'Asr', 'Isha'}));
+      expect(all, hasLength(63));
+      expect(daysOf(all), range(4, 24));
+    });
+
+    test('one prayer: 63 days when the rows reach that far', () {
+      days = _rows(DateTime(2026, 10, 4), 70);
+      final all = build(const ReminderSettings(prayers: {'Asr'}));
+      expect(all, hasLength(63));
+      expect(all.last.at.month, 12);
+      expect(all.last.at.day, 5); // 4 Oct + 62 days
+    });
+
+    test('a partly past today still counts whole days: 3 + 12 × 5 = 63', () {
+      now = tz.TZDateTime(mosqueTz, 2026, 10, 4, 14); // after Dhuhr
+      final all = build(const ReminderSettings());
+      expect(all.where((r) => r.at.day == 4).map((r) => r.title),
+          ['Asr', 'Maghrib', 'Isha']);
+      expect(all, hasLength(63));
+      expect(daysOf(all), range(4, 16));
+    });
+
+    test('never half a day: the first day that does not fit ends it', () {
+      final all = build(const ReminderSettings(), budget: 13);
+      expect(all, hasLength(10));
+      expect(daysOf(all), {4, 5});
+    });
+
+    test("Friday swap: Jumu'ah takes Dhuhr's slot, never one more", () {
+      final friday = build(const ReminderSettings()).where((r) => r.at.day == 9);
+      expect(friday.map((r) => r.title),
+          ['Fajr', "Jumu'ah", 'Asr', 'Maghrib', 'Isha']);
+    });
+
+    test("a Friday without Jumu'ah costs one slot less, so a day may fit", () {
+      // Dhuhr, Asr, Isha: 3 a day, 2 on Fridays (9, 16, 23 Oct) without a
+      // Jumu'ah time. 18 × 3 + 3 × 2 = 60, so Sun 25 Oct fits too: 63.
+      days = _rows(DateTime(2026, 10, 4), 30, jumuah: null);
+      final all = build(const ReminderSettings(prayers: {'Dhuhr', 'Asr', 'Isha'}));
+      expect(all, hasLength(63));
+      expect(daysOf(all), range(4, 25));
+      expect(all.where((r) => r.at.day == 9).map((r) => r.title), ['Asr', 'Isha']);
+    });
+
+    test('the rows run out before the budget: they stop there, nothing filled', () {
+      days = [
+        ..._rows(DateTime(2026, 10, 4), 3),
+        _row(DateTime(2026, 10, 8)), // 7 Oct missing
+      ];
+      final all = build(const ReminderSettings());
+      expect(all, hasLength(20));
+      expect(daysOf(all), {4, 5, 6, 8});
+      final one = build(const ReminderSettings(prayers: {'Isha'}));
+      expect(daysOf(one), {4, 5, 6, 8});
+    });
+  });
+
+  group('the "open the app" notice', () {
+    Reminder? notice(ReminderSettings s, {AppLocalizations? l}) {
+      final loc = l ?? en;
+      final reminders =
+          buildReminders(days, s, loc, now: now, sound: ReminderSound.standard);
+      return buildNotice(days, reminders, loc, now: now, sound: ReminderSound.standard);
+    }
+
+    String hm(tz.TZDateTime t) =>
+        '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+
+    test('10:00 Toronto time on the last scheduled day', () {
+      final n = notice(const ReminderSettings())!;
+      expect((n.at.month, n.at.day), (10, 15));
+      expect(hm(n.at), '10:00');
+      expect(n.at.location, mosqueTz);
+      expect(n.id, noticeId);
+      expect(n.title, 'Prayer reminders');
+      expect(n.body,
+          'Your prayer reminders will stop tomorrow. Open Pape Mosque once to keep them coming at the right times.');
+      // Its id is clear of every reminder's.
+      final ids = build(const ReminderSettings(prayers: {'Asr'})).map((r) => r.id);
+      expect(ids, isNot(contains(noticeId)));
+    });
+
+    test('Turkish and French', () {
+      expect(notice(const ReminderSettings(), l: tr)!.body,
+          "Namaz hatırlatmalarınız yarın duracak. Doğru saatte gelmeye devam etmeleri için Pape Mosque'u bir kez açmanız yeterli.");
+      expect(notice(const ReminderSettings(), l: fr)!.body,
+          "Vos rappels de prière s'arrêteront demain. Ouvrez Pape Mosque une fois pour continuer à les recevoir à l'heure.");
+    });
+
+    test('follows the last scheduled day when the rows run out', () {
+      days = _rows(DateTime(2026, 10, 4), 2);
+      final n = notice(const ReminderSettings())!;
+      expect((n.at.day, hm(n.at)), (5, '10:00'));
+    });
+
+    test('silent only when the member chose silent', () {
+      final reminders = build(const ReminderSettings());
+      for (final (chosen, used) in [
+        (ReminderSound.silent, ReminderSound.silent),
+        (ReminderSound.athan, ReminderSound.standard),
+        (ReminderSound.standard, ReminderSound.standard),
+      ]) {
+        expect(buildNotice(days, reminders, en, now: now, sound: chosen)!.sound, used);
+      }
+    });
+
+    group('10:00 already passed on the last day (today)', () {
+      setUp(() => days = [_row(DateTime(2026, 10, 4))]);
+      tz.TZDateTime at(int h, int m) => tz.TZDateTime(mosqueTz, 2026, 10, 4, h, m);
+
+      test('the middle of the next prayer gap still ahead', () {
+        // Dhuhr's iqamah 13:45 → Asr 16:23.
+        now = at(11, 0);
+        expect(hm(notice(const ReminderSettings())!.at), '15:04');
+        // Asr's iqamah 16:45 → Maghrib 19:02.
+        now = at(15, 30);
+        expect(hm(notice(const ReminderSettings())!.at), '17:53');
+        // Maghrib 19:02 → Isha 20:19.
+        now = at(18, 0);
+        expect(hm(notice(const ReminderSettings())!.at), '19:40');
+      });
+
+      test('no gap left: no notice', () {
+        now = at(19, 45);
+        expect(build(const ReminderSettings()), isNotEmpty); // Isha is ahead
+        expect(notice(const ReminderSettings()), isNull);
+      });
+
+      test('never in quiet hours (21:30–08:00)', () {
+        // A summer evening: Maghrib 20:50, Isha 22:30; the gap's middle is
+        // 21:40, so nothing fits.
+        final summer = PrayerCachePayload(
+          dailyPrayerTimes: const [
+            DailyPrayerItem(name: 'Fajr', time: '3:50', iqamah: '4:30'),
+            DailyPrayerItem(name: 'Dhuhr', time: '1:20', iqamah: '1:45'),
+            DailyPrayerItem(name: 'Asr', time: '5:30', iqamah: '5:45'),
+            DailyPrayerItem(name: 'Maghrib', time: '8:50', iqamah: '8:50'),
+            DailyPrayerItem(name: 'Isha', time: '10:30', iqamah: '10:40'),
+          ],
+          hijriDate: '',
+          gregorianDate: '04.10.2026',
+        );
+        days = [(date: '2026-10-04', payload: summer)];
+        now = at(19, 30);
+        expect(notice(const ReminderSettings()), isNull);
+        // Earlier the same day, the Asr → Maghrib gap (19:17) is fine.
+        now = at(17, 0);
+        expect(hm(notice(const ReminderSettings())!.at), '19:17');
+      });
+
+      test("Friday: the gaps are around Jumu'ah, not Dhuhr", () {
+        days = [_row(DateTime(2026, 10, 9))];
+        now = tz.TZDateTime(mosqueTz, 2026, 10, 9, 11);
+        // Jumu'ah 14:00 → Asr 16:23 (Dhuhr's would give 15:04).
+        expect(hm(notice(const ReminderSettings())!.at), '15:11');
+      });
+    });
+
+    test('absent when reminders are off or nothing was scheduled', () {
+      expect(notice(const ReminderSettings(enabled: false)), isNull);
+      expect(notice(const ReminderSettings(prayers: {})), isNull);
+      days = [];
+      expect(notice(const ReminderSettings()), isNull);
     });
   });
 
@@ -174,8 +356,9 @@ void main() {
   });
 
   group('Friday: Jumu\'ah instead of Dhuhr', () {
+    // The first Friday ahead (30 Oct).
     Reminder friday(ReminderSettings s, {AppLocalizations? l}) => build(s, l: l)
-        .singleWhere((r) => r.at.weekday == DateTime.friday && r.id % 10 == 1);
+        .firstWhere((r) => r.at.weekday == DateTime.friday && r.id % 10 == 1);
 
     setUp(() {
       // Wednesday 28 October 2026, 3:00; Friday 30 October is in range.

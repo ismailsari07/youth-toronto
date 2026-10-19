@@ -1468,4 +1468,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reminderJumuahSoon => 'Prière du vendredi dans 5 minutes';
+
+  @override
+  String get remindersEndingNotice =>
+      'Vos rappels de prière s\'arrêteront demain. Ouvrez Pape Mosque une fois pour continuer à les recevoir à l\'heure.';
+
+  @override
+  String get lastBackgroundRefresh => 'Dernière actualisation en arrière-plan';
 }

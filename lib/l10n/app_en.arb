@@ -938,5 +938,13 @@
   "reminderJumuahSoon": "Jumu'ah in 5 minutes",
   "@reminderJumuahSoon": {
     "description": "Friday's reminder 5 minutes before the Jumu'ah time (title: jumuah)."
+  },
+  "remindersEndingNotice": "Your prayer reminders will stop tomorrow. Open Pape Mosque once to keep them coming at the right times.",
+  "@remindersEndingNotice": {
+    "description": "Local notification on the last day with scheduled prayer reminders (title: prayerReminders). Moved forward every time the app syncs."
+  },
+  "lastBackgroundRefresh": "Last background refresh",
+  "@lastBackgroundRefresh": {
+    "description": "About this app: when a prayer_refresh silent push last rescheduled the reminders in the background; the value is a date and time, or a dash if never."
   }
 }

@@ -24,7 +24,10 @@ void main() {
 
   testWidgets('pull to refresh reschedules reminders and the widget', (tester) async {
     var refreshes = 0;
-    prayerRefresh = () async => refreshes++;
+    prayerRefresh = () async {
+      refreshes++;
+      return true;
+    };
     final today = mosqueNow();
     await tester.pumpWidget(
       ProviderScope(

@@ -457,5 +457,7 @@
   "keyboardPrevious": "Champ précédent",
   "keyboardNext": "Champ suivant",
   "reminderJumuahNow": "C'est l'heure de la prière du vendredi",
-  "reminderJumuahSoon": "Prière du vendredi dans 5 minutes"
+  "reminderJumuahSoon": "Prière du vendredi dans 5 minutes",
+  "remindersEndingNotice": "Vos rappels de prière s'arrêteront demain. Ouvrez Pape Mosque une fois pour continuer à les recevoir à l'heure.",
+  "lastBackgroundRefresh": "Dernière actualisation en arrière-plan"
 }

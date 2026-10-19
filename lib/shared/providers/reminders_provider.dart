@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/notification_sounds.dart';
+import '../../core/prayer_refresh.dart';
 import '../../core/reminder_settings.dart';
 import '../../core/reminder_sync.dart';
 
@@ -16,6 +17,11 @@ final reminderSettingsProvider =
 /// Whether this build carries the athan recording (see [NotificationSounds]).
 final athanBundledProvider =
     FutureProvider<bool>((ref) => NotificationSounds.athanBundled());
+
+/// When a prayer_refresh silent push last rescheduled the reminders in the
+/// background (null: never). Read again each time the About sheet opens.
+final lastBackgroundRefreshProvider =
+    FutureProvider.autoDispose<DateTime?>((ref) => BackgroundRefreshLog.load());
 
 class ReminderSettingsNotifier extends AsyncNotifier<ReminderSettings> {
   @override

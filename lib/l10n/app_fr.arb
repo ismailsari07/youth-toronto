@@ -455,5 +455,7 @@
   "regErrRejected": "Réponse refusée. Mettez l'application à jour.",
   "keyboardDone": "Terminé",
   "keyboardPrevious": "Champ précédent",
-  "keyboardNext": "Champ suivant"
+  "keyboardNext": "Champ suivant",
+  "reminderJumuahNow": "C'est l'heure de la prière du vendredi",
+  "reminderJumuahSoon": "Prière du vendredi dans 5 minutes"
 }

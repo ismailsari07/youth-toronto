@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../prayer_refresh.dart';
 import 'push_prompt.dart';
 
 /// The device side of push: iOS permission, the FCM token and taps. Behind
@@ -29,6 +30,11 @@ abstract class PushPlatform {
   /// Data of the notification that launched the app, if one did.
   Future<Map<String, dynamic>?> initialOpen();
 
+  /// Data of messages that arrive while the app is open, silent ones
+  /// (prayer_refresh) included. In the background they go to
+  /// [onBackgroundPush] instead.
+  Stream<Map<String, dynamic>> get received;
+
   /// This app's page in the iOS Settings app.
   Future<void> openSystemSettings();
 
@@ -40,6 +46,8 @@ abstract class PushPlatform {
       await Firebase.initializeApp();
       // The system banner while the app is open; tapping it arrives on
       // [opened] like any other tap. No badge anywhere.
+      // Silent prayer_refresh pushes while the app is in the background.
+      FirebaseMessaging.onBackgroundMessage(onBackgroundPush);
       await FirebaseMessaging.instance
           .setForegroundNotificationPresentationOptions(
         alert: true,
@@ -105,6 +113,10 @@ class FirebasePushPlatform implements PushPlatform {
       (await _messaging.getInitialMessage())?.data;
 
   @override
+  Stream<Map<String, dynamic>> get received =>
+      FirebaseMessaging.onMessage.map((m) => m.data);
+
+  @override
   Future<void> openSystemSettings() async {
     try {
       await launchUrl(Uri.parse('app-settings:'));
@@ -134,6 +146,9 @@ class UnsupportedPushPlatform implements PushPlatform {
 
   @override
   Future<Map<String, dynamic>?> initialOpen() async => null;
+
+  @override
+  Stream<Map<String, dynamic>> get received => const Stream.empty();
 
   @override
   Future<void> openSystemSettings() async {}

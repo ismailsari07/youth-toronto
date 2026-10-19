@@ -930,5 +930,13 @@
   "keyboardNext": "Next field",
   "@keyboardNext": {
     "description": "VoiceOver label of an arrow on the keyboard accessory bar."
+  },
+  "reminderJumuahNow": "It's time for Jumu'ah prayer",
+  "@reminderJumuahNow": {
+    "description": "Friday's Dhuhr reminder, at the Jumu'ah time (title: jumuah)."
+  },
+  "reminderJumuahSoon": "Jumu'ah in 5 minutes",
+  "@reminderJumuahSoon": {
+    "description": "Friday's reminder 5 minutes before the Jumu'ah time (title: jumuah)."
   }
 }

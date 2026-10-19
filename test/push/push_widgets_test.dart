@@ -231,6 +231,11 @@ void main() {
         const ProfileRootScreen(),
         local: const PushLocal(saved: true, deviceCode: 'K7QM2X9P'),
       );
+      // Taller than the default 800×600: Profile also lists Prayer reminders.
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpAndSettle();
       final row = find.text('About this app');
       await tester.scrollUntilVisible(row, 200);
       await tester.tap(row);

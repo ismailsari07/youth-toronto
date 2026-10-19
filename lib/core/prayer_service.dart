@@ -28,28 +28,38 @@ class PrayerService {
     }
   }
 
-  /// Rows from Toronto-yesterday onward, oldest first, keyed by date.
-  /// Yesterday is included as a fallback for the hours before the daily
-  /// cron writes today's row. Throws on failure so callers can keep what
-  /// they already have.
-  static Future<List<({String date, PrayerCachePayload payload})>>
-      fetchRecentDays() async {
+  /// The rows from [first] to [last] days from today (Toronto calendar,
+  /// inclusive), oldest first. Only rows that are really there: a missing
+  /// day stays missing, and a row that can't be read is dropped rather than
+  /// failing the rest. Throws when the call itself fails, so callers can
+  /// keep what they already have.
+  static Future<List<({String date, PrayerCachePayload payload})>> fetchDays({
+    required int first,
+    required int last,
+  }) async {
     // Calendar-day step (not 24h), so a DST change can't skip a date.
     final now = mosqueNow();
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final from = DateTime(now.year, now.month, now.day + first);
+    final to = DateTime(now.year, now.month, now.day + last);
     final rows = await Supabase.instance.client
         .from('prayer_cache')
         .select('date, payload')
-        .gte('date', mosqueDateKey(yesterday))
+        .gte('date', mosqueDateKey(from))
+        .lte('date', mosqueDateKey(to))
         .order('date');
-    return [
-      for (final row in rows)
-        (
+    final days = <({String date, PrayerCachePayload payload})>[];
+    for (final row in rows) {
+      try {
+        days.add((
           date: row['date'] as String,
           payload: PrayerCachePayload.fromJson(
             row['payload'] as Map<String, dynamic>,
           ),
-        ),
-    ];
+        ));
+      } catch (_) {
+        // Unreadable: that day has no data.
+      }
+    }
+    return days;
   }
 }

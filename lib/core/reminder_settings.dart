@@ -1,5 +1,5 @@
 /// When a prayer notification arrives. Only one at a time, so the schedule
-/// stays at most 5 prayers × 7 days = 35 (iOS keeps at most 64).
+/// stays at most 5 prayers × 5 days = 25 (iOS keeps at most 64).
 enum ReminderTiming { atAthan, beforeIqamah }
 
 /// The sound of the athan-time notification. The 5-minutes-before-iqamah

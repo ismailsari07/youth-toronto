@@ -11,7 +11,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 /// One prayer_cache row as pape-api stores it: afternoon and evening times
 /// on a 12-hour clock with no AM/PM.
-PrayerCachePayload _payload({String fajr = '5:43'}) => PrayerCachePayload(
+PrayerCachePayload _payload({String fajr = '5:43', required String date}) => PrayerCachePayload(
   dailyPrayerTimes: [
     DailyPrayerItem(name: 'Fajr', time: fajr, iqamah: '6:45'),
     const DailyPrayerItem(name: 'Sunrise', time: '7:11'),
@@ -21,22 +21,26 @@ PrayerCachePayload _payload({String fajr = '5:43'}) => PrayerCachePayload(
     const DailyPrayerItem(name: 'Isha', time: '8:19', iqamah: '8:30'),
   ],
   hijriDate: '23.4.1448',
-  gregorianDate: '04.10.2026',
+  gregorianDate: date,
 );
+
+/// A real row for [day]: its own date, Diyanet's date to match.
+PrayerDay _row(DateTime day, {String fajr = '5:43'}) =>
+    (date: mosqueDateKey(day), payload: _payload(fajr: fajr, date: diyanetDate(day)));
 
 void main() {
   setUpAll(initMosqueTime);
 
   // Sunday 4 October 2026, 10:00 in Toronto.
   late tz.TZDateTime now;
-  // prayer_cache holds yesterday and today; later days reuse today's times.
+  // The 30-day window: yesterday and a month ahead.
   late List<PrayerDay> days;
 
   setUp(() {
     now = tz.TZDateTime(mosqueTz, 2026, 10, 4, 10);
     days = [
-      (date: '2026-10-03', payload: _payload(fajr: '5:42')),
-      (date: '2026-10-04', payload: _payload()),
+      _row(DateTime(2026, 10, 3), fajr: '5:42'),
+      for (var i = 0; i < 30; i++) _row(DateTime(2026, 10, 4 + i)),
     ];
   });
 
@@ -46,20 +50,32 @@ void main() {
   List<Map<String, Object?>> prayers(Map<String, Object?> data) =>
       (data['prayers']! as List).cast<Map<String, Object?>>();
 
-  test('covers yesterday plus the next 7 days, six times a day', () {
+  test('covers yesterday, today and the next 13 days, six times a day', () {
     final list = prayers(build('en'));
     final dates = list.map((p) => p['day']).toSet().toList();
-    expect(dates, [
-      '2026-10-03',
-      '2026-10-04',
-      '2026-10-05',
-      '2026-10-06',
-      '2026-10-07',
-      '2026-10-08',
-      '2026-10-09',
-      '2026-10-10',
-    ]);
-    expect(list, hasLength(8 * 6));
+    expect(dates, [for (var d = 3; d <= 17; d++) '2026-10-${d.toString().padLeft(2, '0')}']);
+    expect(list, hasLength(15 * 6));
+  });
+
+  test('a day without its own row is left out, never filled', () {
+    days = [_row(DateTime(2026, 10, 4)), _row(DateTime(2026, 10, 6))];
+    final dates = prayers(build('en')).map((p) => p['day']).toSet();
+    expect(dates, {'2026-10-04', '2026-10-06'});
+  });
+
+  test('the data ends where the rows end (the widget then says "open the app")', () {
+    days = [_row(DateTime(2026, 10, 3)), _row(DateTime(2026, 10, 4))];
+    final dates = prayers(build('en')).map((p) => p['day']).toSet();
+    expect(dates, {'2026-10-03', '2026-10-04'});
+  });
+
+  test("a row whose Diyanet date isn't its own is left out", () {
+    days = [
+      _row(DateTime(2026, 10, 4)),
+      (date: '2026-10-05', payload: _payload(date: '06.10.2026')),
+    ];
+    final dates = prayers(build('en')).map((p) => p['day']).toSet();
+    expect(dates, {'2026-10-04'});
   });
 
   test('prayers are in time order, as Unix seconds on the mosque clock', () {
@@ -126,7 +142,7 @@ void main() {
     final data = build('en');
     final round = jsonDecode(jsonEncode(data)) as Map<String, Object?>;
     expect(round['version'], 1);
-    expect(round['prayers'], hasLength(48));
+    expect(round['prayers'], hasLength(15 * 6));
   });
 
   test('no rows at all gives no prayers rather than invented times', () {

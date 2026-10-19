@@ -1,11 +1,10 @@
-/// Prayer reminders are switched off while their times can be wrong for
-/// members who don't open the app for a few days (prayer_cache only holds
-/// today's row). While false: nothing is scheduled, every reminder an
-/// earlier build left on the phone is cancelled at launch, the permission
-/// is never asked for, and the bell, the reminders sheet and the reminder
-/// rows are hidden. The code and strings stay; set to true to bring it all
-/// back.
-const bool kPrayerRemindersEnabled = false;
+/// Prayer reminders (back since 1.3.0, off 1.0.2–1.2.x). They were off
+/// while prayer_cache held only today's row and the app filled later days
+/// with it. Now the rows cover about 30 days and the app schedules only from
+/// real rows (scheduleDays), 5 days ahead. While false: nothing is
+/// scheduled, every pending reminder is cancelled at launch, and the bell,
+/// the reminders sheet and the reminder rows are hidden.
+const bool kPrayerRemindersEnabled = true;
 
 /// Sign in with Google is postponed (1.1.0 ships Apple only). The code
 /// stays (AuthService.signInWithGoogle, the button in

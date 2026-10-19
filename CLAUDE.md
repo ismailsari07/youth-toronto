@@ -69,8 +69,8 @@ pape-admin (§3 `push_devices`, §5). Code: `lib/core/push/`, `lib/shared/provid
   the app's notifications. Taps route via `pushRoute()` to
   `/community/event/:id` / `/community/announcement/:id` (loaded by id, published filter), else Community.
 - `AppDelegate` keeps itself as the notification-center delegate, so Firebase doesn't replace it; both
-  plugins get every callback. When prayer reminders come back, check that a foreground reminder isn't
-  presented twice (both plugins answer `willPresent` for local notifications).
+  plugins get every callback. Prayer reminders are back (1.3.0): on the phone, check that a foreground reminder
+  isn't presented twice (both plugins answer `willPresent` for local notifications).
 - Firebase pinned to `firebase_core` 4.x / `firebase_messaging` 16.x; 17.0 (Firebase iOS SDK 13) is untested.
 
 ## Sign in with Apple and Google (since 1.1.0)
@@ -138,6 +138,30 @@ The keyboard always has a way out (TestFlight 1.2.0: number, phone and multi-lin
 - A submit button that must stay visible while typing lives in the body, not `bottomNavigationBar` (the keyboard covers
   that slot). The registration form does this and hides its "can't be cancelled" line while the keyboard is up: on an
   iPhone SE that leaves about 150 pt of form between the nav bar and Send.
+
+## Prayer reminders (back since 1.3.0)
+
+Owner's hard rule: a prayer notification must NEVER fire at a wrong time. If real data runs out, reminders stop; no
+estimates, no filling, no carrying a day forward (pape-admin `docs/prayer-range-migrations.md`). `prayer_cache` holds a
+rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/reminder_sync.dart`, `prayer_days.dart`,
+`prayer_refresh.dart`; tests `test/reminders/`, `test/widget/prayer_widget_data_test.dart`. Decided 2026-10-19.
+
+- `scheduleDays` uses a day only if it has its own row whose `gregorianDate` is that date; nothing is ever filled. The
+  reminders and the widget share it. Reminders: today + 4 days (`reminderDays = 5`, ≤ 25 pending; iOS keeps 64). Widget:
+  yesterday + 14 days; after the last row it shows "open the app".
+- Friday's Dhuhr is Jumu'ah: title `jumuah`, at that Friday row's `jumaaPrayerTime` (as both athan and iqamah, so "5 min
+  before" = 5 min before it); no readable Jumu'ah time → no Dhuhr reminder that day. Follows the Dhuhr switch.
+- Default: a saved on/off wins; with none, on only if iOS already allows notifications (e.g. after the push pre-prompt).
+  The iOS prompt never appears on its own: only `sync(ask: true)` from the reminders sheet asks. No "reminders stop"
+  notice (owner rejected it, 2026-10-10).
+- Rescheduled on launch, resume, pull-to-refresh on Prayer, settings/language changes, and the `prayer_refresh` silent
+  push (pape-admin sends it after any change to a row dated today or later, debounced; FCM data
+  `{"type":"prayer_refresh"}`, `content-available`). Foreground: `PushPlatform.received`; background:
+  `onBackgroundPush`, which FlutterFire runs on iOS on the app's own engine, so the widget bridge is there too. iOS
+  may not deliver it (app swiped away, Low Power Mode, Background App Refresh off); the 5-day horizon bounds the damage.
+  A failed fetch keeps what's scheduled (it came from real rows); an empty answer clears it.
+- No bell on the Prayer hero: next to the Donate pill it cut the mosque line on an iPhone SE. Reminders open from the
+  row under the prayer times, Profile and Settings.
 
 ## Release checklist
 

@@ -1462,4 +1462,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get keyboardNext => 'Champ suivant';
+
+  @override
+  String get reminderJumuahNow => 'C\'est l\'heure de la prière du vendredi';
+
+  @override
+  String get reminderJumuahSoon => 'Prière du vendredi dans 5 minutes';
 }

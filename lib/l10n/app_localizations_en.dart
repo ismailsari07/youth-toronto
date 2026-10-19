@@ -1445,4 +1445,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keyboardNext => 'Next field';
+
+  @override
+  String get reminderJumuahNow => 'It\'s time for Jumu\'ah prayer';
+
+  @override
+  String get reminderJumuahSoon => 'Jumu\'ah in 5 minutes';
 }

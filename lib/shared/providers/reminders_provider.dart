@@ -52,12 +52,13 @@ class ReminderSettingsNotifier extends AsyncNotifier<ReminderSettings> {
   Future<void> setSound(ReminderSound sound) =>
       _save(_current.copyWith(sound: sound));
 
-  /// Shows the change at once, saves it, then re-syncs: scheduling (and the
-  /// permission prompt) when on, cancelling when off. Completes once the
-  /// sync has run.
+  /// Shows the change at once, saves it, then re-syncs: scheduling when on
+  /// (the only place the iOS permission prompt may appear: the member just
+  /// asked for reminders), cancelling when off. Completes once the sync has
+  /// run.
   Future<void> _save(ReminderSettings next) async {
     state = AsyncData(next);
     await ReminderSync.saveSettings(next);
-    await ReminderSync.sync();
+    await ReminderSync.sync(ask: next.active);
   }
 }

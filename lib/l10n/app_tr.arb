@@ -455,5 +455,7 @@
   "regErrRejected": "Bu yanıt kabul edilmedi. Uygulamayı güncelle.",
   "keyboardDone": "Bitti",
   "keyboardPrevious": "Önceki alan",
-  "keyboardNext": "Sonraki alan"
+  "keyboardNext": "Sonraki alan",
+  "reminderJumuahNow": "Cuma namazı vakti",
+  "reminderJumuahSoon": "Cuma namazına 5 dakika kaldı"
 }

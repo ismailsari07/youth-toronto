@@ -8,7 +8,7 @@ import '../../../core/feature_flags.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
 import '../../../core/prayer_utils.dart';
-import '../../../core/prayer_widget_sync.dart';
+import '../../../core/prayer_refresh.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/content_provider.dart';
@@ -60,8 +60,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         // The panel's content too, so a new banner shows on a pull.
         ref.read(contentProvider.notifier).refresh(force: true);
         await ref.read(prayerProvider.future);
-        // The home-screen widget picks up any corrected times too.
-        PrayerWidgetSync.sync();
+        // Reminders and the home-screen widget pick up corrected times too.
+        prayerRefresh();
       },
       padding: const EdgeInsets.fromLTRB(
         AppSpace.pageGutter,

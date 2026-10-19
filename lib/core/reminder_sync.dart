@@ -5,6 +5,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../l10n/l10n.dart';
 import '../shared/formatters.dart';
 import 'feature_flags.dart';
+import 'models.dart';
 import 'mosque_time.dart';
 import 'notification_service.dart';
 import 'notification_sounds.dart';
@@ -14,10 +15,13 @@ import 'reminder_settings.dart';
 
 /// Keeps this device's prayer notifications in step with the mosque
 /// schedule and the member's choices: the chosen prayers, at athan time or
-/// 5 minutes before the iqamah, 7 days ahead, in Toronto time.
+/// 5 minutes before the iqamah, [reminderDays] days ahead, in Toronto time,
+/// only from real prayer_cache rows (see [scheduleDays]).
 ///
-/// The settings live on the device (notifications are per device), so they
-/// work signed in or out. The server's notifications_enabled is not read.
+/// Runs on launch, on resume, on pull-to-refresh, on a settings or language
+/// change and on a `prayer_refresh` silent push (see
+/// prayer_refresh_background.dart). The settings live on the device
+/// (notifications are per device), so they work signed in or out.
 class ReminderSync {
   static const _enabledKey = 'prayer_reminders_enabled';
   static const _prayersKey = 'prayer_reminders_prayers';
@@ -26,15 +30,38 @@ class ReminderSync {
 
   static Future<void>? _inFlight;
   static bool _rerun = false;
+  static bool _askQueued = false;
 
-  /// Keys written before a setting existed read as its default, so
-  /// existing members keep the original behaviour (see [ReminderSettings]).
+  /// Whether iOS lets the app show notifications (null: can't tell). Never
+  /// prompts. Replaced in tests.
+  @visibleForTesting
+  static Future<bool?> Function() permissionGranted =
+      NotificationService.notificationsAllowed;
+
+  /// Shows the iOS prompt the first time, then returns the stored answer.
+  /// Replaced in tests.
+  @visibleForTesting
+  static Future<bool> Function() askPermission = NotificationService.requestPermissions;
+
+  /// The rows, and the plugin call that replaces every pending reminder.
+  /// Replaced in tests.
+  @visibleForTesting
+  static Future<List<PrayerDay>> Function({required int first, required int last})
+      fetchDays = PrayerService.fetchDays;
+  @visibleForTesting
+  static Future<void> Function(List<Reminder>, {required String channelName})
+      schedule = NotificationService.scheduleReminders;
+
+  /// A saved choice always wins. With none (a new install, or one that
+  /// never touched the settings), reminders are on only if iOS already
+  /// allows notifications, e.g. after the push pre-prompt; otherwise off.
+  /// Other missing keys read as their defaults (see [ReminderSettings]).
   static Future<ReminderSettings> loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final prayers = prefs.getStringList(_prayersKey);
       return ReminderSettings(
-        enabled: prefs.getBool(_enabledKey) ?? true,
+        enabled: prefs.getBool(_enabledKey) ?? await permissionGranted() == true,
         prayers: prayers == null
             ? ReminderSettings.allPrayers
             : prayers.where(ReminderSettings.allPrayers.contains).toSet(),
@@ -44,7 +71,7 @@ class ReminderSync {
       );
     } catch (e) {
       debugPrint('ReminderSync: reading settings failed: $e');
-      return const ReminderSettings();
+      return const ReminderSettings(enabled: false);
     }
   }
 
@@ -60,7 +87,12 @@ class ReminderSync {
   /// Safe to call any time; never throws. Only one run at a time: a call made
   /// during a run (e.g. a switch flipped mid-sync) queues one fresh run
   /// afterwards, so the latest settings and data always win.
-  static Future<void> sync() {
+  ///
+  /// [ask]: the member just turned reminders on, so iOS may show its
+  /// permission prompt. Every other caller (launch, resume, refresh, push)
+  /// leaves it false: the prompt never appears on its own.
+  static Future<void> sync({bool ask = false}) {
+    _askQueued |= ask;
     if (_inFlight != null) {
       _rerun = true;
       return _inFlight!;
@@ -72,14 +104,16 @@ class ReminderSync {
     try {
       do {
         _rerun = false;
-        await _run();
+        final ask = _askQueued;
+        _askQueued = false;
+        await _run(ask: ask);
       } while (_rerun);
     } finally {
       _inFlight = null;
     }
   }
 
-  static Future<void> _run() async {
+  static Future<void> _run({required bool ask}) async {
     try {
       if (!kPrayerRemindersEnabled) {
         // Switched off: cancel anything an earlier build scheduled, and
@@ -92,17 +126,19 @@ class ReminderSync {
         await NotificationService.cancelAll();
         return;
       }
-      await NotificationService.requestPermissions();
+      final allowed = ask ? await askPermission() : await permissionGranted();
+      // Not allowed: nothing would show. The sheet explains it.
+      if (allowed == false) return;
 
       final List<PrayerDay> days;
       try {
-        days = await PrayerService.fetchRecentDays();
+        days = await fetchDays(first: 0, last: reminderDays - 1);
       } catch (e) {
-        // Offline or server error: keep the notifications already scheduled.
+        // Offline or server error: keep the notifications already
+        // scheduled. They came from real rows.
         debugPrint('ReminderSync: loading prayer days failed: $e');
         return;
       }
-      if (days.isEmpty) return;
 
       // Notification text is fixed when scheduled, so it is written in the
       // language the app shows now; changing language re-runs this sync.
@@ -110,7 +146,8 @@ class ReminderSync {
       final sound = settings.soundWith(
         athanBundled: await NotificationSounds.athanBundled(),
       );
-      await NotificationService.scheduleReminders(
+      // No rows at all is real too: everything pending is cleared.
+      await schedule(
         buildReminders(days, settings, l, now: mosqueNow(), sound: sound),
         channelName: l.prayerReminders,
       );
@@ -121,16 +158,22 @@ class ReminderSync {
 }
 
 const _prayerOrder = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-const _daysAhead = 7; // 7 × 5 prayers = 35, under iOS's 64 cap
 const _leadTime = Duration(minutes: 5);
 
-/// Every notification [settings] asks for over the next 7 mosque-calendar
-/// days from [now], in time order. At athan time they use [sound]; 5
-/// minutes before the iqamah, always the standard sound.
+/// How many mosque-calendar days are scheduled, today included: at most
+/// 5 × 5 = 25 pending, well under iOS's 64. Short on purpose: a correction
+/// the app hasn't heard about (no silent push, app not opened) can only
+/// stay wrong this long, and a phone that never syncs stops after it.
+const reminderDays = 5;
+
+/// Every notification [settings] asks for over the next [reminderDays]
+/// mosque-calendar days from [now], in time order, from real rows only (a
+/// day without its own row gets nothing). At athan time they use [sound];
+/// 5 minutes before the iqamah, always the standard sound.
 ///
-/// No row yet for future days (prayer_cache only holds up to today):
-/// scheduleDays uses the latest known day's times, refreshed on every
-/// open/resume.
+/// Friday's Dhuhr is Jumu'ah: "Cuma namazı" at that row's
+/// `jumaaPrayerTime`, used as both the athan and the iqamah time. A Friday
+/// without a readable Jumu'ah time gets no Dhuhr reminder (never Dhuhr's).
 List<Reminder> buildReminders(
   List<PrayerDay> days,
   ReminderSettings settings,
@@ -143,10 +186,16 @@ List<Reminder> buildReminders(
   final reminders = <Reminder>[];
 
   for (final (offset: i, :day, :payload)
-      in scheduleDays(days, now, count: _daysAhead)) {
+      in scheduleDays(days, now, count: reminderDays)) {
     for (final item in payload.dailyPrayerTimes) {
       final index = _prayerOrder.indexOf(item.name);
       if (index < 0 || !settings.prayers.contains(item.name)) continue;
+      if (item.name == 'Dhuhr' && day.weekday == DateTime.friday) {
+        final jumuah = _jumuah(i, index, day, payload, l,
+            now: now, atAthan: atAthan, sound: sound);
+        if (jumuah != null) reminders.add(jumuah);
+        continue;
+      }
       final key = item.name.toLowerCase();
       final iqamah = item.iqamah;
       final iqamahKnown =
@@ -177,4 +226,28 @@ List<Reminder> buildReminders(
     }
   }
   return reminders;
+}
+
+Reminder? _jumuah(
+  int offset,
+  int index,
+  DateTime day,
+  PrayerCachePayload payload,
+  AppLocalizations l, {
+  required tz.TZDateTime now,
+  required bool atAthan,
+  required ReminderSound sound,
+}) {
+  final time = payload.jumaaPrayerTime;
+  final moment = time == null ? null : prayerMoment(day, 'Dhuhr', time);
+  if (moment == null) return null;
+  final at = atAthan ? moment : moment.subtract(_leadTime);
+  if (!at.isAfter(now)) return null;
+  return (
+    id: offset * 10 + index,
+    title: l.jumuah,
+    body: atAthan ? l.reminderJumuahNow : l.reminderJumuahSoon,
+    at: at,
+    sound: atAthan ? sound : ReminderSound.standard,
+  );
 }

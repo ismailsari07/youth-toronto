@@ -1439,4 +1439,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get keyboardNext => 'Sonraki alan';
+
+  @override
+  String get reminderJumuahNow => 'Cuma namazı vakti';
+
+  @override
+  String get reminderJumuahSoon => 'Cuma namazına 5 dakika kaldı';
 }

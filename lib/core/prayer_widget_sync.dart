@@ -12,18 +12,21 @@ import 'prayer_service.dart';
 /// Feeds the iOS home-screen and lock-screen widgets (ios/PrayerWidget).
 ///
 /// The widget never touches the network: it reads one JSON document the app
-/// writes into the shared App Group, holding a week of prayer instants with
-/// their names and times already localised and formatted. It builds its own
-/// timeline from that, so it stays right for days without the app opening.
+/// writes into the shared App Group, holding up to two weeks of prayer
+/// instants with their names and times already localised and formatted. It
+/// builds its own timeline from that, so it stays right for days without
+/// the app opening, and shows "open the app" once the data runs out.
 ///
 /// Times come from the same rows and day rules as the reminders
-/// ([scheduleDays]), on the mosque's clock. Only prayer times are stored.
+/// ([scheduleDays]: real rows only, nothing filled in), on the mosque's
+/// clock. Only prayer times are stored.
 class PrayerWidgetSync {
   static const _channel = MethodChannel('ca.papemosque.app/prayer_widget');
 
-  /// Yesterday (so the widget knows which window it starts in) plus 7 days.
+  /// Yesterday (so the widget knows which window it starts in), today and
+  /// the next 13 days: whatever of that prayer_cache really holds.
   static const _firstDay = -1;
-  static const _dayCount = 8;
+  static const _dayCount = 15;
 
   static Future<void>? _inFlight;
   static bool _rerun = false;
@@ -60,12 +63,17 @@ class PrayerWidgetSync {
     try {
       List<PrayerDay>? days;
       try {
-        days = _lastDays = await PrayerService.fetchRecentDays();
+        days = _lastDays = await PrayerService.fetchDays(
+          first: _firstDay,
+          last: _firstDay + _dayCount - 1,
+        );
       } catch (_) {
         // Offline: keep what the widget has, unless we can re-localise it.
         days = _lastDays;
       }
-      if (days == null || days.isEmpty) return;
+      // Never fetched: keep what the widget has. An empty answer is real
+      // and is written: the widget then shows "open the app".
+      if (days == null) return;
 
       final l = await currentAppLocalizations();
       final data = buildPrayerWidgetData(days, l, mosqueNow());

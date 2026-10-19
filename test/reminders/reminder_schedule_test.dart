@@ -14,8 +14,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 /// One prayer_cache row as pape-api stores it: afternoon and evening times
-/// on a 12-hour clock with no AM/PM.
-PrayerCachePayload _payload({String? dhuhrIqamah = '1:45'}) =>
+/// on a 12-hour clock with no AM/PM. [date] is its Diyanet date
+/// (DD.MM.YYYY), which must be the row's own.
+PrayerCachePayload _payload({
+  String? dhuhrIqamah = '1:45',
+  String date = '04.10.2026',
+  String? jumuah = '2:00',
+}) =>
     PrayerCachePayload(
       dailyPrayerTimes: [
         const DailyPrayerItem(name: 'Fajr', time: '5:43', iqamah: '6:45'),
@@ -26,7 +31,19 @@ PrayerCachePayload _payload({String? dhuhrIqamah = '1:45'}) =>
         const DailyPrayerItem(name: 'Isha', time: '8:19', iqamah: '8:30'),
       ],
       hijriDate: '23.4.1448',
-      gregorianDate: '04.10.2026',
+      gregorianDate: date,
+      jumaaPrayerTime: jumuah,
+    );
+
+/// Real rows for [count] days from [from], each with its own date.
+List<PrayerDay> _rows(DateTime from, int count, {String? jumuah = '2:00'}) => [
+      for (var i = 0; i < count; i++)
+        _row(DateTime(from.year, from.month, from.day + i), jumuah: jumuah),
+    ];
+
+PrayerDay _row(DateTime day, {String? jumuah = '2:00', String? diyanetDay}) => (
+      date: mosqueDateKey(day),
+      payload: _payload(date: diyanetDay ?? diyanetDate(day), jumuah: jumuah),
     );
 
 void main() {
@@ -42,7 +59,8 @@ void main() {
 
   setUp(() {
     now = tz.TZDateTime(mosqueTz, 2026, 10, 4, 3);
-    days = [(date: '2026-10-04', payload: _payload())];
+    // The 30-day window: far more rows than the horizon.
+    days = _rows(DateTime(2026, 10, 4), 30);
   });
 
   List<Reminder> build(
@@ -75,19 +93,21 @@ void main() {
       expect(today.every((r) => r.sound == ReminderSound.silent), isTrue);
     });
 
-    test('7 days, at most 35, all in Toronto time and in the future', () {
+    test('5 days (Sun 4 – Thu 8 Oct), at most 25, Toronto time, all ahead', () {
+      expect(reminderDays, 5);
       final all = build(const ReminderSettings());
-      expect(all, hasLength(35));
+      expect(all, hasLength(25));
+      expect(all.map((r) => r.at.day).toSet(), {4, 5, 6, 7, 8});
       expect(all.every((r) => r.at.location == mosqueTz), isTrue);
       expect(all.every((r) => r.at.isAfter(now)), isTrue);
-      expect(all.map((r) => r.id).toSet(), hasLength(35));
-      expect(build(atAthan), hasLength(35));
+      expect(all.map((r) => r.id).toSet(), hasLength(25));
+      expect(build(atAthan), hasLength(25));
     });
 
     test('only the chosen prayers', () {
       final some = build(const ReminderSettings(prayers: {'Fajr', 'Isha'}));
       expect(some.map((r) => r.title).toSet(), {'Fajr', 'Isha'});
-      expect(some, hasLength(14));
+      expect(some, hasLength(10));
     });
 
     test('nothing when the master switch is off or no prayer is chosen', () {
@@ -110,6 +130,118 @@ void main() {
       );
       final dhuhr = build(atAthan).firstWhere((r) => r.title == 'Dhuhr');
       expect(dhuhr.body, "It's time for Dhuhr prayer");
+    });
+  });
+
+  group('real rows only (owner: never a wrong time)', () {
+    Set<int> daysOf(List<Reminder> r) => r.map((x) => x.at.day).toSet();
+
+    test('a day without its own row gets nothing; it is never filled', () {
+      days = [
+        _row(DateTime(2026, 10, 4)),
+        _row(DateTime(2026, 10, 5)),
+        _row(DateTime(2026, 10, 7)),
+      ];
+      expect(daysOf(build(const ReminderSettings())), {4, 5, 7});
+    });
+
+    test('when the data runs out, the reminders stop', () {
+      days = _rows(DateTime(2026, 10, 4), 2);
+      final all = build(const ReminderSettings());
+      expect(daysOf(all), {4, 5});
+      expect(all, hasLength(10));
+    });
+
+    test("yesterday's row never stands in for today", () {
+      days = [_row(DateTime(2026, 10, 3))];
+      expect(build(const ReminderSettings()), isEmpty);
+      expect(build(atAthan), isEmpty);
+    });
+
+    test("a row whose Diyanet date isn't its own is skipped", () {
+      days = [
+        _row(DateTime(2026, 10, 4)),
+        // The 2026-10-01 kind of row: another day's data under this date.
+        _row(DateTime(2026, 10, 5), diyanetDay: '06.10.2026'),
+      ];
+      expect(daysOf(build(const ReminderSettings())), {4});
+    });
+
+    test('no rows: nothing', () {
+      days = [];
+      expect(build(const ReminderSettings()), isEmpty);
+    });
+  });
+
+  group('Friday: Jumu\'ah instead of Dhuhr', () {
+    Reminder friday(ReminderSettings s, {AppLocalizations? l}) => build(s, l: l)
+        .singleWhere((r) => r.at.weekday == DateTime.friday && r.id % 10 == 1);
+
+    setUp(() {
+      // Wednesday 28 October 2026, 3:00; Friday 30 October is in range.
+      now = tz.TZDateTime(mosqueTz, 2026, 10, 28, 3);
+      days = _rows(DateTime(2026, 10, 28), 10);
+    });
+
+    test("at athan time: at the row's jumaaPrayerTime, not Dhuhr's athan", () {
+      final r = friday(atAthan);
+      expect((r.at.hour, r.at.minute), (14, 0));
+      expect(r.title, "Jumu'ah");
+      expect(r.body, "It's time for Jumu'ah prayer");
+      expect(r.id, 21);
+    });
+
+    test('5 minutes before: 5 minutes before the Jumu\'ah time', () {
+      final r = friday(const ReminderSettings());
+      expect((r.at.hour, r.at.minute), (13, 55));
+      expect(r.body, "Jumu'ah in 5 minutes");
+      expect(r.sound, ReminderSound.standard);
+    });
+
+    test('Turkish and French', () {
+      expect(friday(atAthan, l: tr).title, 'Cuma namazı');
+      expect(friday(atAthan, l: tr).body, 'Cuma namazı vakti');
+      expect(friday(const ReminderSettings(), l: tr).body, 'Cuma namazına 5 dakika kaldı');
+      expect(friday(atAthan, l: fr).title, 'Prière du vendredi');
+      expect(friday(atAthan, l: fr).body, "C'est l'heure de la prière du vendredi");
+      expect(friday(const ReminderSettings(), l: fr).body, 'Prière du vendredi dans 5 minutes');
+    });
+
+    test('across the DST change: Fri 30 Oct 2:00 PM EDT, Fri 6 Nov 1:00 PM EST', () {
+      expect(friday(atAthan).at.toUtc(), DateTime.utc(2026, 10, 30, 18));
+      now = tz.TZDateTime(mosqueTz, 2026, 11, 4, 3);
+      days = [
+        ..._rows(DateTime(2026, 11, 4), 2),
+        _row(DateTime(2026, 11, 6), jumuah: '1:00'),
+        ..._rows(DateTime(2026, 11, 7), 2),
+      ];
+      final r = friday(atAthan);
+      expect((r.at.hour, r.at.minute), (13, 0));
+      expect(r.at.timeZoneOffset, const Duration(hours: -5));
+      expect(r.at.toUtc(), DateTime.utc(2026, 11, 6, 18));
+    });
+
+    test('a Friday without a Jumu\'ah time: no Dhuhr reminder, never Dhuhr\'s time', () {
+      days = [
+        ..._rows(DateTime(2026, 10, 28), 2),
+        _row(DateTime(2026, 10, 30), jumuah: null),
+        ..._rows(DateTime(2026, 10, 31), 2),
+      ];
+      final all = build(atAthan);
+      expect(all.where((r) => r.at.day == 30).map((r) => r.title), ['Fajr', 'Asr', 'Maghrib', 'Isha']);
+      days = [_row(DateTime(2026, 10, 30), jumuah: 'soon')];
+      expect(build(atAthan).map((r) => r.title), isNot(contains("Jumu'ah")));
+    });
+
+    test('follows the Dhuhr switch', () {
+      final noDhuhr = build(const ReminderSettings(prayers: {'Fajr', 'Asr', 'Maghrib', 'Isha'}));
+      expect(noDhuhr.map((r) => r.title), isNot(contains("Jumu'ah")));
+    });
+
+    test('other days keep Dhuhr', () {
+      final thursday = build(atAthan).firstWhere((r) => r.at.day == 29 && r.id % 10 == 1);
+      expect(thursday.title, 'Dhuhr');
+      expect((thursday.at.hour, thursday.at.minute), (13, 11));
     });
   });
 
@@ -163,6 +295,19 @@ void main() {
       expect(s.timing, ReminderTiming.beforeIqamah);
     });
 
+    test('no saved choice: on only if iOS already allows notifications', () async {
+      addTearDown(() => ReminderSync.permissionGranted = NotificationService.notificationsAllowed);
+      for (final (granted, on) in [(true, true), (false, false), (null, false)]) {
+        SharedPreferences.setMockInitialValues({});
+        ReminderSync.permissionGranted = () async => granted;
+        expect((await ReminderSync.loadSettings()).enabled, on, reason: '$granted');
+      }
+      // A saved choice wins either way.
+      SharedPreferences.setMockInitialValues({'prayer_reminders_enabled': false});
+      ReminderSync.permissionGranted = () async => true;
+      expect((await ReminderSync.loadSettings()).enabled, isFalse);
+    });
+
     test('a device that had reminders off keeps them off', () async {
       SharedPreferences.setMockInitialValues({'prayer_reminders_enabled': false});
       expect((await ReminderSync.loadSettings()).active, isFalse);
@@ -197,7 +342,7 @@ void main() {
 
     test('switching off the last prayer turns everything off; '
         'turning it back on brings all five back', () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'prayer_reminders_enabled': true});
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(reminderSettingsProvider.notifier);

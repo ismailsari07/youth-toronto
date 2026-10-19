@@ -14,8 +14,7 @@ import 'core/prayer_service.dart';
 import 'core/push/push_platform.dart';
 import 'core/push/push_prompt.dart';
 import 'core/push/push_sync.dart';
-import 'core/prayer_widget_sync.dart';
-import 'core/reminder_sync.dart';
+import 'core/prayer_refresh.dart';
 import 'core/router.dart';
 import 'features/push/push_prompt_sheet.dart';
 import 'features/update/screens/update_required_screen.dart';
@@ -122,11 +121,13 @@ class _MytAppState extends ConsumerState<MytApp> {
   @override
   void initState() {
     super.initState();
-    // Keep the 7-day reminder window and the iOS widget's week of times
-    // fresh: once the first frame is up (so the permission prompt never
-    // blocks launch) and on every resume. Fire-and-forget: neither sync
-    // throws or blocks the UI, and the widget's doesn't wait on the
-    // reminders' permission prompt.
+    // Keep the 5-day reminder window and the iOS widget's two weeks of
+    // times fresh: once the first frame is up, on every resume, on a pull
+    // on Prayer and on a prayer_refresh silent push (see prayer_refresh.dart;
+    // in the background it arrives at onBackgroundPush instead).
+    // Fire-and-forget: neither sync throws or blocks the UI, and neither
+    // ever shows the permission prompt.
+    ref.read(pushPlatformProvider).received.listen(handlePushData);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _syncSchedules();
       // The panel's content: at every launch, and on resume once it's
@@ -174,10 +175,7 @@ class _MytAppState extends ConsumerState<MytApp> {
     }
   }
 
-  void _syncSchedules() {
-    ReminderSync.sync();
-    PrayerWidgetSync.sync();
-  }
+  void _syncSchedules() => prayerRefresh();
 
   @override
   void dispose() {

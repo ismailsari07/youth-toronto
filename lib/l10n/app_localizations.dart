@@ -2481,6 +2481,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next field'**
   String get keyboardNext;
+
+  /// Friday's Dhuhr reminder, at the Jumu'ah time (title: jumuah).
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time for Jumu\'ah prayer'**
+  String get reminderJumuahNow;
+
+  /// Friday's reminder 5 minutes before the Jumu'ah time (title: jumuah).
+  ///
+  /// In en, this message translates to:
+  /// **'Jumu\'ah in 5 minutes'**
+  String get reminderJumuahSoon;
 }
 
 class _AppLocalizationsDelegate

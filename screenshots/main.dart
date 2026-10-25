@@ -21,8 +21,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 // data container before each launch (SIMCTL_CHILD_* variables never reached
 // the app on Codemagic), and photographs the simulator once `tmp/shot_ready`
 // exists. shot_ready holds the `<shot> <lang>` the app actually used, which
-// take.sh compares with what it asked for. Nothing is written to the
-// database: no device registration, no event view.
+// take.sh compares with what it asked for, or `failed: <reason>` when the
+// screen can't be opened. Nothing is written to the database: no device
+// registration, no event view.
 
 /// The screens, in App Store order.
 const shots = [
@@ -33,6 +34,9 @@ const shots = [
   'mosque',
   'reminders',
 ];
+
+/// The event the `event` shot opens, matched by title.
+const eventTitle = 'Gençlik Buluşması';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -92,8 +96,16 @@ Future<void> _open(String shot, String lang) async {
       final events = await container
           .read(eventsProvider.future)
           .timeout(const Duration(seconds: 30));
-      final pick =
-          events.where((e) => e.event.hasForm).firstOrNull ?? events.first;
+      final pick = events
+          .where((e) => e.event.title.contains(eventTitle))
+          .firstOrNull;
+      // Never another event in its place: take.sh fails the run on this.
+      if (pick == null) {
+        return _ready(
+          'failed: no upcoming event titled "$eventTitle" '
+          '(${events.length} upcoming)',
+        );
+      }
       router.go('/community');
       await Future<void>.delayed(const Duration(milliseconds: 500));
       router.push('/community/event/${pick.event.id}');
@@ -112,11 +124,15 @@ Future<void> _open(String shot, String lang) async {
 
   // Pages fetch their own details and photos, then animate in.
   await Future<void>.delayed(const Duration(seconds: 5));
-  // Written aside and renamed, so take.sh never reads it half-written.
+  await _ready('$shot $lang');
+}
+
+/// Tells take.sh the screen is up (`<shot> <lang>`) or why it isn't
+/// (`failed: …`). Written aside and renamed, so take.sh never reads it
+/// half-written.
+Future<void> _ready(String status) async {
   final temp = Directory.systemTemp.path;
-  final ready = await File(
-    '$temp/shot_ready.part',
-  ).writeAsString('$shot $lang');
+  final ready = await File('$temp/shot_ready.part').writeAsString(status);
   await ready.rename('$temp/shot_ready');
 }
 

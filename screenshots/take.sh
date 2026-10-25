@@ -66,6 +66,7 @@ for lang in "${LANGS[@]}"; do
     [ -f "$READY" ] || { echo "Timed out waiting for $lang $shot"; exit 1; }
     # A wrong screen must fail the build, never pass as a green run.
     got=$(cat "$READY")
+    case "$got" in failed:*) echo "$lang $shot: ${got#failed: }"; exit 1 ;; esac
     [ "$got" = "$shot $lang" ] || { echo "Asked for '$shot $lang', the app opened '$got'"; exit 1; }
     sleep 1
     xcrun simctl io "$UDID" screenshot --type=png "$file"

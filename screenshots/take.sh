@@ -41,6 +41,8 @@ xcrun simctl launch "$UDID" "$BUNDLE" >/dev/null
 sleep 10
 xcrun simctl terminate "$UDID" "$BUNDLE" || true
 CONTAINER=$(xcrun simctl get_app_container "$UDID" "$BUNDLE" data)
+mkdir -p "$CONTAINER/tmp"
+REQUEST="$CONTAINER/tmp/shot_request"
 READY="$CONTAINER/tmp/shot_ready"
 
 for lang in "${LANGS[@]}"; do
@@ -54,13 +56,17 @@ for lang in "${LANGS[@]}"; do
     if [ "$shot" = prayer_dark ]; then appearance=dark; else appearance=light; fi
     xcrun simctl ui "$UDID" appearance "$appearance"
     rm -f "$READY"
-    SIMCTL_CHILD_SHOT="$shot" SIMCTL_CHILD_SHOT_LANG="$lang" \
-      xcrun simctl launch "$UDID" "$BUNDLE" >/dev/null
+    # The app reads its shot and language from this file (screenshots/main.dart).
+    printf '%s %s\n' "$shot" "$lang" > "$REQUEST"
+    xcrun simctl launch "$UDID" "$BUNDLE" >/dev/null
     for _ in $(seq 1 90); do
       [ -f "$READY" ] && break
       sleep 1
     done
     [ -f "$READY" ] || { echo "Timed out waiting for $lang $shot"; exit 1; }
+    # A wrong screen must fail the build, never pass as a green run.
+    got=$(cat "$READY")
+    [ "$got" = "$shot $lang" ] || { echo "Asked for '$shot $lang', the app opened '$got'"; exit 1; }
     sleep 1
     xcrun simctl io "$UDID" screenshot --type=png "$file"
     xcrun simctl terminate "$UDID" "$BUNDLE" || true

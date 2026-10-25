@@ -17,9 +17,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // App Store screenshots (screenshots/take.sh on Codemagic's macOS machines).
 // The real app on live Supabase data, signed out, opened on one screen per
-// launch. take.sh picks it with SIMCTL_CHILD_SHOT and SIMCTL_CHILD_SHOT_LANG
-// and photographs the simulator once `tmp/shot_ready` exists. Nothing is
-// written to the database: no device registration, no event view.
+// launch. take.sh writes `<shot> <lang>` to `tmp/shot_request` in the app's
+// data container before each launch (SIMCTL_CHILD_* variables never reached
+// the app on Codemagic), and photographs the simulator once `tmp/shot_ready`
+// exists. shot_ready holds the `<shot> <lang>` the app actually used, which
+// take.sh compares with what it asked for. Nothing is written to the
+// database: no device registration, no event view.
 
 /// The screens, in App Store order.
 const shots = [
@@ -32,9 +35,8 @@ const shots = [
 ];
 
 Future<void> main() async {
-  final shot = Platform.environment['SHOT'] ?? shots.first;
-  final lang = Platform.environment['SHOT_LANG'] ?? 'en';
   WidgetsFlutterBinding.ensureInitialized();
+  final (shot, lang) = await _request();
 
   final prefs = await SharedPreferences.getInstance();
   // The push pre-prompt never opens on its own after three "Not now"s.
@@ -57,10 +59,25 @@ Future<void> main() async {
     ],
   );
 
-  WidgetsBinding.instance.addPostFrameCallback((_) => _open(shot));
+  WidgetsBinding.instance.addPostFrameCallback((_) => _open(shot, lang));
 }
 
-Future<void> _open(String shot) async {
+/// The shot and language take.sh asked for. Without a readable request it
+/// opens the first shot in English, and shot_ready says so: take.sh then
+/// fails instead of keeping a wrong picture.
+Future<(String, String)> _request() async {
+  try {
+    final words = (await File(
+      '${Directory.systemTemp.path}/shot_request',
+    ).readAsString()).trim().split(RegExp(r'\s+'));
+    if (words.length == 2) return (words[0], words[1]);
+  } catch (_) {
+    /* no request: defaults */
+  }
+  return (shots.first, 'en');
+}
+
+Future<void> _open(String shot, String lang) async {
   final context = rootNavigatorKey.currentContext!;
   final container = ProviderScope.containerOf(context);
   Future<void> loaded(Future<Object?> future) =>
@@ -95,7 +112,12 @@ Future<void> _open(String shot) async {
 
   // Pages fetch their own details and photos, then animate in.
   await Future<void>.delayed(const Duration(seconds: 5));
-  await File('${Directory.systemTemp.path}/shot_ready').writeAsString(shot);
+  // Written aside and renamed, so take.sh never reads it half-written.
+  final temp = Directory.systemTemp.path;
+  final ready = await File(
+    '$temp/shot_ready.part',
+  ).writeAsString('$shot $lang');
+  await ready.rename('$temp/shot_ready');
 }
 
 /// The device RPCs, answered as if offline, so a screenshot run never adds

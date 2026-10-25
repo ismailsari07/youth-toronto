@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,12 +8,21 @@ import 'package:myt_flutter/core/push/device_identity.dart';
 import 'package:myt_flutter/core/push/push_api.dart';
 import 'package:myt_flutter/core/reminder_sync.dart';
 import 'package:myt_flutter/core/router.dart';
+import 'package:myt_flutter/features/donations/donate_sheet.dart';
+import 'package:myt_flutter/features/marriage/marriage_routes.dart';
+import 'package:myt_flutter/features/profile/widgets/language_sheet.dart';
+import 'package:myt_flutter/features/prayer/screens/prayer_home_screen.dart';
 import 'package:myt_flutter/features/prayer/widgets/reminders_sheet.dart';
+import 'package:myt_flutter/l10n/l10n.dart';
 import 'package:myt_flutter/main.dart';
+import 'package:myt_flutter/shared/providers/donations_provider.dart';
 import 'package:myt_flutter/shared/providers/events_news_provider.dart';
 import 'package:myt_flutter/shared/providers/prayer_provider.dart';
 import 'package:myt_flutter/shared/providers/push_provider.dart';
 import 'package:myt_flutter/shared/providers/registration_provider.dart';
+import 'package:myt_flutter/ui/components/app_card.dart';
+import 'package:myt_flutter/ui/components/app_row.dart';
+import 'package:myt_flutter/ui/components/island_tab_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // App Store screenshots (screenshots/take.sh on Codemagic's macOS machines).
@@ -33,6 +43,10 @@ const shots = [
   'event',
   'mosque',
   'reminders',
+  'times',
+  'marriage',
+  'donate',
+  'language',
 ];
 
 /// The event the `event` shot opens, matched by title.
@@ -118,13 +132,150 @@ Future<void> _open(String shot, String lang) async {
       await Future<void>.delayed(const Duration(seconds: 1));
       final profile = rootNavigatorKey.currentContext!;
       if (profile.mounted) unawaited(showRemindersSheet(profile));
-    default: // prayer_light, prayer_dark
+    case 'times':
       await loaded(container.read(prayerProvider.future));
+      // Let the times card and the Jumu'ah card ease in before measuring.
+      await Future<void>.delayed(const Duration(seconds: 2));
+      final failure = await _scrollToTimes();
+      if (failure != null) return _ready('failed: $failure');
+    case 'marriage':
+      // Signed out, the service opens on its gate (MarriageRoutes.entryFor).
+      router.go('/profile');
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      router.push(MarriageRoutes.gate);
+    case 'donate':
+      await loaded(container.read(prayerProvider.future));
+      // The sheet must show the funds, not only "All donation options".
+      for (
+        var i = 0;
+        i < 30 && container.read(donationFundsProvider).isEmpty;
+        i++
+      ) {
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
+      if (container.read(donationFundsProvider).isEmpty) {
+        return _ready('failed: no donation funds loaded');
+      }
+      final prayer = rootNavigatorKey.currentContext!;
+      if (prayer.mounted) unawaited(showDonateSheet(prayer));
+    case 'language':
+      router.go('/profile');
+      await Future<void>.delayed(const Duration(seconds: 1));
+      final profile = rootNavigatorKey.currentContext!;
+      if (profile.mounted) unawaited(showLanguageSheet(profile));
+      await Future<void>.delayed(const Duration(seconds: 1));
+      final rows = _elements()
+          .map((e) => e.widget)
+          .whereType<AppListRow>()
+          .map((r) => r.title)
+          .toSet();
+      final missing = [
+        for (final lang in const ['English', 'Türkçe', 'Français'])
+          if (!rows.contains(lang)) lang,
+      ];
+      if (missing.isNotEmpty) {
+        return _ready('failed: language sheet lacks ${missing.join(', ')}');
+      }
+    case 'prayer_light' || 'prayer_dark':
+      await loaded(container.read(prayerProvider.future));
+    default:
+      return _ready('failed: unknown shot "$shot"');
   }
 
   // Pages fetch their own details and photos, then animate in.
   await Future<void>.delayed(const Duration(seconds: 5));
   await _ready('$shot $lang');
+}
+
+/// Scrolls Prayer so "Today at the mosque" sits just under the status bar,
+/// then checks that the whole times card and the Jumu'ah card are above the
+/// tab bar. Returns why not, or null.
+Future<String?> _scrollToTimes() async {
+  final l = rootNavigatorKey.currentContext!.l10n;
+  final home = _elements()
+      .where((e) => e.widget is PrayerHomeScreen)
+      .firstOrNull;
+  final scrollable = home == null
+      ? null
+      : _elements(home)
+            .where((e) => e.widget is Scrollable)
+            .map((e) => (e as StatefulElement).state as ScrollableState)
+            .firstOrNull;
+  if (scrollable == null) return 'Prayer is not on screen';
+  final position = scrollable.position;
+
+  // The list is lazy: step down until the section is built.
+  Element? findHeader() => _elements(scrollable.context as Element).where((e) {
+    final w = e.widget;
+    return w is SectionHeader && w.title == l.todayAtTheMosque;
+  }).firstOrNull;
+  var header = findHeader();
+  while (header == null && position.pixels < position.maxScrollExtent) {
+    position.jumpTo(min(position.pixels + 200, position.maxScrollExtent));
+    await WidgetsBinding.instance.endOfFrame;
+    header = findHeader();
+  }
+  if (header == null) return 'no "${l.todayAtTheMosque}" section on Prayer';
+
+  final top = MediaQuery.paddingOf(header).top + 12;
+  position.jumpTo(
+    (position.pixels + _rect(header).top - top).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    ),
+  );
+  await WidgetsBinding.instance.endOfFrame;
+  header = findHeader();
+  if (header == null) return 'the "${l.todayAtTheMosque}" section went away';
+
+  // Gold card: Jumu'ah, unless an Eid is near and takes its place.
+  final jumuah = _elements(scrollable.context as Element).where((e) {
+    final w = e.widget;
+    return w is Text && w.data == l.jumuah;
+  }).lastOrNull; // last: on a Friday the Dhuhr row says Jumu'ah too
+  if (jumuah == null) return 'no Jumu\'ah card on Prayer (an Eid card?)';
+  final card = _ancestorElement<AppCard>(jumuah) ?? jumuah;
+  final island = _elements()
+      .where((e) => e.widget is IslandTabBar)
+      .map(_rect)
+      .firstOrNull;
+  final bottom = island?.top ?? MediaQuery.sizeOf(header).height;
+  if (_rect(header).top < top - 1) {
+    return '"${l.todayAtTheMosque}" is under the status bar';
+  }
+  if (_rect(card).bottom > bottom) {
+    return 'the Jumu\'ah card is under the tab bar';
+  }
+  return null;
+}
+
+/// Every element below [root] (the whole tree by default), parents first.
+Iterable<Element> _elements([Element? root]) sync* {
+  final stack = <Element>[root ?? WidgetsBinding.instance.rootElement!];
+  while (stack.isNotEmpty) {
+    final element = stack.removeLast();
+    yield element;
+    final children = <Element>[];
+    element.visitChildElements(children.add);
+    stack.addAll(children.reversed);
+  }
+}
+
+Element? _ancestorElement<T extends Widget>(Element element) {
+  Element? found;
+  element.visitAncestorElements((e) {
+    if (e.widget is T) {
+      found = e;
+      return false;
+    }
+    return true;
+  });
+  return found;
+}
+
+Rect _rect(Element element) {
+  final box = element.renderObject! as RenderBox;
+  return box.localToGlobal(Offset.zero) & box.size;
 }
 
 /// Tells take.sh the screen is up (`<shot> <lang>`) or why it isn't

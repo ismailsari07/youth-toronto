@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 APP=build/ios/iphonesimulator/Runner.app
 BUNDLE=ca.papemosque.app
 OUT=screenshots/out
-SHOTS=(prayer_light prayer_dark community event mosque reminders)
+SHOTS=(prayer_light prayer_dark community event mosque reminders times marriage donate language)
 LANGS=(en tr)
 DEVICE_TYPE=com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro-Max
 

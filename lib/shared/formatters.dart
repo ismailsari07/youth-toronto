@@ -28,7 +28,9 @@ String timeAgo(AppLocalizations l, DateTime dt) {
   if (diff.inHours < 24) return l.hoursAgo(diff.inHours);
   if (diff.inDays < 7) return l.daysAgo(diff.inDays);
   if (diff.inDays < 28) return l.weeksAgo((diff.inDays / 7).floor());
-  return l.monthsAgo((diff.inDays / 30).floor());
+  // 28 and 29 days round down to 0: still "1 month ago".
+  final months = (diff.inDays / 30).floor();
+  return l.monthsAgo(months < 1 ? 1 : months);
 }
 
 /// 12-hour clock time, e.g. "7:30 PM".

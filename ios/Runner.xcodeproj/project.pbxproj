@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1F0C0D12E5F4A0100B7D3E1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1F0C0D22E5F4A0100B7D3E1 /* InfoPlist.strings */; };
 		F920D70D2C86089A40134DF1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DDEAB9068ED444C47640F233 /* GoogleService-Info.plist */; };
 		1E739838DC3FC3737F6C9225 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */; };
 		972C15353E728D9C3DB298EE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3CC7BDA0F3E35BCE3B70C3FC /* PrivacyInfo.xcprivacy */; };
@@ -63,6 +64,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A1F0C0D32E5F4A0100B7D3E1 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A1F0C0D42E5F4A0100B7D3E1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3CC7BDA0F3E35BCE3B70C3FC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DDEAB9068ED444C47640F233 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -166,6 +169,7 @@
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
 				97C147021CF9000F007C117D /* Info.plist */,
+				A1F0C0D22E5F4A0100B7D3E1 /* InfoPlist.strings */,
 				24FB9E3ED0A135B0505F06C6 /* Runner.entitlements */,
 				218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */,
 				DDEAB9068ED444C47640F233 /* GoogleService-Info.plist */,
@@ -266,6 +270,8 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
+				tr,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -305,6 +311,7 @@
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				1E739838DC3FC3737F6C9225 /* PrivacyInfo.xcprivacy in Resources */,
 				F920D70D2C86089A40134DF1 /* GoogleService-Info.plist in Resources */,
+				A1F0C0D12E5F4A0100B7D3E1 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,6 +393,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		A1F0C0D22E5F4A0100B7D3E1 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1F0C0D32E5F4A0100B7D3E1 /* fr */,
+				A1F0C0D42E5F4A0100B7D3E1 /* tr */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

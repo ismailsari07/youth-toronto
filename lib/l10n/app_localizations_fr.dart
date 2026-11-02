@@ -71,7 +71,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'asr': 'Après la prière de l\'Asr',
       'maghrib': 'Après la prière du Maghrib',
       'isha': 'Après la prière de l\'Icha',
-      'other': 'Après la prière',
+      'other': 'Après la prière ($prayer)',
     });
     return '$_temp0';
   }
@@ -199,7 +199,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get remindersDeniedNote =>
-      'Les notifications de Pape Mosque sont désactivées dans les Réglages d\'iOS : les rappels ne peuvent pas s\'afficher.';
+      'Les notifications de Pape Mosque sont désactivées dans les Réglages d\'iOS : les rappels ne peuvent pas s\'afficher.';
 
   @override
   String get openSettings => 'Ouvrir les Réglages';
@@ -243,7 +243,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String eidTimes(String first, String second) {
-    return 'Prière à $first · 2ᵉ prière à $second';
+    return 'Prière à $first · 2e prière à $second';
   }
 
   @override
@@ -316,6 +316,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other: 'il y a $count minutes',
       one: 'il y a 1 minute',
+      zero: 'à l\'instant',
     );
     return '$_temp0';
   }
@@ -493,7 +494,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noEventsBody =>
-      'Les événements publiés par la mosquée apparaîtront ici. La prière du vendredi a lieu chaque semaine, comme d\'habitude.';
+      'Les événements publiés par la mosquée apparaîtront ici. La prière du vendredi (Joumou\'a) a lieu chaque semaine, comme d\'habitude.';
 
   @override
   String get noAnnouncementsTitle => 'Aucune annonce';
@@ -527,7 +528,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shareThisAnnouncement => 'Partager l\'annonce';
 
   @override
-  String get questions => 'Des questions ?';
+  String get questions => 'Des questions?';
 
   @override
   String get callTheOffice => 'Appeler le bureau de la mosquée';
@@ -567,7 +568,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get notSignedInBody =>
-      'Connectez-vous pour vous inscrire aux événements et retrouver vos rappels sur tous vos appareils.';
+      'Pour vous inscrire aux événements et garder vos rappels sur vos appareils.';
 
   @override
   String get signIn => 'Se connecter';
@@ -623,7 +624,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deviceLanguage => 'Langue de l\'appareil';
 
   @override
-  String get deviceLanguageDetail => 'Suit le réglage du téléphone';
+  String get deviceLanguageDetail => 'Suit le réglage de votre téléphone';
 
   @override
   String get languageAuto => 'Auto';
@@ -705,7 +706,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Connectez-vous pour vous inscrire aux événements';
 
   @override
-  String get noAccountYet => 'Pas encore de compte ?';
+  String get noAccountYet => 'Pas encore de compte?';
 
   @override
   String get accountOptional =>
@@ -728,7 +729,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vos informations sont communiquées uniquement au bureau de la mosquée.';
 
   @override
-  String get alreadyHaveAccount => 'Vous avez déjà un compte ? Connectez-vous';
+  String get alreadyHaveAccount => 'Vous avez déjà un compte? Connectez-vous';
 
   @override
   String get enterName => 'Veuillez saisir votre nom.';
@@ -1086,7 +1087,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de charger votre demande. Veuillez réessayer.';
 
   @override
-  String get withdrawSheetTitle => 'Retirer votre demande ?';
+  String get withdrawSheetTitle => 'Retirer votre demande?';
 
   @override
   String get withdrawSheetBody =>
@@ -1115,7 +1116,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openingHours => 'Heures d\'ouverture';
 
   @override
-  String get jumuah => 'Prière du vendredi';
+  String get jumuah => 'Prière du vendredi (Joumou\'a)';
 
   @override
   String get getInTouch => 'Nous joindre';
@@ -1133,7 +1134,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get allDonationOptions => 'Toutes les options de don';
 
   @override
-  String get donateRowSubtitle => 'Donnez via notre site web';
+  String get donateRowSubtitle => 'Faites un don sur notre site web';
 
   @override
   String get donatePill => 'Donner';
@@ -1153,7 +1154,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pushPromptReason =>
-      'Soyez informé des événements et des nouvelles importantes de la mosquée.';
+      'Recevez des avis sur les événements et les nouvelles importantes de la mosquée.';
 
   @override
   String get pushPromptAllow => 'Activer les notifications';
@@ -1180,13 +1181,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pushDeniedDetail =>
-      'Pour les activer, ouvrez Pape Mosque dans Réglages.';
+      'Pour les activer, ouvrez Pape Mosque dans les Réglages.';
 
   @override
-  String get pushOpenSettings => 'Ouvrir Réglages';
+  String get pushOpenSettings => 'Ouvrir les Réglages';
 
   @override
-  String get eventNotify => 'M\'avertir pour cet événement';
+  String get eventNotify => 'Me prévenir pour cet événement';
 
   @override
   String get eventNotifyOn => 'Un rappel avant le début';
@@ -1205,7 +1206,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get announcementGone => 'Cette annonce n\'est plus disponible';
 
   @override
-  String get goneBody => 'Il est peut-être terminé ou a été retiré.';
+  String get goneBody =>
+      'Cette publication a peut-être pris fin ou été retirée.';
 
   @override
   String get appVersion => 'Version';
@@ -1249,14 +1251,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get addNameBody =>
-      'Affiché sur votre profil. Vous pouvez le saisir une fois ; pour le modifier ensuite, contactez le bureau de la mosquée.';
+      'Affiché sur votre profil. Vous pouvez le saisir une fois; pour le modifier ensuite, contactez le bureau de la mosquée.';
 
   @override
   String get saveName => 'Enregistrer';
 
   @override
   String get errorAppleRevokeFailed =>
-      'Apple n\'a pas pu confirmer la suppression : votre compte n\'a donc pas été supprimé. Veuillez réessayer dans quelques minutes.';
+      'Apple n\'a pas pu confirmer la suppression : votre compte n\'a donc pas été supprimé. Veuillez réessayer dans quelques minutes.';
 
   @override
   String get regBadge => 'Inscription';
@@ -1283,7 +1285,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String regViews(int count) {
-    return '$count personnes ont consulté';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Consulté par $count personnes',
+      one: 'Consulté par 1 personne',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1294,7 +1302,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String regDeadlineWas(String when) {
-    return 'Fin des inscriptions : $when';
+    return 'Fin des inscriptions : $when';
   }
 
   @override
@@ -1317,18 +1325,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get regStateFailed => 'Impossible de charger l\'inscription.';
 
   @override
-  String get regRegistered => 'Vous êtes inscrit';
+  String get regRegistered => 'Inscription confirmée';
 
   @override
   String regRegisteredOn(String when) {
-    return 'Inscrit le $when';
+    return 'Inscription faite le $when';
   }
 
   @override
   String get regSubmitted => 'Vos réponses';
 
   @override
-  String get regNotifyLocked => 'Activé car vous êtes inscrit';
+  String get regNotifyLocked => 'Activé en raison de votre inscription';
 
   @override
   String get regRecurringNote => 'L\'inscription vaut pour tout le programme.';
@@ -1346,7 +1354,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get regFullName => 'Nom complet';
 
   @override
-  String get regEmail => 'E-mail';
+  String get regEmail => 'Courriel';
 
   @override
   String get regPhone => 'Téléphone';
@@ -1362,11 +1370,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Une inscription ne peut pas être annulée dans l\'application.';
 
   @override
-  String get regOffline => 'Pas de connexion. L\'inscription en nécessite une.';
+  String get regOffline =>
+      'Aucune connexion Internet. L\'inscription en nécessite une.';
 
   @override
   String get regFormChanged =>
-      'Le formulaire a changé. Vérifiez-le et renvoyez.';
+      'Le formulaire a changé. Vérifiez-le, puis renvoyez-le.';
 
   @override
   String get regFixBelow => 'Vérifiez les champs ci-dessous.';
@@ -1424,7 +1433,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get regErrNameInvalid => '120 caractères au maximum.';
 
   @override
-  String get regErrPhoneRequired => 'Saisissez votre numéro.';
+  String get regErrPhoneRequired => 'Saisissez votre numéro de téléphone.';
 
   @override
   String get regErrPhoneInvalid => 'Saisissez un numéro valide.';

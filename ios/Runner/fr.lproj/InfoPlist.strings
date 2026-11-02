@@ -1,0 +1,3 @@
+/* Texts of iOS's permission prompts (keys from Info.plist). */
+"NSCameraUsageDescription" = "Pape Mosque n'utilise pas l'appareil photo. Les documents sont choisis dans votre photothèque ou vos fichiers.";
+"NSPhotoLibraryUsageDescription" = "Choisissez la photo d'un document à transmettre en privé à la mosquée. Seule la photo sélectionnée est utilisée.";

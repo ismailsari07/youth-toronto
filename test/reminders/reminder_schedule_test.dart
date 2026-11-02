@@ -385,7 +385,7 @@ void main() {
       expect(friday(atAthan, l: tr).title, 'Cuma namazı');
       expect(friday(atAthan, l: tr).body, 'Cuma namazı vakti');
       expect(friday(const ReminderSettings(), l: tr).body, 'Cuma namazına 5 dakika kaldı');
-      expect(friday(atAthan, l: fr).title, 'Prière du vendredi');
+      expect(friday(atAthan, l: fr).title, "Prière du vendredi (Joumou'a)");
       expect(friday(atAthan, l: fr).body, "C'est l'heure de la prière du vendredi");
       expect(friday(const ReminderSettings(), l: fr).body, 'Prière du vendredi dans 5 minutes');
     });

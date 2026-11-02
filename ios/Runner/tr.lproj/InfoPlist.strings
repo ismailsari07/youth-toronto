@@ -1,0 +1,3 @@
+/* Texts of iOS's permission prompts (keys from Info.plist). */
+"NSCameraUsageDescription" = "Pape Mosque kamerayı kullanmaz. Belgeler fotoğraf arşivinizden veya dosyalarınızdan seçilir.";
+"NSPhotoLibraryUsageDescription" = "Camiye gizli olarak iletmek üzere bir belgenin fotoğrafını seçin. Yalnızca seçtiğiniz fotoğraf kullanılır.";

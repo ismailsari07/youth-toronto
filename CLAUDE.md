@@ -172,6 +172,15 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
 - No bell on the Prayer hero: next to the Donate pill it cut the mosque line on an iPhone SE. Reminders open from the
   row under the prayer times, Profile and Settings.
 
+## French (audited 2026-11-02)
+
+Canadian French, `vous`, gender-neutral wording. Terms: prière, adhan, iqama, Fajr/Dhohr/Asr/Maghrib/Icha, "Prière du
+vendredi (Joumou'a)", mosquée, don, courriel. Typography: no space before `?`, `!`, `;`; no-break space before `:`; "2e".
+`test/l10n/french_strings_test.dart` enforces keys, placeholders and typography; `test/l10n/french_layout_test.dart`
+renders every main screen and sheet at 390 pt and fails on an overflow or cut text (`SHOT_DIR=<dir>` also saves PNGs).
+Native: permission prompts in `ios/Runner/{fr,tr}.lproj/InfoPlist.strings`; the widget's own texts in `WidgetText`
+(`PrayerWidget.swift`). The app name stays "Pape Mosque" on the home screen, as iOS Settings shows it.
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

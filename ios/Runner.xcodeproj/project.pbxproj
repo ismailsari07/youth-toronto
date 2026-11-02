@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DD9F43860622E272D9DB4888 /* SiriData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB08FE9AAC92D17DC1D0CAB /* SiriData.swift */; };
+		AE1FAF01E269AE79C7D63AFC /* SiriLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B132B74A1CF5590AB4C8E4A /* SiriLogic.swift */; };
+		40885522E6E1C240D8CB20B4 /* SiriText.swift in Sources */ = {isa = PBXBuildFile; fileRef = E52F7B2F6E495971E5F5D568 /* SiriText.swift */; };
+		EE42AD849DD01616F77E10FA /* SiriCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD8111F674BC10AC16CF12F /* SiriCardView.swift */; };
+		3589C670B0385353A1D129C2 /* SiriIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF28901EAF3D68D3C434D5C /* SiriIntents.swift */; };
+		ACCEC10BB931233B181E62D4 /* PapeShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C68FC8CAE8B03238EA8A05 /* PapeShortcuts.swift */; };
+		7923AF0F88F7E39DD58B9E63 /* SiriLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1542ED2D6D718DC24E415BA4 /* SiriLogicTests.swift */; };
+		722012F364ED91C6BD7803B1 /* AppShortcuts.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47D67F4933CBA558DC1E67DD /* AppShortcuts.strings */; };
+		8154486AE6E2421AC1D91ACE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1875C67CDB916F6EC7A4EDEF /* Localizable.strings */; };
 		A1F0C0D12E5F4A0100B7D3E1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1F0C0D22E5F4A0100B7D3E1 /* InfoPlist.strings */; };
 		F920D70D2C86089A40134DF1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DDEAB9068ED444C47640F233 /* GoogleService-Info.plist */; };
 		1E739838DC3FC3737F6C9225 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */; };
@@ -64,6 +73,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2AB08FE9AAC92D17DC1D0CAB /* SiriData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriData.swift; sourceTree = "<group>"; };
+		0B132B74A1CF5590AB4C8E4A /* SiriLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriLogic.swift; sourceTree = "<group>"; };
+		E52F7B2F6E495971E5F5D568 /* SiriText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriText.swift; sourceTree = "<group>"; };
+		2CD8111F674BC10AC16CF12F /* SiriCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriCardView.swift; sourceTree = "<group>"; };
+		BBF28901EAF3D68D3C434D5C /* SiriIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriIntents.swift; sourceTree = "<group>"; };
+		04C68FC8CAE8B03238EA8A05 /* PapeShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PapeShortcuts.swift; sourceTree = "<group>"; };
+		1542ED2D6D718DC24E415BA4 /* SiriLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriLogicTests.swift; sourceTree = "<group>"; };
+		DC93CE49C89378A929A42B86 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
+		9672A6C5DBFC41A393F26BB0 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
+		7D316374605C1EEDD75DD5B6 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
+		3EC8D390A659B6659194F1BD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		2AB0EFDE6F59C79BEA8ED953 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		68F7A38E232FD17E030A4A7E /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		47371677BB5567CD132F55C0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A1F0C0D32E5F4A0100B7D3E1 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A1F0C0D42E5F4A0100B7D3E1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -110,6 +133,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		813966956EDF48CA99AB527A /* Siri */ = {
+			isa = PBXGroup;
+			children = (
+				2AB08FE9AAC92D17DC1D0CAB /* SiriData.swift */,
+				0B132B74A1CF5590AB4C8E4A /* SiriLogic.swift */,
+				E52F7B2F6E495971E5F5D568 /* SiriText.swift */,
+				2CD8111F674BC10AC16CF12F /* SiriCardView.swift */,
+				BBF28901EAF3D68D3C434D5C /* SiriIntents.swift */,
+				04C68FC8CAE8B03238EA8A05 /* PapeShortcuts.swift */,
+			);
+			path = Siri;
+			sourceTree = "<group>";
+		};
 		484F38E257D000C4D94F7D25 /* PrayerWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -126,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
+				1542ED2D6D718DC24E415BA4 /* SiriLogicTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -169,6 +206,9 @@
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
 				97C147021CF9000F007C117D /* Info.plist */,
+				813966956EDF48CA99AB527A /* Siri */,
+				47D67F4933CBA558DC1E67DD /* AppShortcuts.strings */,
+				1875C67CDB916F6EC7A4EDEF /* Localizable.strings */,
 				A1F0C0D22E5F4A0100B7D3E1 /* InfoPlist.strings */,
 				24FB9E3ED0A135B0505F06C6 /* Runner.entitlements */,
 				218195EC1D672D990FB88138 /* PrivacyInfo.xcprivacy */,
@@ -312,6 +352,8 @@
 				1E739838DC3FC3737F6C9225 /* PrivacyInfo.xcprivacy in Resources */,
 				F920D70D2C86089A40134DF1 /* GoogleService-Info.plist in Resources */,
 				A1F0C0D12E5F4A0100B7D3E1 /* InfoPlist.strings in Resources */,
+				722012F364ED91C6BD7803B1 /* AppShortcuts.strings in Resources */,
+				8154486AE6E2421AC1D91ACE /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +407,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
+				7923AF0F88F7E39DD58B9E63 /* SiriLogicTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +416,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				DD9F43860622E272D9DB4888 /* SiriData.swift in Sources */,
+				AE1FAF01E269AE79C7D63AFC /* SiriLogic.swift in Sources */,
+				40885522E6E1C240D8CB20B4 /* SiriText.swift in Sources */,
+				EE42AD849DD01616F77E10FA /* SiriCardView.swift in Sources */,
+				3589C670B0385353A1D129C2 /* SiriIntents.swift in Sources */,
+				ACCEC10BB931233B181E62D4 /* PapeShortcuts.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -393,9 +442,30 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		47D67F4933CBA558DC1E67DD /* AppShortcuts.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DC93CE49C89378A929A42B86 /* en */,
+				9672A6C5DBFC41A393F26BB0 /* fr */,
+				7D316374605C1EEDD75DD5B6 /* tr */,
+			);
+			name = AppShortcuts.strings;
+			sourceTree = "<group>";
+		};
+		1875C67CDB916F6EC7A4EDEF /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3EC8D390A659B6659194F1BD /* en */,
+				2AB0EFDE6F59C79BEA8ED953 /* fr */,
+				68F7A38E232FD17E030A4A7E /* tr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		A1F0C0D22E5F4A0100B7D3E1 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
+				47371677BB5567CD132F55C0 /* en */,
 				A1F0C0D32E5F4A0100B7D3E1 /* fr */,
 				A1F0C0D42E5F4A0100B7D3E1 /* tr */,
 			);
@@ -570,6 +640,11 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					AppIntents,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = ca.papemosque.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -751,6 +826,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					AppIntents,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = ca.papemosque.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -773,6 +853,11 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					AppIntents,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = ca.papemosque.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";

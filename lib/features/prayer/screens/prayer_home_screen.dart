@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/eid.dart';
 import '../../../core/feature_flags.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
@@ -387,7 +388,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   ) {
     if (eid == null) return null;
     for (final entry in [(true, eid.eidFitr), (false, eid.eidAdha)]) {
-      final date = _parseTurkishDate(entry.$2.date);
+      final date = parseEidDate(entry.$2.date);
       if (date == null) continue;
       final now = mosqueNow();
       final days = date.difference(DateTime(now.year, now.month, now.day)).inDays;
@@ -401,23 +402,6 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       }
     }
     return null;
-  }
-
-  static const _turkishMonths = {
-    'ocak': 1, 'şubat': 2, 'subat': 2, 'mart': 3, 'nisan': 4, 'mayıs': 5,
-    'mayis': 5, 'haziran': 6, 'temmuz': 7, 'ağustos': 8, 'agustos': 8,
-    'eylül': 9, 'eylul': 9, 'ekim': 10, 'kasım': 11, 'kasim': 11, 'aralık': 12,
-    'aralik': 12,
-  };
-
-  DateTime? _parseTurkishDate(String raw) {
-    final parts = raw.trim().split(RegExp(r'\s+'));
-    if (parts.length < 3) return null;
-    final day = int.tryParse(parts[0]);
-    final month = _turkishMonths[parts[1].toLowerCase()];
-    final year = int.tryParse(parts[2]);
-    if (day == null || month == null || year == null) return null;
-    return DateTime(year, month, day);
   }
 
   /// Spec §7.1 step 8.

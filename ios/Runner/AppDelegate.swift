@@ -14,6 +14,7 @@ import WidgetKit
 
   private var widgetChannel: FlutterMethodChannel?
   private var soundChannel: FlutterMethodChannel?
+  private var siriChannel: FlutterMethodChannel?
   private var previewPlayer: AVAudioPlayer?
 
   override func application(
@@ -25,6 +26,7 @@ import WidgetKit
     GeneratedPluginRegistrant.register(with: self)
     registerPrayerWidgetBridge()
     registerNotificationSoundBridge()
+    registerSiriBridge()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
@@ -46,6 +48,48 @@ import WidgetKit
       result(nil)
     }
     widgetChannel = channel
+  }
+
+  /// lib/core/siri_bridge.dart: the data the Siri shortcuts read (see
+  /// ios/Runner/Siri/SiriData.swift), whether this launch is in the background
+  /// (lib/core/launch_gate.dart), and a donate shortcut waiting to be opened.
+  private func registerSiriBridge() {
+    guard let registrar = self.registrar(forPlugin: "SiriBridge") else { return }
+    let channel = FlutterMethodChannel(
+      name: "ca.papemosque.app/siri",
+      binaryMessenger: registrar.messenger()
+    )
+    channel.setMethodCallHandler { call, result in
+      switch call.method {
+      case "update":
+        guard let args = call.arguments as? [String: String],
+              let key = args["key"], let json = args["json"],
+              [SiriStoreKey.prayers, SiriStoreKey.events, SiriStoreKey.mosque].contains(key)
+        else {
+          result(FlutterError(code: "bad_args", message: nil, details: nil))
+          return
+        }
+        UserDefaults(suiteName: SiriStoreKey.appGroup)?.set(json, forKey: key)
+        result(nil)
+      case "isInBackground":
+        result(UIApplication.shared.applicationState == .background)
+      case "takeAction":
+        result(SiriSession.pendingAction)
+        SiriSession.pendingAction = nil
+      case "hadAction":
+        result(SiriSession.hadAction)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+    siriChannel = channel
+    NotificationCenter.default.addObserver(
+      forName: SiriSession.actionNotification,
+      object: nil,
+      queue: .main
+    ) { [weak self] _ in
+      self?.siriChannel?.invokeMethod("action", arguments: nil)
+    }
   }
 
   /// The athan recording, if this build carries it: ios/Runner/Sounds/athan.caf

@@ -181,6 +181,33 @@ renders every main screen and sheet at 390 pt and fails on an overflow or cut te
 Native: permission prompts in `ios/Runner/{fr,tr}.lproj/InfoPlist.strings`; the widget's own texts in `WidgetText`
 (`PrayerWidget.swift`). The app name stays "Pape Mosque" on the home screen, as iOS Settings shows it.
 
+## Siri and Shortcuts (since 1.4.0)
+
+iOS 16+, ten App Shortcuts (Apple's limit) in EN/TR/FR. Same hard rule as the reminders: never a wrong or estimated time.
+Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.dart`, `lib/core/launch_gate.dart`.
+
+- Data: three versioned JSON documents in the App Group (`siri_prayers`, `siri_events`, `siri_mosque`; shapes in
+  `siri_data_sync.dart`), each written separately so one failed fetch can't touch another. Intents read only these, no
+  network. Flutter writes every time as an instant and as text with the reminders' code; Swift compares instants and
+  repeats the text. Prayers: with the widget sync, same rows. Events: after a successful fetch (launch, resume, pull,
+  silent push); refused after 7 days. Mosque: after a content refresh and at launch.
+- Answers follow the device's language, not the app's setting, because Siri matches phrases in its own language; events
+  are written in all three. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.
+- Intents are in the Runner target (Apple's rule for App Shortcuts), so a question launches the app in the background.
+  `LaunchGate` keeps that invisible: no launch counted, no pre-prompt, no `register_device`, no reminder reschedule, no
+  fetch started by the launch, until the app really comes forward, then all of it once
+  (`test/siri/launch_gate_test.dart` pumps the real `MytApp`). Silent pushes get the same gate and still reschedule through
+  `onBackgroundPush`. The pre-prompt also never fires over a shortcut that brought the app forward.
+- Directions and Call: Siri confirms, then `HandoffIntent` brings the app forward for a moment to open Maps or `tel:`; a
+  background intent can't open another app. iOS adds its own `tel:` alert. Donate opens `showDonateSheet`.
+- `AppIntents` is weak-linked (`-weak_framework`) because the app still runs on iOS 15.
+- App names: `INAlternativeAppNames` with per-language values in `InfoPlist.strings`, limit three per language. Turkish's
+  third is "Pape Camii'nde" so "Pape Camii'nde sıradaki namaz" matches. Apple's docs ask for an Intents extension; an Apple
+  engineer wrote (June 2026) that it keeps working for App Shortcuts. If a phone ignores them, that extension is next.
+- Turkish sentences say "1:07'de" (`TurkishTime`: the suffix follows the last number said, no AM/PM); cards keep "1:07 PM".
+- Tests: `tool/siri_swift_test.sh` runs the Foundation-only logic in Docker; workflow `siri-check` in `codemagic.yaml`
+  compiles everything (the only compile of `AppIntents` and SwiftUI code; this machine has no Xcode) and runs RunnerTests.
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

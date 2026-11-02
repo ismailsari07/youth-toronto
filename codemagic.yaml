@@ -1,0 +1,51 @@
+# Only for the yaml-configured Codemagic app (it also runs `screenshots` from the
+# screenshots branch). The release build stays in the Workflow Editor app, which
+# ignores this file.
+workflows:
+  siri-check:
+    name: Siri check (simulator build + Swift tests, no signing)
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    environment:
+      flutter: 3.38.5
+      xcode: latest
+      cocoapods: default
+    # No triggering section: it runs only when started by hand.
+    scripts:
+      - name: Get packages
+        script: flutter pub get
+      - name: Flutter tests
+        script: flutter test
+      - name: Build for the simulator (no signing)
+        script: flutter build ios --simulator --debug
+      - name: The shortcuts made it into the app
+        script: |
+          set -e
+          app=build/ios/iphonesimulator/Runner.app
+          test -d "$app/Metadata.appintents" || { echo "No App Intents metadata in the app"; exit 1; }
+          # Debug builds keep the code in Runner.debug.dylib on recent Xcodes.
+          bin="$app/Runner"
+          test -f "$app/Runner.debug.dylib" && bin="$app/Runner.debug.dylib"
+          otool -l "$bin" | grep -A2 LC_LOAD_WEAK_DYLIB | grep -q AppIntents \
+            || { echo "AppIntents is not weak-linked: the app would crash on iOS 15"; exit 1; }
+          for lang in en tr fr; do
+            test -f "$app/$lang.lproj/AppShortcuts.strings" || { echo "No $lang phrases"; exit 1; }
+          done
+      - name: Swift tests (RunnerTests)
+        script: |
+          set -e
+          device=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          runtimes = json.load(sys.stdin)['devices']
+          for runtime in sorted(runtimes, reverse=True):
+              for d in runtimes[runtime]:
+                  if d['name'].startswith('iPhone'):
+                      print(d['udid'])
+                      raise SystemExit
+          ")
+          echo "Testing on $device"
+          xcodebuild test \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -destination "id=$device" \
+            CODE_SIGNING_ALLOWED=NO

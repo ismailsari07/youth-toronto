@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'mosque_time.dart';
 import 'prayer_widget_sync.dart';
 import 'reminder_sync.dart';
+import 'siri_data_sync.dart';
 
 /// The silent push pape-admin sends after any change to a prayer_cache row
 /// dated today or later (debounced on the server): data
@@ -20,12 +21,15 @@ const prayerRefreshType = 'prayer_refresh';
 
 bool isPrayerRefresh(Map<String, dynamic> data) => data['type'] == prayerRefreshType;
 
-/// Reminders and widget, together. Never throws. Completes with whether the
+/// Reminders, widget and Siri's data, together. Never throws. Completes with whether the
 /// reminders were rescheduled from fresh rows.
 Future<bool> refreshPrayerSchedules() async {
   initMosqueTime();
-  final (rescheduled, _) =
-      await (ReminderSync.sync(), PrayerWidgetSync.sync()).wait;
+  final (rescheduled, _, _) = await (
+    ReminderSync.sync(),
+    PrayerWidgetSync.sync(),
+    SiriDataSync.syncEvents(),
+  ).wait;
   return rescheduled;
 }
 

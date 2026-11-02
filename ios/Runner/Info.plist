@@ -15,6 +15,23 @@
 	<!-- papemosque:///prayer opens the Prayer tab; used by the home-screen
 	     and lock-screen widgets. Flutter's deep linking hands the path to
 	     go_router. -->
+	<!-- Other names Siri accepts for the app; the values are per language in
+	     {en,tr,fr}.lproj/InfoPlist.strings (limit: three per language). -->
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>APP_NAME_SYNONYM_1</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>APP_NAME_SYNONYM_2</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>APP_NAME_SYNONYM_3</string>
+		</dict>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

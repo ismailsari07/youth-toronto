@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import 'core/auth_service.dart';
 import 'core/content/content_repository.dart';
 import 'core/donations/donation_funds.dart';
+import 'core/launch_gate.dart';
 import 'core/mosque_time.dart';
 import 'core/notification_service.dart';
 import 'core/prayer_service.dart';
@@ -16,6 +17,9 @@ import 'core/push/push_prompt.dart';
 import 'core/push/push_sync.dart';
 import 'core/prayer_refresh.dart';
 import 'core/router.dart';
+import 'core/siri_bridge.dart';
+import 'core/siri_data_sync.dart';
+import 'features/donations/donate_sheet.dart';
 import 'features/push/push_prompt_sheet.dart';
 import 'features/update/screens/update_required_screen.dart';
 import 'l10n/l10n.dart';
@@ -27,6 +31,10 @@ import 'shared/providers/push_provider.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_mode_provider.dart';
 import 'ui/components/app_text_input.dart';
+
+/// Retries a saved Apple name. A variable only so tests can replace it.
+@visibleForTesting
+Future<bool> Function() flushPendingAppleName = AuthService.flushPendingName;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,7 +70,12 @@ void main() async {
     /* push stays off this launch */
   }
   final pushLocal = await PushSync.loadLocal();
-  final launchCount = await PushPromptStore.countLaunch();
+  // A Siri question or a silent push can start the app with no screen: then
+  // nothing is counted or started until it comes forward (LaunchGate).
+  final startedInBackground = await SiriBridge.isInBackground();
+  final launchCount = startedInBackground
+      ? await PushPromptStore.nextLaunch()
+      : await PushPromptStore.countLaunch();
   final savedLocale = await LocaleStore.load();
   final savedThemeMode = await ThemeModeStore.load();
   // The last good content bundle, else the one shipped in the app. Local
@@ -88,7 +101,7 @@ void main() async {
         initialPushLocalProvider.overrideWithValue(pushLocal),
         launchCountProvider.overrideWithValue(launchCount),
       ],
-      child: const MytApp(),
+      child: MytApp(startedInBackground: startedInBackground),
     ),
   );
 }
@@ -111,7 +124,9 @@ void _silencePdfViewerLogs() {
 }
 
 class MytApp extends ConsumerStatefulWidget {
-  const MytApp({super.key});
+  const MytApp({super.key, this.startedInBackground = false});
+
+  final bool startedInBackground;
 
   @override
   ConsumerState<MytApp> createState() => _MytAppState();
@@ -119,6 +134,10 @@ class MytApp extends ConsumerStatefulWidget {
 
 class _MytAppState extends ConsumerState<MytApp> {
   late final AppLifecycleListener _lifecycle;
+  late final LaunchGate _gate = LaunchGate(
+    startedInBackground: widget.startedInBackground,
+    onFirstForeground: _firstForeground,
+  );
 
   @override
   void initState() {
@@ -130,24 +149,15 @@ class _MytAppState extends ConsumerState<MytApp> {
     // Fire-and-forget: neither sync throws or blocks the UI, and neither
     // ever shows the permission prompt.
     ref.read(pushPlatformProvider).received.listen(handlePushData);
+    // A donate shortcut while the app is already running.
+    SiriBridge.channel.setMethodCallHandler((call) async {
+      if (call.method == 'action') await _takeSiriAction();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _syncSchedules();
-      // The panel's content: at every launch, and on resume once it's
-      // 15 minutes old. In the background; screens keep what they show.
-      ref.read(contentProvider.notifier).refresh(force: true);
-      ref.read(donationFundsProvider.notifier).refresh(force: true);
-      ref.read(pushProvider.notifier).start(navigate: _openFromNotification);
-      // An Apple name whose save failed at sign-in (Apple never resends it).
-      AuthService.flushPendingName().then((saved) {
-        if (saved && mounted) ref.invalidate(userProfileProvider);
-      });
-      // From the second launch on, our pre-prompt may ask (once).
-      Future<void>.delayed(const Duration(milliseconds: 1200), () {
-        final context = rootNavigatorKey.currentContext;
-        if (mounted && context != null && context.mounted) {
-          maybeShowPushPrompt(context, ref, PromptTrigger.launch);
-        }
-      });
+      _gate.firstFrame(
+        isResumed:
+            WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed,
+      );
     });
     _lifecycle = AppLifecycleListener(onResume: _onResume);
     // The server links this device to whoever registered it last
@@ -160,7 +170,48 @@ class _MytAppState extends ConsumerState<MytApp> {
     });
   }
 
+  /// What a launch does once the app is really on screen: at the first frame,
+  /// or at the first resume after a background launch. Runs once.
+  void _firstForeground() {
+    if (widget.startedInBackground) PushPromptStore.countLaunch();
+    _syncSchedules();
+    // The panel's content: at every launch, and on resume once it's
+    // 15 minutes old. In the background; screens keep what they show.
+    ref.read(contentProvider.notifier).refresh(force: true);
+    ref.read(donationFundsProvider.notifier).refresh(force: true);
+    // What Siri reads, from the content this launch starts with (the fetch
+    // above rewrites it). Written here too for a member offline since install.
+    SiriDataSync.writeMosque(ref.read(contentProvider));
+    ref.read(pushProvider.notifier).start(navigate: _openFromNotification);
+    // An Apple name whose save failed at sign-in (Apple never resends it).
+    flushPendingAppleName().then((saved) {
+      if (saved && mounted) ref.invalidate(userProfileProvider);
+    });
+    _takeSiriAction();
+    // From the second launch on, our pre-prompt may ask (once): never over a
+    // Siri handoff or the donation sheet, and never off screen.
+    Future<void>.delayed(const Duration(milliseconds: 1200), () async {
+      if (await SiriBridge.hadAction()) return;
+      final resumed =
+          WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+      final context = rootNavigatorKey.currentContext;
+      if (resumed && mounted && context != null && context.mounted) {
+        maybeShowPushPrompt(context, ref, PromptTrigger.launch);
+      }
+    });
+  }
+
+  /// The donate shortcut: the same sheet as the Donate pill.
+  Future<void> _takeSiriAction() async {
+    if (await SiriBridge.takeAction() != 'donate') return;
+    final context = rootNavigatorKey.currentContext;
+    if (mounted && context != null && context.mounted) {
+      showDonateSheet(context);
+    }
+  }
+
   void _onResume() {
+    if (!_gate.resume()) return;
     _syncSchedules();
     ref.read(contentProvider.notifier).refresh();
     ref.read(donationFundsProvider.notifier).refresh();

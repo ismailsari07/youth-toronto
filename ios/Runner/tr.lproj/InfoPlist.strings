@@ -1,3 +1,8 @@
 /* Texts of iOS's permission prompts (keys from Info.plist). */
 "NSCameraUsageDescription" = "Pape Mosque kamerayı kullanmaz. Belgeler fotoğraf arşivinizden veya dosyalarınızdan seçilir.";
 "NSPhotoLibraryUsageDescription" = "Camiye gizli olarak iletmek üzere bir belgenin fotoğrafını seçin. Yalnızca seçtiğiniz fotoğraf kullanılır.";
+
+/* Other names Siri accepts for the app (INAlternativeAppNames in Info.plist). */
+"APP_NAME_SYNONYM_1" = "Pape Camii";
+"APP_NAME_SYNONYM_2" = "Pape Camii'nde";
+"APP_NAME_SYNONYM_3" = "Mosquée Pape";

@@ -8,6 +8,7 @@ import '../shared/formatters.dart';
 import 'mosque_time.dart';
 import 'prayer_days.dart';
 import 'prayer_service.dart';
+import 'siri_data_sync.dart';
 
 /// Feeds the iOS home-screen and lock-screen widgets (ios/PrayerWidget).
 ///
@@ -78,6 +79,13 @@ class PrayerWidgetSync {
       final l = await currentAppLocalizations();
       final data = buildPrayerWidgetData(days, l, mosqueNow());
       await _channel.invokeMethod<void>('update', jsonEncode(data));
+      // The same rows feed the Siri shortcuts: no second request.
+      await SiriDataSync.writePrayers(
+        days,
+        mosqueNow(),
+        firstDay: _firstDay,
+        dayCount: _dayCount,
+      );
     } catch (e) {
       debugPrint('PrayerWidgetSync: update failed: $e');
     }

@@ -2,8 +2,9 @@
 /// [main] and the first frame still run, because Flutter builds its first
 /// frame without a screen, but nothing a member would notice may happen then:
 /// no pre-prompt, no launch counted, no `register_device`, no reminders
-/// rescheduled, no network work on the launch's behalf. All of that waits
-/// until the app really comes forward, and runs once.
+/// rescheduled, no sync of the panel's content. All of that waits until the
+/// app really comes forward, and runs once. (The unseen first frame can still
+/// run a screen's read-only loads; they write nothing.)
 class LaunchGate {
   LaunchGate({required this.startedInBackground, required this.onFirstForeground});
 

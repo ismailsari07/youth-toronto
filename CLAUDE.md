@@ -195,7 +195,8 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   are written in all three. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.
 - Intents are in the Runner target (Apple's rule for App Shortcuts), so a question launches the app in the background.
   `LaunchGate` keeps that invisible: no launch counted, no pre-prompt, no `register_device`, no reminder reschedule, no
-  fetch started by the launch, until the app really comes forward, then all of it once
+  sync of the panel's content, until the app really comes forward, then all of it once. (The unseen first frame can still
+  run the home screen's read-only loads, like prayer times and events; they write nothing.)
   (`test/siri/launch_gate_test.dart` pumps the real `MytApp`). Silent pushes get the same gate and still reschedule through
   `onBackgroundPush`. The pre-prompt also never fires over a shortcut that brought the app forward.
 - Directions and Call: Siri confirms, then `HandoffIntent` brings the app forward for a moment to open Maps or `tel:`; a

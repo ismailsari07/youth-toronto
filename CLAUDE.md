@@ -205,6 +205,8 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
 - App names: `INAlternativeAppNames` with per-language values in `InfoPlist.strings`, limit three per language. Turkish's
   third is "Pape Camii'nde" so "Pape Camii'nde sıradaki namaz" matches. Apple's docs ask for an Intents extension; an Apple
   engineer wrote (June 2026) that it keeps working for App Shortcuts. If a phone ignores them, that extension is next.
+- Prayer parameter: Siri matches the name in the phrase's language (Turkish İmsak, Öğle, İkindi, Akşam, Yatsı). No synonyms like
+  "Sabah": that initializer needs iOS 17 and the table is read at build time, so it can't vary by iOS version.
 - Turkish sentences say "1:07'de" (`TurkishTime`: the suffix follows the last number said, no AM/PM); cards keep "1:07 PM".
 - Tests: `tool/siri_swift_test.sh` runs the Foundation-only logic in Docker; workflow `siri-check` in `codemagic.yaml`
   compiles everything (the only compile of `AppIntents` and SwiftUI code; this machine has no Xcode) and runs RunnerTests.

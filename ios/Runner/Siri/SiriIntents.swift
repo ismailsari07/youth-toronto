@@ -29,12 +29,15 @@ enum PrayerChoice: String, AppEnum {
 
   static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Prayer")
 
+  // Titles are per language in Localizable.strings (Isha is "Yatsı" in Turkish,
+  // "Icha" in French). No synonyms: that initializer needs iOS 17, and this
+  // table is read at build time, so it can't vary by iOS version.
   static var caseDisplayRepresentations: [PrayerChoice: DisplayRepresentation] = [
-    .fajr: DisplayRepresentation(title: "Fajr", synonyms: ["Fajr", "İmsak", "imsak", "Sabah", "sabah", "Fajr prayer"]),
-    .dhuhr: DisplayRepresentation(title: "Dhuhr", synonyms: ["Dhuhr", "Zuhr", "Öğle", "öğle", "Dhohr"]),
-    .asr: DisplayRepresentation(title: "Asr", synonyms: ["Asr", "İkindi", "ikindi"]),
-    .maghrib: DisplayRepresentation(title: "Maghrib", synonyms: ["Maghrib", "Akşam", "akşam"]),
-    .isha: DisplayRepresentation(title: "Isha", synonyms: ["Isha", "Yatsı", "yatsı", "Icha"]),
+    .fajr: "Fajr",
+    .dhuhr: "Dhuhr",
+    .asr: "Asr",
+    .maghrib: "Maghrib",
+    .isha: "Isha",
   ]
 
   var key: PrayerKey {

@@ -223,6 +223,12 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
 - Tests: `tool/siri_swift_test.sh` runs the Foundation-only logic in Docker; workflow `siri-check` in `codemagic.yaml`
   compiles everything (the only compile of `AppIntents` and SwiftUI code; this machine has no Xcode) and runs RunnerTests.
 
+## Announcement photos on cards (since 1.4.0)
+
+`PosterFrame` (`announcement_photo.dart`), the website's rule: the card keeps its 16:9 frame and the whole image shows
+(contain), over a blurred, darkened copy of itself. Within 2% of 16:9 it just fills the frame, so photos look as before. The
+detail page keeps the natural size. Event photos (`PhotoBand`) still crop.
+
 ## Release checklist
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;

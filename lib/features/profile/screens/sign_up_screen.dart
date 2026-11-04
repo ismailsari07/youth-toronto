@@ -1,3 +1,4 @@
+import '../../../shared/birth_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -48,13 +49,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime(now.year - 25),
-      firstDate: DateTime(now.year - 100),
-      lastDate: now,
-    );
+    final picked = await showBirthDatePicker(context, initial: _birthDate);
     if (picked == null) return;
     setState(() {
       _birthDate = picked;

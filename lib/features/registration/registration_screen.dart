@@ -257,6 +257,8 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                           ),
                           const SizedBox(height: AppSpace.cardGapWide),
                         ],
+                        _NoCancelNote(text: l.regNoCancelNote),
+                        const SizedBox(height: AppSpace.cardGapWide),
                         SectionHeader(title: l.regYourDetails),
                         const SizedBox(height: AppSpace.sectionHeaderGap),
                         if (s.me != null) _details(context, s, s.me!),
@@ -445,6 +447,31 @@ class _DisabledSubmit extends StatelessWidget {
           child: Text(label, style: AppText.buttonLarge.c(context.colors.inkDisabled)),
         ),
       );
+}
+
+/// Said before the member fills anything in, not only next to the button.
+class _NoCancelNote extends StatelessWidget {
+  const _NoCancelNote({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return AppCard(
+      key: const Key('registration-no-cancel-note'),
+      radius: AppRadius.listCard,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppIcon(AppIcons.alert, size: 18, color: c.ink3),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: AppText.caption.c(c.ink2))),
+        ],
+      ),
+    );
+  }
 }
 
 class _BannerCard extends StatelessWidget {

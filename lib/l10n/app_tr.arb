@@ -401,6 +401,7 @@
   "regPhone": "Telefon",
   "regSavedToProfile": "Profiline kaydedilir",
   "regSubmit": "Kaydı gönder",
+  "regNoCancelNote": "Kayıt uygulamadan iptal edilemez. Değiştirmen gerekirse camiyle iletişime geç.",
   "regNoCancel": "Kayıt uygulamadan iptal edilemez.",
   "regOffline": "İnternet bağlantısı yok. Kayıt için bağlantı gerekir.",
   "regFormChanged": "Form güncellendi, kontrol edip tekrar gönder.",

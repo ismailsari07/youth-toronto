@@ -1340,6 +1340,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get regSubmit => 'Kaydı gönder';
 
   @override
+  String get regNoCancelNote =>
+      'Kayıt uygulamadan iptal edilemez. Değiştirmen gerekirse camiyle iletişime geç.';
+
+  @override
   String get regNoCancel => 'Kayıt uygulamadan iptal edilemez.';
 
   @override

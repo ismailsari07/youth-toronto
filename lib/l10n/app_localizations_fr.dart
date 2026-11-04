@@ -1369,6 +1369,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get regSubmit => 'Envoyer l\'inscription';
 
   @override
+  String get regNoCancelNote =>
+      'Une inscription ne peut pas être annulée dans l\'application. Pour la modifier, veuillez communiquer avec la mosquée.';
+
+  @override
   String get regNoCancel =>
       'Une inscription ne peut pas être annulée dans l\'application.';
 

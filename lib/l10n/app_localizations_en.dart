@@ -1273,7 +1273,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String regViews(int count) {
-    return '$count people viewed';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people viewed',
+      one: '1 person viewed',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1345,6 +1351,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regSubmit => 'Send registration';
+
+  @override
+  String get regNoCancelNote =>
+      'A registration can\'t be cancelled in the app. If you need to change it, please contact the mosque.';
 
   @override
   String get regNoCancel => 'A registration can\'t be cancelled in the app.';

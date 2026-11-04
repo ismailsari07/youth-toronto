@@ -2167,7 +2167,7 @@ abstract class AppLocalizations {
   /// Under the registration card; only from 25 views.
   ///
   /// In en, this message translates to:
-  /// **'{count} people viewed'**
+  /// **'{count, plural, =1{1 person viewed} other{{count} people viewed}}'**
   String regViews(int count);
 
   /// Registration state and disabled button: no places left.
@@ -2295,6 +2295,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send registration'**
   String get regSubmit;
+
+  /// At the top of the registration form, before the member sends it.
+  ///
+  /// In en, this message translates to:
+  /// **'A registration can\'t be cancelled in the app. If you need to change it, please contact the mosque.'**
+  String get regNoCancelNote;
 
   /// Under the send button.
   ///

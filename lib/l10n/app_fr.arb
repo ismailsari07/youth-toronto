@@ -401,6 +401,7 @@
   "regPhone": "Téléphone",
   "regSavedToProfile": "Enregistré dans votre profil",
   "regSubmit": "Envoyer l'inscription",
+  "regNoCancelNote": "Une inscription ne peut pas être annulée dans l'application. Pour la modifier, veuillez communiquer avec la mosquée.",
   "regNoCancel": "Une inscription ne peut pas être annulée dans l'application.",
   "regOffline": "Aucune connexion Internet. L'inscription en nécessite une.",
   "regFormChanged": "Le formulaire a changé. Vérifiez-le, puis renvoyez-le.",

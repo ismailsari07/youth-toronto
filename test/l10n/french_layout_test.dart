@@ -102,7 +102,7 @@ void main() {
   });
 
   final now = DateTime.now();
-  UpcomingEvent event(String id, String recurrence, {String? after, bool form = false}) {
+  UpcomingEvent event(String id, String recurrence, {String? after, bool form = false, bool contribution = false}) {
     final start = tz.TZDateTime.from(now.add(const Duration(days: 9)), mosqueTz);
     return UpcomingEvent(
       YouthEvent(
@@ -118,6 +118,9 @@ void main() {
         isPublished: true,
         startsAfterPrayer: after,
         registrationForm: form ? reg.form() : null,
+        contributionPhone: contribution ? '416 555 0142' : null,
+        contributionHeading: contribution ? 'Souhaitez-vous contribuer à cette soirée?' : null,
+        contributionText: contribution ? 'Pour apporter un repas ou une collation, vous pouvez nous appeler.' : null,
       ),
       start,
     );
@@ -291,6 +294,7 @@ void main() {
     'prayer_home': (_) => const PrayerHomeScreen(),
     'community_events': (_) => const CommunityScreen(),
     'event_recurring': (_) => EventDetailScreen(upcoming: event('e2', 'weekly', after: 'maghrib')),
+    'event_contribution': (_) => EventDetailScreen(upcoming: event('e5', 'none', contribution: true)),
     'announcement': (_) => AnnouncementDetailScreen(item: announcement),
     'profile_signed_in': (_) => const ProfileRootScreen(),
     'settings': (_) => const SettingsScreen(),

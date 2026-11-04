@@ -814,6 +814,12 @@ abstract class AppLocalizations {
   /// **'Call the mosque office'**
   String get callTheOffice;
 
+  /// Event page, contribution box: under the phone number when the event names no contact person.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to call'**
+  String get tapToCall;
+
   /// No description provided for @mosqueOffice.
   ///
   /// In en, this message translates to:

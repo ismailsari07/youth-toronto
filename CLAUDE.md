@@ -122,6 +122,15 @@ Contract: pape-admin CLAUDE.md §10 (the server enforces everything; the app's c
   mute); `set_event_notifications` answering `P0001 registered` is `PushError.registered` (toggle stays on). The
   event's notification row is on and locked only while push can arrive (D5).
 
+## Contribution box (next version after 1.3.1)
+
+Optional "call this number to contribute" card on the event page, after "About this event"
+(`lib/features/community/widgets/event_contribution_card.dart`). Information only, no payment. Columns
+`youth_events.contribution_phone/_heading/_text/_name`: no phone means no card. The phone is always
+`416 555 0142` (Canada/US, set by the panel), so `telUri` dials it. The heading and text are single-language, like
+the event title; only "Tap to call" is translated. **When this version is on the App Store:** set
+`APP_SHOWS_CONTRIBUTION = true` in pape-admin `src/lib/event-contribution.ts`.
+
 ## Keyboard (since 1.2.1)
 
 The keyboard always has a way out (TestFlight 1.2.0: number, phone and multi-line fields had none). Code:

@@ -143,6 +143,17 @@ class YouthEvent {
 
   bool get hasForm => registrationForm != null;
 
+  /// The contribution box: "call this number to contribute" (pape-admin
+  /// CLAUDE.md §3). No phone means no box.
+  final String? contributionPhone;
+  final String? contributionHeading;
+  final String? contributionText;
+  final String? contributionName;
+
+  bool get hasContribution =>
+      (contributionPhone?.trim().isNotEmpty ?? false) &&
+      (contributionHeading?.trim().isNotEmpty ?? false);
+
   const YouthEvent({
     required this.id,
     required this.title,
@@ -159,6 +170,10 @@ class YouthEvent {
     required this.isPublished,
     this.startsAfterPrayer,
     this.registrationForm,
+    this.contributionPhone,
+    this.contributionHeading,
+    this.contributionText,
+    this.contributionName,
   });
 
   EventRecurrence get repeats => EventRecurrence.parse(recurrence);
@@ -195,6 +210,10 @@ class YouthEvent {
         isPublished: json['is_published'] as bool? ?? false,
         startsAfterPrayer: _prayerKey(json['starts_after_prayer'] as String?),
         registrationForm: json['registration_form'],
+        contributionPhone: json['contribution_phone'] as String?,
+        contributionHeading: json['contribution_heading'] as String?,
+        contributionText: json['contribution_text'] as String?,
+        contributionName: json['contribution_name'] as String?,
       );
 
   static const prayerKeys = {'fajr', 'dhuhr', 'asr', 'maghrib', 'isha'};

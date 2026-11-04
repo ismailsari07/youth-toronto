@@ -360,6 +360,10 @@
   "shareThisAnnouncement": "Share this announcement",
   "questions": "Questions?",
   "callTheOffice": "Call the mosque office",
+  "tapToCall": "Tap to call",
+  "@tapToCall": {
+    "description": "Event page, contribution box: under the phone number when the event names no contact person."
+  },
   "mosqueOffice": "Mosque office",
   "everyoneWelcome": "Everyone is welcome",
   "freeToAttend": "Free to attend",

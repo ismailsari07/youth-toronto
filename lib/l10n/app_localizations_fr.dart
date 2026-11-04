@@ -534,6 +534,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get callTheOffice => 'Appeler le bureau de la mosquée';
 
   @override
+  String get tapToCall => 'Touchez pour appeler';
+
+  @override
   String get mosqueOffice => 'Bureau de la mosquée';
 
   @override

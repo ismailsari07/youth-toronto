@@ -531,6 +531,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get callTheOffice => 'Cami ofisini arayın';
 
   @override
+  String get tapToCall => 'Aramak için dokunun';
+
+  @override
   String get mosqueOffice => 'Cami ofisi';
 
   @override

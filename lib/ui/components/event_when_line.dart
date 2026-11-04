@@ -42,7 +42,7 @@ class EventWhenLine extends ConsumerWidget {
         ? '${recurrenceWhen(l, event.repeats, start)} · '
             '${l.afterPrayerInline(prayer)}'
         : l.afterPrayer(prayer);
-    final about = estimate == null ? null : l.aboutTime(eventTime(estimate));
+    final about = estimate == null ? null : l.aboutTime(eventTime(l, estimate));
 
     return Semantics(
       label: [

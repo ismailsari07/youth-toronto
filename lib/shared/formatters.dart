@@ -10,8 +10,9 @@ import '../l10n/l10n.dart';
 // the strings for the current language: words and date order come from the
 // ARB files (the `datePattern*` keys), month and weekday names from intl.
 //
-// Clock times stay 12-hour ("7:30 PM") in every language: the mosque is in
-// Canada, where that is how times are written.
+// Clock times follow the language: "4:55 PM" in English, "16:55" in Turkish,
+// "16 h 55" in French (Canadian style). Display only: instants and scheduling
+// never read this text.
 
 String _format(AppLocalizations l, String pattern, DateTime dt) =>
     DateFormat(pattern, l.localeName).format(dt);
@@ -33,23 +34,34 @@ String timeAgo(AppLocalizations l, DateTime dt) {
   return l.monthsAgo(months < 1 ? 1 : months);
 }
 
-/// 12-hour clock time, e.g. "7:30 PM".
-String eventTime(DateTime dt) {
-  final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
-  final m = dt.minute.toString().padLeft(2, '0');
-  final ampm = dt.hour >= 12 ? 'PM' : 'AM';
-  return '$h:$m $ampm';
+/// A wall-clock time in [language] (`en`, `tr`, `fr`). French on the hour is
+/// "16 h". French keeps its parts together with no-break spaces.
+String clockText(String language, int hour, int minute) {
+  final mm = minute.toString().padLeft(2, '0');
+  switch (language.split(RegExp('[-_]')).first) {
+    case 'tr':
+      return '${hour.toString().padLeft(2, '0')}:$mm';
+    case 'fr':
+      return minute == 0 ? '$hour\u00A0h' : '$hour\u00A0h\u00A0$mm';
+    default:
+      final h = hour % 12 == 0 ? 12 : hour % 12;
+      return '$h:$mm ${hour >= 12 ? 'PM' : 'AM'}';
+  }
 }
 
-/// Event card date, e.g. "MAY 8 · 7:30 PM", "8 MAI · 7:30 PM".
+/// An event's clock time: "7:30 PM", "19:30", "19 h 30".
+String eventTime(AppLocalizations l, DateTime dt) =>
+    clockText(l.localeName, dt.hour, dt.minute);
+
+/// Event card date, e.g. "MAY 8 · 7:30 PM", "8 MAI · 19 h 30".
 String eventCardDate(AppLocalizations l, DateTime dt) =>
     '${upper(_format(l, l.datePatternCard, dt), l.localeName)} · '
-    '${eventTime(dt)}';
+    '${eventTime(l, dt)}';
 
 /// Hero/subtitle date, kept short so it stays on one line:
 /// "Sat 26 Sep · 6:30 PM".
 String heroDateTime(AppLocalizations l, DateTime dt) =>
-    '${shortDate(l, dt)} · ${eventTime(dt)}';
+    '${shortDate(l, dt)} · ${eventTime(l, dt)}';
 
 /// Screen title date: "Wednesday, 23 September", "23 Eylül Çarşamba".
 String todayTitle(AppLocalizations l) => _titleDate(l, DateTime.now());
@@ -71,13 +83,11 @@ String? gregorianTitle(AppLocalizations l, String? raw) {
 
 /// prayer_cache mixes 24-hour morning times ("05:24") with 12-hour afternoon
 /// ones ("1:16"); mosque_time resolves which is which by prayer name. This
-/// renders them all as "5:24 AM".
-String prayerClock12(String prayerName, String stored) {
+/// renders them all in the language's clock: "1:16 PM", "13:16", "13 h 16".
+String prayerClockText(AppLocalizations l, String prayerName, String stored) {
   final clock = prayerClock(prayerName, stored);
   if (clock == null) return stored;
-  final h = clock.hour % 12 == 0 ? 12 : clock.hour % 12;
-  final suffix = clock.hour >= 12 ? 'PM' : 'AM';
-  return '$h:${clock.minute.toString().padLeft(2, '0')} $suffix';
+  return clockText(l.localeName, clock.hour, clock.minute);
 }
 
 /// prayer_cache stores `hijriDate` as d.M.yyyy — "11.2.1448" → "11 Safar 1448".
@@ -244,7 +254,7 @@ String sessionLine(AppLocalizations l, UpcomingEvent u) {
       : shortDate(l, u.startsAt);
   final prayer = e.startsAfterPrayer;
   final when =
-      prayer == null ? eventTime(u.startsAt) : l.afterPrayerInline(prayer);
+      prayer == null ? eventTime(l, u.startsAt) : l.afterPrayerInline(prayer);
   return '$lead · $when';
 }
 

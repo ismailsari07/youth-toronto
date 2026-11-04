@@ -449,7 +449,7 @@ void main() {
     test('French', () {
       expect(dhuhr(atAthan, fr).title, 'Dhohr');
       expect(dhuhr(atAthan, fr).body,
-          "C'est l'heure de la prière du Dhohr · Iqama à 1:45 PM");
+          "C'est l'heure de la prière du Dhohr · Iqama à 13\u00A0h\u00A045");
       expect(dhuhr(const ReminderSettings(), fr).body,
           'Iqama du Dhohr dans 5 minutes');
       final asr = build(const ReminderSettings(), l: fr)
@@ -459,11 +459,11 @@ void main() {
 
     test('Turkish: İmsak as the title, Sabah namazı in the body', () {
       expect(dhuhr(atAthan, tr).title, 'Öğle');
-      expect(dhuhr(atAthan, tr).body, 'Öğle namazı vakti girdi · Cemaat 1:45 PM');
+      expect(dhuhr(atAthan, tr).body, 'Öğle namazı vakti girdi · Cemaat 13:45');
       expect(dhuhr(const ReminderSettings(), tr).body,
           'Öğle cemaatine 5 dakika kaldı');
       expect(fajr(atAthan, tr).title, 'İmsak');
-      expect(fajr(atAthan, tr).body, 'Sabah namazı vakti girdi · Cemaat 6:45 AM');
+      expect(fajr(atAthan, tr).body, 'Sabah namazı vakti girdi · Cemaat 06:45');
       expect(fajr(const ReminderSettings(), tr).body,
           'Sabah namazı cemaatine 5 dakika kaldı');
     });

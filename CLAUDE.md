@@ -216,7 +216,9 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   engineer wrote (June 2026) that it keeps working for App Shortcuts. If a phone ignores them, that extension is next.
 - Prayer parameter: Siri matches the name in the phrase's language (Turkish İmsak, Öğle, İkindi, Akşam, Yatsı). No synonyms like
   "Sabah": that initializer needs iOS 17 and the table is read at build time, so it can't vary by iOS version.
-- Turkish sentences say "1:07'de" (`TurkishTime`: the suffix follows the last number said, no AM/PM); cards keep "1:07 PM".
+- Turkish sentences say "13:07'de", "16:30'da" (`TurkishTime`: the suffix follows the last number said; on the hour, the
+  hour: "16:00'da"); cards keep "13:07". Each time in `siri_prayers` is `{en, tr, fr}` (document version 2): Siri's language can
+  differ from the app's, and a document missing a language is refused.
 - No Apple names in any intent text: title, description, parameter, phrase, short title, spoken or snippet text, in any language.
   App Store Connect rejects the upload otherwise (ITMS-90626, build 23 of 1.4.0, "cannot contain 'siri'"), and only at upload.
   `test/siri/siri_trademark_test.dart` scans the code's string literals and every `.strings` file for these names.
@@ -228,6 +230,13 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
 `PosterFrame` (`announcement_photo.dart`), the website's rule: the card keeps its 16:9 frame and the whole image shows
 (contain), over a blurred, darkened copy of itself. Within 2% of 16:9 it just fills the frame, so photos look as before. The
 detail page keeps the natural size. Event photos (`PhotoBand`) still crop.
+
+## Clock times (since 1.4.0)
+
+English "4:55 PM", Turkish "16:55" (morning "05:43"), French "16 h 55" (no-break spaces; on the hour "16 h"). One function,
+`clockText` in `lib/shared/formatters.dart`, behind `prayerClockText` and `eventTime`; the widget and Siri get its text from
+Flutter. Display only: instants and scheduling never read it (`test/l10n/clock_format_test.dart`, DST days included).
+`french_layout_test.dart` fails on a 12-hour or colon time on any French screen. Free text from the panel isn't converted.
 
 ## Release checklist
 

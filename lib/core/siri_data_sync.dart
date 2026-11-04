@@ -19,13 +19,17 @@ import 'siri_bridge.dart';
 /// Group, each with its own key, so one failed fetch never touches another.
 /// The shortcuts read only these; they have no network.
 ///
-/// Every time is written as an instant and as display text by the code the
-/// reminders use, so Siri can't disagree with the app.
+/// Every time is written as an instant and as display text in each language
+/// by the code the reminders use, so Siri can't disagree with the app. Siri's
+/// language can differ from the app's, so all three are always there.
 abstract final class SiriDataSync {
   static const prayersKey = 'siri_prayers';
   static const eventsKey = 'siri_events';
   static const mosqueKey = 'siri_mosque';
-  static const version = 1;
+
+  /// 2: every time carries its text per language. An older document is
+  /// refused and rewritten at the next launch.
+  static const version = 2;
 
   /// Sessions kept per document. Answers are refused after 7 days, so this
   /// only has to outlast that.
@@ -62,18 +66,29 @@ abstract final class SiriDataSync {
 
 int _seconds(DateTime t) => t.millisecondsSinceEpoch ~/ 1000;
 
+/// A stored time's text in the three languages. Only for a time that already
+/// parsed into an instant.
+Map<String, String> _clockTexts(String name, String stored) {
+  final clock = prayerClock(name, stored)!;
+  return {
+    for (final code in const ['en', 'tr', 'fr'])
+      code: clockText(code, clock.hour, clock.minute),
+  };
+}
+
 /// The prayers document: real rows only ([scheduleDays]), nothing filled in.
-/// Version 1:
+/// Version 2, where every text below is `{"en": "5:43 AM", "tr": "05:43",
+/// "fr": "5 h 43"}` (shortened here):
 ///
 /// ```json
 /// {"version": 1, "writtenAt": 1793600000,
 ///  "days": [{"date": "2026-11-06",
-///    "prayers": [{"key": "Fajr", "at": 1793620980, "time": "5:43 AM",
-///                 "iqamahAt": 1793622780, "iqamah": "6:13 AM"}],
-///    "jumuah": {"at": 1793640000, "time": "1:30 PM"}}],
+///    "prayers": [{"key": "Fajr", "at": 1793620980, "time": {…},
+///                 "iqamahAt": 1793622780, "iqamah": {…}}],
+///    "jumuah": {"at": 1793640000, "time": {…}}}],
 ///  "eid": [{"which": "fitr", "date": "2027-03-09",
-///           "firstAt": 1804000000, "first": "8:00 AM",
-///           "secondAt": 1804001800, "second": "8:30 AM"}]}
+///           "firstAt": 1804000000, "first": {…},
+///           "secondAt": 1804001800, "second": {…}}]}
 /// ```
 ///
 /// `jumuah` only on a Friday, from that Friday's own row, as the reminders
@@ -99,9 +114,9 @@ Map<String, Object?> buildPrayers(
       prayers.add({
         'key': item.name,
         'at': _seconds(moment),
-        'time': prayerClock12(item.name, item.time),
+        'time': _clockTexts(item.name, item.time),
         if (iqamahMoment != null) 'iqamahAt': _seconds(iqamahMoment),
-        if (iqamahMoment != null) 'iqamah': prayerClock12(item.name, iqamah!),
+        if (iqamahMoment != null) 'iqamah': _clockTexts(item.name, iqamah!),
       });
     }
     final jumaa = day.weekday == DateTime.friday ? payload.jumaaPrayerTime : null;
@@ -112,7 +127,7 @@ Map<String, Object?> buildPrayers(
       if (jumaaMoment != null)
         'jumuah': {
           'at': _seconds(jumaaMoment),
-          'time': prayerClock12('Dhuhr', jumaa!),
+          'time': _clockTexts('Dhuhr', jumaa!),
         },
     });
   }
@@ -139,9 +154,9 @@ List<Map<String, Object?>> _eid(EidPrayerTimes? eid) {
       'which': which,
       'date': mosqueDateKey(date),
       'firstAt': _seconds(first),
-      'first': prayerClock12('Fajr', entry.firstIqamah),
+      'first': _clockTexts('Fajr', entry.firstIqamah),
       if (second != null) 'secondAt': _seconds(second),
-      if (second != null) 'second': prayerClock12('Fajr', entry.secondIqamah),
+      if (second != null) 'second': _clockTexts('Fajr', entry.secondIqamah),
     });
   }
   return out;
@@ -150,7 +165,7 @@ List<Map<String, Object?>> _eid(EidPrayerTimes? eid) {
 /// The events document. Each line in all three languages, from the app's own
 /// wording, because Siri's language can differ from the app's. Prayer-linked
 /// sessions say "after Maghrib" with no clock time: no estimates here. Version
-/// 1:
+/// 2:
 ///
 /// ```json
 /// {"version": 1, "fetchedAt": 1793600000,
@@ -211,7 +226,7 @@ Map<String, Object?> buildEvents(Iterable<YouthEvent> events, tz.TZDateTime now)
   };
 }
 
-/// The mosque document, from the content bundle. Version 1:
+/// The mosque document, from the content bundle. Version 2:
 ///
 /// ```json
 /// {"version": 1, "name": "…", "phone": "647 834 2000",

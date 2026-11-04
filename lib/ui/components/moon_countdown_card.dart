@@ -291,9 +291,9 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
         const SizedBox(height: 2),
         Text(
           [
-            l.athanAt(prayerClock12(next.name, next.time)),
+            l.athanAt(prayerClockText(l, next.name, next.time)),
             if (next.iqamah != null)
-              l.iqamahAt(prayerClock12(next.name, next.iqamah!)),
+              l.iqamahAt(prayerClockText(l, next.name, next.iqamah!)),
           ].join(' · '),
           style: AppText.countdownSub.c(context.colors.onHeroSecondary),
         ),
@@ -366,7 +366,7 @@ class _MoonCountdownCardState extends State<MoonCountdownCard> {
           ).c(context.colors.onHero),
         ),
         Text(
-          prayerClock12(prayer.name, prayer.time),
+          prayerClockText(context.l10n, prayer.name, prayer.time),
           style: const TextStyle(fontSize: 11.5, height: 1.2)
               .c(context.colors.onHeroSecondary),
         ),

@@ -24,7 +24,7 @@ struct StoredPrayer: Decodable, Hashable {
   let key: String // English name: Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha
   let name: String // localised
   let at: Double // athan, Unix seconds
-  let time: String // "4:55 PM"
+  let time: String // "4:55 PM", "16:55", "16 h 55": written by the app
   let athan: String // "Athan 4:55 PM"
   let iqamah: String? // "Iqamah 5:15 PM"; absent for Sunrise
   let day: String // mosque date, yyyy-MM-dd
@@ -66,6 +66,8 @@ struct WidgetText {
   let nextPrayer: String
   let athan: String
   let prayerNames: [String: String]
+  /// The gallery sample's times, Fajr to Isha, in the language's clock.
+  let sampleTimes: [String]
 
   static func forLanguage(_ code: String?) -> WidgetText {
     let lang = String((code ?? "en").prefix(2)).lowercased()
@@ -80,6 +82,10 @@ struct WidgetText {
         prayerNames: [
           "Fajr": "Fajr", "Sunrise": "Lever du soleil", "Dhuhr": "Dhohr",
           "Asr": "Asr", "Maghrib": "Maghrib", "Isha": "Icha",
+        ],
+        sampleTimes: [
+          "5\u{00A0}h\u{00A0}43", "7\u{00A0}h\u{00A0}11", "13\u{00A0}h\u{00A0}11",
+          "16\u{00A0}h\u{00A0}23", "19\u{00A0}h\u{00A0}02", "20\u{00A0}h\u{00A0}19",
         ]
       )
     case "tr":
@@ -92,7 +98,8 @@ struct WidgetText {
         prayerNames: [
           "Fajr": "İmsak", "Sunrise": "Güneş", "Dhuhr": "Öğle",
           "Asr": "İkindi", "Maghrib": "Akşam", "Isha": "Yatsı",
-        ]
+        ],
+        sampleTimes: ["05:43", "07:11", "13:11", "16:23", "19:02", "20:19"]
       )
     default:
       return WidgetText(
@@ -101,7 +108,8 @@ struct WidgetText {
         openApp: "Open Pape Mosque to update prayer times.",
         nextPrayer: "NEXT PRAYER",
         athan: "Athan",
-        prayerNames: [:]
+        prayerNames: [:],
+        sampleTimes: ["5:43 AM", "7:11 AM", "1:11 PM", "4:23 PM", "7:02 PM", "8:19 PM"]
       )
     }
   }
@@ -174,12 +182,12 @@ struct PrayerEntry: TimelineEntry {
       )
     }
     let day = [
-      prayer("Fajr", -36_000, "5:43 AM"),
-      prayer("Sunrise", -32_000, "7:11 AM"),
-      prayer("Dhuhr", -12_000, "1:11 PM"),
-      prayer("Asr", 4_500, "4:23 PM"),
-      prayer("Maghrib", 14_000, "7:02 PM"),
-      prayer("Isha", 18_000, "8:19 PM"),
+      prayer("Fajr", -36_000, text.sampleTimes[0]),
+      prayer("Sunrise", -32_000, text.sampleTimes[1]),
+      prayer("Dhuhr", -12_000, text.sampleTimes[2]),
+      prayer("Asr", 4_500, text.sampleTimes[3]),
+      prayer("Maghrib", 14_000, text.sampleTimes[4]),
+      prayer("Isha", 18_000, text.sampleTimes[5]),
     ]
     let snapshot = Snapshot(
       label: text.nextPrayer, next: day[3], current: day[2], highlighted: day[2], day: day

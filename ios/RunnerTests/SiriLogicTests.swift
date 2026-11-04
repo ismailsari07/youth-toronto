@@ -15,10 +15,17 @@ final class SiriLogicTests: XCTestCase {
     cal.date(from: DateComponents(year: y, month: mo, day: d, hour: h, minute: mi))!
   }
 
-  private func clock(_ date: Date) -> String {
+  /// What Flutter writes (clockText in lib/shared/formatters.dart).
+  private func clock(_ date: Date) -> SiriClock {
     let c = cal.dateComponents([.hour, .minute], from: date)
-    let h = c.hour! % 12 == 0 ? 12 : c.hour! % 12
-    return "\(h):" + String(format: "%02d", c.minute!) + (c.hour! >= 12 ? " PM" : " AM")
+    let (hour, minute) = (c.hour!, c.minute!)
+    let h = hour % 12 == 0 ? 12 : hour % 12
+    let mm = String(format: "%02d", minute)
+    return SiriClock(
+      en: "\(h):\(mm) \(hour >= 12 ? "PM" : "AM")",
+      tr: String(format: "%02d", hour) + ":" + mm,
+      fr: minute == 0 ? "\(hour)\u{00A0}h" : "\(hour)\u{00A0}h\u{00A0}\(mm)"
+    )
   }
 
   private func prayer(_ key: PrayerKey, _ date: Date, iqamahAfter: Int? = 20) -> SiriPrayer {
@@ -51,7 +58,7 @@ final class SiriLogicTests: XCTestCase {
   }
 
   private func doc(_ days: [SiriDay], eid: [SiriEid] = []) -> SiriPrayersDoc {
-    SiriPrayersDoc(version: 1, writtenAt: 0, days: days, eid: eid)
+    SiriPrayersDoc(version: SiriStoreKey.version, writtenAt: 0, days: days, eid: eid)
   }
 
   // Sunday 8 Nov 2026 is an ordinary day; Friday is 13 Nov.
@@ -84,7 +91,7 @@ final class SiriLogicTests: XCTestCase {
 
   func testNextPrayerNameTimesAndTimeLeft() {
     let answer = engine(at(2026, 11, 8, 12, 0)).nextPrayer()
-    XCTAssertEqual(answer.spoken, "Sıradaki namaz öğle. Ezan 1:07 PM, Cemaat 1:27 PM. 1 saat 7 dakika kaldı.")
+    XCTAssertEqual(answer.spoken, "Sıradaki namaz öğle. Ezan 13:07, Cemaat 13:27. 1 saat 7 dakika kaldı.")
   }
 
   func testNextPrayerSkipsSunrise() {
@@ -143,9 +150,9 @@ final class SiriLogicTests: XCTestCase {
   }
 
   func testUnknownVersionIsMissing() {
-    let json = #"{"version":2,"writtenAt":0,"days":[],"eid":[]}"#
+    let json = #"{"version":1,"writtenAt":0,"days":[],"eid":[]}"#
     XCTAssertNil(SiriStore.decode(SiriPrayersDoc.self, json: json) { $0.version })
-    let good = #"{"version":1,"writtenAt":0,"days":[],"eid":[]}"#
+    let good = #"{"version":2,"writtenAt":0,"days":[],"eid":[]}"#
     XCTAssertNotNil(SiriStore.decode(SiriPrayersDoc.self, json: good) { $0.version })
     XCTAssertNil(SiriStore.decode(SiriPrayersDoc.self, json: "not json") { $0.version })
   }
@@ -154,12 +161,12 @@ final class SiriLogicTests: XCTestCase {
 
   func testSpecificPrayerAthanAndIqamah() {
     let spoken = engine(at(2026, 11, 8, 12)).prayerTime(.isha).spoken
-    XCTAssertEqual(spoken, "Bugün yatsı: Ezan 8:19 PM, Cemaat 8:39 PM.")
+    XCTAssertEqual(spoken, "Bugün yatsı: Ezan 20:19, Cemaat 20:39.")
   }
 
   func testFridayDhuhrAddsJumuah() {
     let spoken = engine(at(2026, 11, 13, 10)).prayerTime(.dhuhr).spoken
-    XCTAssertEqual(spoken, "Bugün öğle: Ezan 1:07 PM, Cemaat 1:27 PM, Cuma namazı 1:30 PM.")
+    XCTAssertEqual(spoken, "Bugün öğle: Ezan 13:07, Cemaat 13:27, Cuma namazı 13:30.")
     let other = engine(at(2026, 11, 8, 10)).prayerTime(.dhuhr).spoken
     XCTAssertFalse(other.contains("Cuma"))
   }
@@ -184,19 +191,19 @@ final class SiriLogicTests: XCTestCase {
 
   func testActiveWindow() {
     let e = engine(at(2026, 11, 8, 14, 0))
-    XCTAssertEqual(e.timeLeft(.dhuhr).spoken, "Öğle vaktinin çıkmasına 2 saat 23 dakika var. 4:23'te çıkacak.")
+    XCTAssertEqual(e.timeLeft(.dhuhr).spoken, "Öğle vaktinin çıkmasına 2 saat 23 dakika var. 16:23'te çıkacak.")
     XCTAssertEqual(e.timeLeft(nil).spoken, e.timeLeft(.dhuhr).spoken)
   }
 
   func testOwnersSentences() {
     XCTAssertEqual(
       engine(at(2026, 11, 8, 10)).timeLeft(.dhuhr).spoken,
-      "Öğle vakti henüz girmedi (1:07'de girecek)."
+      "Öğle vakti henüz girmedi (13:07'de girecek)."
     )
     XCTAssertEqual(engine(at(2026, 11, 8, 17)).timeLeft(.dhuhr).spoken, "Öğle vakti çıktı.")
     XCTAssertEqual(
       engine(at(2026, 11, 8, 10)).timeLeft(nil).spoken,
-      "Şu an namaz vakti değil, öğle 1:07'de girecek."
+      "Şu an namaz vakti değil, öğle 13:07'de girecek."
     )
   }
 
@@ -255,7 +262,7 @@ final class SiriLogicTests: XCTestCase {
     XCTAssertTrue(TimeLeft(from: now, to: now.addingTimeInterval(59)).isUnderAMinute)
     XCTAssertTrue(TimeLeft(from: now, to: now.addingTimeInterval(-5)).isUnderAMinute)
     let e = engine(at(2026, 11, 8, 16, 22, 30))
-    XCTAssertEqual(e.timeLeft(.dhuhr).spoken, "Öğle vaktinin çıkmasına 1 dakikadan az var. 4:23'te çıkacak.")
+    XCTAssertEqual(e.timeLeft(.dhuhr).spoken, "Öğle vaktinin çıkmasına 1 dakikadan az var. 16:23'te çıkacak.")
   }
 
   private func at(_ y: Int, _ mo: Int, _ d: Int, _ h: Int, _ mi: Int, _ s: Int) -> Date {
@@ -265,7 +272,7 @@ final class SiriLogicTests: XCTestCase {
   // MARK: Jumu'ah
 
   func testJumuahBeforeOnFridayIsToday() {
-    XCTAssertEqual(engine(at(2026, 11, 13, 10)).jumuah().spoken, "Cuma namazı bugün 1:30'da.")
+    XCTAssertEqual(engine(at(2026, 11, 13, 10)).jumuah().spoken, "Cuma namazı bugün 13:30'da.")
   }
 
   func testJumuahAfterOnFridayIsNextFriday() {
@@ -312,12 +319,12 @@ final class SiriLogicTests: XCTestCase {
 
   func testEventsOlderThanSevenDaysAreNotCurrent() {
     let now = at(2026, 11, 8, 12)
-    let old = SiriEventsDoc(version: 1, fetchedAt: now.addingTimeInterval(-8 * 86400).timeIntervalSince1970, items: [])
+    let old = SiriEventsDoc(version: SiriStoreKey.version, fetchedAt: now.addingTimeInterval(-8 * 86400).timeIntervalSince1970, items: [])
     XCTAssertEqual(
       engine(now, events: old).upcomingEvents().spoken,
       "Etkinlikler güncel değil, lütfen uygulamayı açın."
     )
-    let edge = SiriEventsDoc(version: 1, fetchedAt: now.addingTimeInterval(-7 * 86400).timeIntervalSince1970, items: [])
+    let edge = SiriEventsDoc(version: SiriStoreKey.version, fetchedAt: now.addingTimeInterval(-7 * 86400).timeIntervalSince1970, items: [])
     XCTAssertEqual(engine(now, events: edge).upcomingEvents().spoken, "Yaklaşan etkinlik yok.")
   }
 
@@ -329,7 +336,7 @@ final class SiriLogicTests: XCTestCase {
       event("a", "2026-11-09", at(2026, 11, 9, 18)),
       event("old", "2026-11-07", at(2026, 11, 7, 18)),
     ]
-    let answer = engine(now, events: SiriEventsDoc(version: 1, fetchedAt: now.timeIntervalSince1970, items: items)).upcomingEvents()
+    let answer = engine(now, events: SiriEventsDoc(version: SiriStoreKey.version, fetchedAt: now.timeIntervalSince1970, items: items)).upcomingEvents()
     XCTAssertEqual(answer.spoken, "Sıradaki etkinlik: Etkinlik a, Her Çarşamba, akşam namazından sonra.")
     guard case let .events(_, list) = answer.card else { return XCTFail() }
     XCTAssertEqual(list.map(\.title), ["Etkinlik a", "Etkinlik b"])
@@ -339,14 +346,14 @@ final class SiriLogicTests: XCTestCase {
   func testEventStaysListedAllDay() {
     let now = at(2026, 11, 8, 22)
     let items = [event("a", "2026-11-08", at(2026, 11, 8, 10))]
-    let list = SiriEvents.upcoming(SiriEventsDoc(version: 1, fetchedAt: now.timeIntervalSince1970, items: items), now: now)
+    let list = SiriEvents.upcoming(SiriEventsDoc(version: SiriStoreKey.version, fetchedAt: now.timeIntervalSince1970, items: items), now: now)
     XCTAssertEqual(list?.count, 1)
   }
 
   func testEventsOffInThePanelReadAsNone() {
     let now = at(2026, 11, 8, 12)
-    let m = SiriMosqueDoc(version: 1, name: "M", phone: nil, tel: nil, address: nil, lat: nil, lng: nil, eventsEnabled: false)
-    let docs = SiriEventsDoc(version: 1, fetchedAt: now.timeIntervalSince1970, items: [event("a", "2026-11-09", at(2026, 11, 9, 18))])
+    let m = SiriMosqueDoc(version: SiriStoreKey.version, name: "M", phone: nil, tel: nil, address: nil, lat: nil, lng: nil, eventsEnabled: false)
+    let docs = SiriEventsDoc(version: SiriStoreKey.version, fetchedAt: now.timeIntervalSince1970, items: [event("a", "2026-11-09", at(2026, 11, 9, 18))])
     XCTAssertEqual(engine(now, events: docs, mosque: m).upcomingEvents().spoken, "Yaklaşan etkinlik yok.")
   }
 
@@ -357,9 +364,9 @@ final class SiriLogicTests: XCTestCase {
       which: which,
       date: String(format: "%04d-%02d-%02d", y, mo, d),
       firstAt: at(y, mo, d, 8).timeIntervalSince1970,
-      first: "8:00 AM",
+      first: clock(at(y, mo, d, 8)),
       secondAt: at(y, mo, d, 8, 30).timeIntervalSince1970,
-      second: "8:30 AM"
+      second: clock(at(y, mo, d, 8, 30))
     )
   }
 
@@ -372,7 +379,7 @@ final class SiriLogicTests: XCTestCase {
   func testUpcomingEidIsTheSoonest() {
     let e = engine(at(2026, 11, 8, 12), eid: [eid("adha", 2027, 5, 16), eid("fitr", 2027, 3, 9)])
     XCTAssertTrue(e.eid().spoken.hasPrefix("Ramazan Bayramı namazı"), e.eid().spoken)
-    XCTAssertTrue(e.eid().spoken.contains("Namaz 8:00 AM, İkinci cemaat 8:30 AM"), e.eid().spoken)
+    XCTAssertTrue(e.eid().spoken.contains("Namaz 08:00, İkinci cemaat 08:30"), e.eid().spoken)
   }
 
   func testEidDayCountsUntilTheSecondPrayerPasses() {
@@ -419,16 +426,64 @@ final class SiriLogicTests: XCTestCase {
 
   func testTurkishSuffixFollowsTheLastNumberSaid() {
     let cases: [(String, String)] = [
-      ("1:07 PM", "1:07'de"), ("4:23 PM", "4:23'te"), ("5:43 AM", "5:43'te"),
-      ("8:19 PM", "8:19'da"), ("1:30 PM", "1:30'da"), ("7:40 PM", "7:40'ta"),
-      ("1:50 PM", "1:50'de"), ("2:20 PM", "2:20'de"), ("6:10 AM", "6:10'da"),
-      ("1:05 PM", "1:05'te"), ("7:06 AM", "7:06'da"),
-      ("1:00 PM", "1:00'de"), ("3:00 PM", "3:00'te"), ("6:00 AM", "6:00'da"),
-      ("10:00 AM", "10:00'da"), ("12:00 PM", "12:00'de"), ("9:00 AM", "9:00'da"),
+      ("13:07", "13:07'de"), ("16:23", "16:23'te"), ("05:43", "05:43'te"),
+      ("20:19", "20:19'da"), ("16:30", "16:30'da"), ("19:40", "19:40'ta"),
+      ("13:50", "13:50'de"), ("14:20", "14:20'de"), ("06:10", "06:10'da"),
+      ("13:05", "13:05'te"), ("07:06", "07:06'da"),
+      // On the hour, only the hour is said.
+      ("13:00", "13:00'te"), ("16:00", "16:00'da"), ("15:00", "15:00'te"),
+      ("06:00", "06:00'da"), ("10:00", "10:00'da"), ("12:00", "12:00'de"),
+      ("09:00", "09:00'da"), ("20:00", "20:00'de"), ("21:00", "21:00'de"),
+      ("00:00", "00:00'da"), ("00:30", "00:30'da"),
     ]
     for (time, expected) in cases {
       XCTAssertEqual(TurkishTime.at(time), expected, time)
     }
+  }
+
+  func testSentencesUseTheTurkishSuffixOn24HourTimes() {
+    XCTAssertEqual(
+      engine(at(2026, 11, 8, 17)).timeLeft(.asr).spoken,
+      "İkindi vaktinin çıkmasına 2 saat 2 dakika var. 19:02'de çıkacak."
+    )
+    XCTAssertEqual(engine(at(2026, 11, 13, 9)).jumuah().spoken, "Cuma namazı bugün 13:30'da.")
+  }
+
+  func testSnippetsAndSpeechFollowTheLanguage() {
+    let now = at(2026, 11, 8, 12)
+    guard case let .table(_, en, _) = engine(now, .en).todayTimes().card,
+          case let .table(_, tr, _) = engine(now, .tr).todayTimes().card,
+          case let .table(_, fr, _) = engine(now, .fr).todayTimes().card else {
+      return XCTFail("today's times should be a table")
+    }
+    XCTAssertEqual(en[3].time, "4:23 PM")
+    XCTAssertEqual(tr[3].time, "16:23")
+    XCTAssertEqual(fr[3].time, "16\u{00A0}h\u{00A0}23")
+    XCTAssertEqual(tr[0].time, "05:43")
+    XCTAssertEqual(fr[0].time, "5\u{00A0}h\u{00A0}43")
+    XCTAssertFalse(engine(now, .tr).todayTimes().spoken.contains("PM"))
+    XCTAssertFalse(engine(now, .fr).todayTimes().spoken.contains("PM"))
+  }
+
+  /// The texts come from Flutter; the instants decide. Across both clock
+  /// changes a time reads the same and its instant moves by the hour.
+  func testDSTDaysKeepTheWallClockInEveryLanguage() {
+    for (y, mo, d, utcHour) in [(2026, 3, 7, 18), (2026, 3, 8, 17), (2026, 10, 31, 17), (2026, 11, 1, 18)] {
+      let dhuhr = day(y, mo, d).prayer(.dhuhr)!
+      XCTAssertEqual(dhuhr.time.en, "1:07 PM")
+      XCTAssertEqual(dhuhr.time.tr, "13:07")
+      XCTAssertEqual(dhuhr.time.fr, "13\u{00A0}h\u{00A0}07")
+      var utc = Calendar(identifier: .gregorian)
+      utc.timeZone = TimeZone(identifier: "UTC")!
+      XCTAssertEqual(utc.component(.hour, from: dhuhr.date), utcHour, "\(y)-\(mo)-\(d)")
+    }
+  }
+
+  func testATimeWithoutEveryLanguageIsRefused() {
+    let missingFr = #"{"version":2,"writtenAt":0,"days":[{"date":"2026-11-08","prayers":[{"key":"Fajr","at":1,"time":{"en":"5:43 AM","tr":"05:43"}}]}],"eid":[]}"#
+    XCTAssertNil(SiriStore.decode(SiriPrayersDoc.self, json: missingFr) { $0.version })
+    let oldText = #"{"version":2,"writtenAt":0,"days":[{"date":"2026-11-08","prayers":[{"key":"Fajr","at":1,"time":"5:43 AM"}]}],"eid":[]}"#
+    XCTAssertNil(SiriStore.decode(SiriPrayersDoc.self, json: oldText) { $0.version })
   }
 
   func testTheThreeLanguages() {
@@ -439,12 +494,12 @@ final class SiriLogicTests: XCTestCase {
     )
     XCTAssertEqual(
       engine(now, .fr).nextPrayer().spoken,
-      "La prochaine prière est le Dhohr. Adhan 1:07 PM, Iqama 1:27 PM. Il reste 1 heure 7 minutes."
+      "La prochaine prière est le Dhohr. Adhan 13\u{00A0}h\u{00A0}07, Iqama 13\u{00A0}h\u{00A0}27. Il reste 1 heure 7 minutes."
     )
     XCTAssertEqual(engine(at(2026, 11, 8, 17), .en).timeLeft(.asr).spoken, "2 hours 2 minutes left for Asr, until 7:02 PM.")
     XCTAssertEqual(
       engine(at(2026, 11, 8, 17), .fr).timeLeft(.asr).spoken,
-      "Il reste 2 heures 2 minutes pour la prière de l'Asr, jusqu'à 7:02 PM."
+      "Il reste 2 heures 2 minutes pour la prière de l'Asr, jusqu'à 19\u{00A0}h\u{00A0}02."
     )
     XCTAssertEqual(engine(at(2026, 11, 8, 18), .fr).timeLeft(.dhuhr).spoken, "Le temps de la prière du Dhohr est terminé.")
   }
@@ -453,7 +508,7 @@ final class SiriLogicTests: XCTestCase {
 
   private func mosque(lat: Double? = nil, lng: Double? = nil, phone: String? = "647 834 2000") -> SiriMosqueDoc {
     SiriMosqueDoc(
-      version: 1, name: "Pape", phone: phone, tel: phone == nil ? nil : "tel:+16478342000",
+      version: SiriStoreKey.version, name: "Pape", phone: phone, tel: phone == nil ? nil : "tel:+16478342000",
       address: "336 Pape Avenue, Toronto, ON M4M 2W7", lat: lat, lng: lng, eventsEnabled: true
     )
   }

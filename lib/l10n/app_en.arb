@@ -112,7 +112,7 @@
   },
   "reminderIqamahAt": "Iqamah at {time}",
   "@reminderIqamahAt": {
-    "description": "Appended to the athan-time body after ' · '. [time] is 12-hour in every language, e.g. 1:45 PM.",
+    "description": "Appended to the athan-time body after ' · '. [time] follows the language: 1:45 PM, 13:45, 13 h 45.",
     "placeholders": {
       "time": {
         "type": "String"

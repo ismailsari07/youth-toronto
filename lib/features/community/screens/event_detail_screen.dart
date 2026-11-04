@@ -86,7 +86,7 @@ class EventDetailScreen extends ConsumerWidget {
             ? l.beginsAfterJamaah
             : l.beginsAboutOn(
                 l.beginsAfterJamaah,
-                eventTime(estimate),
+                eventTime(l, estimate),
                 dayMonthLong(l, start),
               ),
       );
@@ -100,7 +100,7 @@ class EventDetailScreen extends ConsumerWidget {
             AppListRow(
               divided: true,
               icon: AppIcons.clock,
-              title: eventTime(start),
+              title: eventTime(l, start),
               subtitle: l.startTime,
             ),
         AppListRow(
@@ -116,7 +116,7 @@ class EventDetailScreen extends ConsumerWidget {
         AppListRow(
           icon: AppIcons.clock,
           title: longDate(l, start),
-          subtitle: eventTime(start),
+          subtitle: eventTime(l, start),
         )
       else ...[
         AppListRow(

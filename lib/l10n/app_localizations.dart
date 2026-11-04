@@ -322,7 +322,7 @@ abstract class AppLocalizations {
   /// **'{prayer, select, fajr{It\'s time for Fajr prayer} dhuhr{It\'s time for Dhuhr prayer} asr{It\'s time for Asr prayer} maghrib{It\'s time for Maghrib prayer} isha{It\'s time for Isha prayer} other{It\'s time for {prayer} prayer}}'**
   String reminderAthanBody(String prayer);
 
-  /// Appended to the athan-time body after ' · '. [time] is 12-hour in every language, e.g. 1:45 PM.
+  /// Appended to the athan-time body after ' · '. [time] follows the language: 1:45 PM, 13:45, 13 h 45.
   ///
   /// In en, this message translates to:
   /// **'Iqamah at {time}'**

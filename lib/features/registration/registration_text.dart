@@ -25,10 +25,10 @@ String registrationErrorText(AppLocalizations l, String field, String code) =>
       _ => l.regErrRejected,
     };
 
-/// A deadline on the mosque's clock: "6 Kasım, 6:59 PM".
+/// A deadline on the mosque's clock: "6 Kasım, 18:59".
 String registrationWhen(AppLocalizations l, DateTime instant) {
   final t = tz.TZDateTime.from(instant, mosqueTz);
-  return '${dayMonthLong(l, t)}, ${eventTime(t)}';
+  return '${dayMonthLong(l, t)}, ${eventTime(l, t)}';
 }
 
 /// The app's language code for picking form labels.

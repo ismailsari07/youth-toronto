@@ -101,8 +101,8 @@ class PrayerWidgetSync {
 ///   "strings": {"nextPrayer": "SIRADAKİ NAMAZ"},
 ///   "prayers": [
 ///     {"key": "Fajr", "name": "İmsak", "at": 1759570980,
-///      "time": "5:43 AM", "athan": "Ezan 5:43 AM",
-///      "iqamah": "Cemaat 6:45 AM", "day": "2026-10-04"}
+///      "time": "05:43", "athan": "Ezan 05:43",
+///      "iqamah": "Cemaat 06:45", "day": "2026-10-04"}
 ///   ]
 /// }
 /// ```
@@ -126,7 +126,7 @@ Map<String, Object?> buildPrayerWidgetData(
     for (final item in payload.dailyPrayerTimes) {
       final moment = prayerMoment(day, item.name, item.time);
       if (moment == null) continue;
-      final time = prayerClock12(item.name, item.time);
+      final time = prayerClockText(l, item.name, item.time);
       final iqamah = item.iqamah;
       prayers.add({
         'key': item.name,
@@ -135,7 +135,7 @@ Map<String, Object?> buildPrayerWidgetData(
         'time': time,
         'athan': l.athanAt(time),
         if (iqamah != null)
-          'iqamah': l.iqamahAt(prayerClock12(item.name, iqamah)),
+          'iqamah': l.iqamahAt(prayerClockText(l, item.name, iqamah)),
         'day': mosqueDateKey(day),
       });
     }

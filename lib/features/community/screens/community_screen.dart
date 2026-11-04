@@ -198,7 +198,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       title: l.jumuah,
       subtitle: jumaa == null
           ? l.everyFriday
-          : l.salahAt(prayerClock12('Dhuhr', jumaa)),
+          : l.salahAt(prayerClockText(l, 'Dhuhr', jumaa)),
     );
   }
 

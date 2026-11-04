@@ -8,7 +8,6 @@ import 'package:myt_flutter/core/models.dart';
 import 'package:myt_flutter/core/mosque_time.dart';
 import 'package:myt_flutter/core/prayer_days.dart';
 import 'package:myt_flutter/core/siri_data_sync.dart';
-import 'package:myt_flutter/shared/formatters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -70,7 +69,7 @@ void main() {
   group('prayers document', () {
     test('is versioned and survives JSON', () {
       final doc = jsonDecode(jsonEncode(prayers([_row(DateTime(2026, 11, 8))])));
-      expect(doc['version'], 1);
+      expect(doc['version'], 2);
       expect(doc['writtenAt'], now().millisecondsSinceEpoch ~/ 1000);
     });
 
@@ -80,8 +79,8 @@ void main() {
       final list = (day['prayers'] as List).cast<Map<String, dynamic>>();
       expect(list.map((p) => p['key']), ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']);
       final dhuhr = list[2];
-      expect(dhuhr['time'], '1:11 PM');
-      expect(dhuhr['iqamah'], '2:00 PM');
+      expect(dhuhr['time'], {'en': '1:11 PM', 'tr': '13:11', 'fr': '13\u00A0h\u00A011'});
+      expect(dhuhr['iqamah'], {'en': '2:00 PM', 'tr': '14:00', 'fr': '14\u00A0h'});
       expect(dhuhr['at'], tz.TZDateTime(mosqueTz, 2026, 11, 8, 13, 11).millisecondsSinceEpoch ~/ 1000);
       expect(dhuhr['iqamahAt'], tz.TZDateTime(mosqueTz, 2026, 11, 8, 14).millisecondsSinceEpoch ~/ 1000);
       expect(list[1].containsKey('iqamah'), isFalse, reason: 'Sunrise');
@@ -103,7 +102,7 @@ void main() {
         _row(DateTime(2026, 11, 13), jumaa: '1:30'), // Friday
       ]));
       expect(days[0].containsKey('jumuah'), isFalse);
-      expect(days[1]['jumuah']['time'], '1:30 PM');
+      expect(days[1]['jumuah']['time'], {'en': '1:30 PM', 'tr': '13:30', 'fr': '13\u00A0h\u00A030'});
       expect(
         days[1]['jumuah']['at'],
         tz.TZDateTime(mosqueTz, 2026, 11, 13, 13, 30).millisecondsSinceEpoch ~/ 1000,
@@ -127,8 +126,8 @@ void main() {
         final list = (doc['eid']! as List).cast<Map<String, dynamic>>();
         expect(list.map((e) => e['which']), ['fitr', 'adha']);
         expect(list[0]['date'], '2027-03-09');
-        expect(list[0]['first'], '8:00 AM');
-        expect(list[0]['second'], '8:30 AM');
+        expect(list[0]['first'], {'en': '8:00 AM', 'tr': '08:00', 'fr': '8\u00A0h'});
+        expect(list[0]['second'], {'en': '8:30 AM', 'tr': '08:30', 'fr': '8\u00A0h\u00A030'});
         expect(list[0]['firstAt'], tz.TZDateTime(mosqueTz, 2027, 3, 9, 8).millisecondsSinceEpoch ~/ 1000);
       });
 
@@ -156,7 +155,7 @@ void main() {
 
     test('stamps the fetch and is versioned', () {
       final doc = buildEvents(const [], now());
-      expect(doc['version'], 1);
+      expect(doc['version'], 2);
       expect(doc['fetchedAt'], now().millisecondsSinceEpoch ~/ 1000);
       expect(doc['items'], isEmpty);
     });
@@ -217,7 +216,8 @@ void main() {
       final item = items([e]).first;
       expect(item['day'], '2026-11-20');
       expect((item['when']['en'] as String), contains('6:30 PM'));
-      expect(eventTime(tz.TZDateTime(mosqueTz, 2026, 11, 20, 18, 30)), '6:30 PM');
+      expect((item['when']['tr'] as String), contains('18:30'));
+      expect((item['when']['fr'] as String), contains('18\u00A0h\u00A030'));
     });
   });
 
@@ -248,7 +248,7 @@ void main() {
 
     test('phone, tel link, address and the events switch', () {
       final doc = buildMosque(bundle());
-      expect(doc['version'], 1);
+      expect(doc['version'], 2);
       expect(doc['phone'], '647 834 2000');
       expect(doc['tel'], 'tel:+16478342000');
       expect(doc['address'], '336 Pape Avenue, Toronto, ON M4M 2W7');

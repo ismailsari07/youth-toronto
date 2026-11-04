@@ -245,7 +245,7 @@ List<Reminder> buildReminders(
         at = prayerMoment(day, item.name, item.time);
         body = iqamahKnown
             ? '${l.reminderAthanBody(key)} · '
-                '${l.reminderIqamahAt(prayerClock12(item.name, iqamah))}'
+                '${l.reminderIqamahAt(prayerClockText(l, item.name, iqamah))}'
             : l.reminderAthanBody(key);
       } else {
         if (!iqamahKnown) continue;

@@ -256,7 +256,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               : AppText.prayerName.c(past ? context.colors.ink2 : context.colors.ink),
           subtitle: isSunrise
               ? l.fajrWindowCloses
-              : l.athanAt(prayerClock12(p.name, p.time)),
+              : l.athanAt(prayerClockText(l, p.name, p.time)),
           subtitleStyle: AppText.caption.c(
             isCurrent ? context.colors.selectedCaption : context.colors.ink3,
           ),
@@ -277,7 +277,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     final iqamah = p.iqamah;
     if (iqamah == null) {
       return Text(
-        prayerClock12(p.name, p.time),
+        prayerClockText(context.l10n, p.name, p.time),
         style: isCurrent
             ? AppText.iqamahValue
                 .copyWith(fontWeight: FontWeight.w700)
@@ -295,7 +295,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               .c(isCurrent ? context.colors.selectedLabel : context.colors.ink4),
         ),
         Text(
-          prayerClock12(p.name, iqamah),
+          prayerClockText(context.l10n, p.name, iqamah),
           style: isCurrent
               ? AppText.iqamahValue
                   .copyWith(fontWeight: FontWeight.w700)
@@ -332,7 +332,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       // prayer_cache, so none is shown.
       subtitle: jumaa == null
           ? l.jumuahEveryFriday
-          : l.salahAt(prayerClock12('Dhuhr', jumaa)),
+          : l.salahAt(prayerClockText(l, 'Dhuhr', jumaa)),
     );
   }
 

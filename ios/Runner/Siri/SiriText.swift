@@ -93,30 +93,25 @@ enum SiriTerms {
 }
 
 enum TurkishTime {
-  /// "1:07 PM" -> "1:07'de": the locative follows the last number spoken,
-  /// and the AM/PM is dropped because "PM'de" reads badly. Only used inside
-  /// sentences; cards keep the full time.
+  /// "13:07" -> "13:07'de", "16:30" -> "16:30'da": the locative follows the last
+  /// number said. Only used inside sentences; cards keep the plain time.
   static func at(_ time: String) -> String {
-    let clock = time.split(separator: " ").first.map(String.init) ?? time
-    let parts = clock.split(separator: ":").compactMap { Int($0) }
-    guard parts.count == 2 else { return clock }
-    return "\(clock)'\(suffix(hour: parts[0], minute: parts[1]))"
+    let parts = time.split(separator: ":").compactMap { Int($0) }
+    guard parts.count == 2 else { return time }
+    return "\(time)'\(suffix(hour: parts[0], minute: parts[1]))"
   }
 
+  /// On the hour only the hour is said: "on altı", "yirmi", "sıfır".
   static func suffix(hour: Int, minute: Int) -> String {
+    suffix(saying: minute == 0 ? hour : minute)
+  }
+
+  private static func suffix(saying number: Int) -> String {
     let lastDigit: [Int: String] = [
       1: "de", 2: "de", 3: "te", 4: "te", 5: "te", 6: "da", 7: "de", 8: "de", 9: "da",
     ]
-    if minute == 0 {
-      // Said as the hour alone: "bir", "on", "on iki".
-      switch hour % 12 {
-      case 0: return "de" // on iki
-      case 10: return "da" // on
-      case let h: return lastDigit[h % 10] ?? "de"
-      }
-    }
-    if let suffix = lastDigit[minute % 10] { return suffix }
-    return [10: "da", 20: "de", 30: "da", 40: "ta", 50: "de"][minute] ?? "de"
+    if let suffix = lastDigit[number % 10] { return suffix }
+    return [0: "da", 10: "da", 20: "de", 30: "da", 40: "ta", 50: "de"][number] ?? "de"
   }
 }
 
@@ -132,6 +127,7 @@ struct SiriEngine {
   private func name(_ key: PrayerKey) -> String { SiriTerms.names[language]?[key] ?? key.rawValue }
   private var athan: String { SiriTerms.athan[language] ?? "Athan" }
   private var iqamah: String { SiriTerms.iqamah[language] ?? "Iqamah" }
+  private func clock(_ time: SiriClock) -> String { time.text(language) }
   private var jumuahName: String { SiriTerms.jumuah[language] ?? "Jumu'ah" }
 
   private func pick(_ en: String, _ tr: String, _ fr: String) -> String {
@@ -193,8 +189,8 @@ struct SiriEngine {
   }
 
   private func timesLine(_ prayer: SiriPrayer) -> [String] {
-    var lines = ["\(athan) \(prayer.time)"]
-    if let time = prayer.iqamah { lines.append("\(iqamah) \(time)") }
+    var lines = ["\(athan) \(clock(prayer.time))"]
+    if let time = prayer.iqamah { lines.append("\(iqamah) \(clock(time))") }
     return lines
   }
 
@@ -205,7 +201,7 @@ struct SiriEngine {
   /// Friday's Dhuhr: the row keeps its own times, with Jumu'ah said too.
   private func fridayLine(_ prayer: SiriPrayer, in day: SiriDay?) -> String? {
     guard prayer.key == .dhuhr, let time = day?.jumuah else { return nil }
-    return "\(jumuahName) \(time.time)"
+    return "\(jumuahName) \(clock(time.time))"
   }
 
   /// A date in the language: "6 Kasım Cuma", "Friday, November 6",
@@ -259,7 +255,7 @@ struct SiriEngine {
     return SiriAnswer(spoken, card: .prayer(
       eyebrow: pick("TODAY", "BUGÜN", "AUJOURD'HUI"),
       name: name(key),
-      big: prayer.time,
+      big: clock(prayer.time),
       lines: lines
     ))
   }
@@ -272,13 +268,13 @@ struct SiriEngine {
     let rows = today.prayers.map {
       SiriCard.Row(
         name: name($0.key),
-        time: $0.time,
-        iqamah: $0.iqamah,
+        time: clock($0.time),
+        iqamah: $0.iqamah.map(clock),
         highlighted: $0.key == highlighted
       )
     }
-    let said = today.prayers.map { "\(name($0.key)) \($0.time)" }.joined(separator: ", ")
-    let footer = today.jumuah.map { "\(jumuahName) \($0.time)" }
+    let said = today.prayers.map { "\(name($0.key)) \(clock($0.time))" }.joined(separator: ", ")
+    let footer = today.jumuah.map { "\(jumuahName) \(clock($0.time))" }
     let spoken = pick("Today's times: \(said).", "Bugünkü vakitler: \(said).", "Horaires d'aujourd'hui\u{00A0}: \(said).")
     return SiriAnswer(
       footer.map { "\(spoken) \($0)." } ?? spoken,
@@ -304,9 +300,9 @@ struct SiriEngine {
       }
       let remaining = left(TimeLeft(from: now, to: end.date))
       let spoken = pick(
-        "\(remaining) left for \(name(key)), until \(end.time).",
-        "\(name(key)) vaktinin çıkmasına \(remaining) var. \(TurkishTime.at(end.time)) çıkacak.",
-        "Il reste \(remaining) pour la prière \(SiriTerms.frOf[key] ?? ""), jusqu'à \(end.time)."
+        "\(remaining) left for \(name(key)), until \(clock(end.time)).",
+        "\(name(key)) vaktinin çıkmasına \(remaining) var. \(TurkishTime.at(end.time.tr)) çıkacak.",
+        "Il reste \(remaining) pour la prière \(SiriTerms.frOf[key] ?? ""), jusqu'à \(clock(end.time))."
       )
       var progress: Double?
       if let start = start, start < end.date {
@@ -315,20 +311,20 @@ struct SiriEngine {
       return SiriAnswer(spoken, card: .window(
         name: name(key),
         status: pick("\(remaining) left", "\(remaining) kaldı", "Il reste \(remaining)"),
-        detail: pick("Until \(end.time)", "Bitiş \(end.time)", "Jusqu'à \(end.time)"),
+        detail: pick("Until \(clock(end.time))", "Bitiş \(clock(end.time))", "Jusqu'à \(clock(end.time))"),
         progress: progress
       ))
 
     case let .notStarted(key, prayer):
       let spoken = pick(
-        "\(name(key)) hasn't started yet. It starts at \(prayer.time).",
-        "\(name(key)) vakti henüz girmedi (\(TurkishTime.at(prayer.time)) girecek).",
-        "\(SiriTerms.frThe[key] ?? name(key)) n'a pas encore commencé. Début à \(prayer.time)."
+        "\(name(key)) hasn't started yet. It starts at \(clock(prayer.time)).",
+        "\(name(key)) vakti henüz girmedi (\(TurkishTime.at(prayer.time.tr)) girecek).",
+        "\(SiriTerms.frThe[key] ?? name(key)) n'a pas encore commencé. Début à \(clock(prayer.time))."
       )
       return SiriAnswer(spoken, card: .window(
         name: name(key),
         status: pick("Not started yet", "Henüz girmedi", "Pas encore commencé"),
-        detail: pick("Starts at \(prayer.time)", "Giriş \(prayer.time)", "Début à \(prayer.time)"),
+        detail: pick("Starts at \(clock(prayer.time))", "Giriş \(clock(prayer.time))", "Début à \(clock(prayer.time))"),
         progress: nil
       ))
 
@@ -347,14 +343,14 @@ struct SiriEngine {
 
     case let .noPrayerNow(next):
       let spoken = pick(
-        "It isn't prayer time now. \(name(next.key)) starts at \(next.time).",
-        "Şu an namaz vakti değil, \(SiriTerms.trLower[next.key] ?? "") \(TurkishTime.at(next.time)) girecek.",
-        "Ce n'est pas l'heure d'une prière. \(SiriTerms.frThe[next.key] ?? name(next.key)) commence à \(next.time)."
+        "It isn't prayer time now. \(name(next.key)) starts at \(clock(next.time)).",
+        "Şu an namaz vakti değil, \(SiriTerms.trLower[next.key] ?? "") \(TurkishTime.at(next.time.tr)) girecek.",
+        "Ce n'est pas l'heure d'une prière. \(SiriTerms.frThe[next.key] ?? name(next.key)) commence à \(clock(next.time))."
       )
       return SiriAnswer(spoken, card: .window(
         name: name(next.key),
         status: pick("Not prayer time", "Namaz vakti değil", "Pas l'heure d'une prière"),
-        detail: pick("Starts at \(next.time)", "Giriş \(next.time)", "Début à \(next.time)"),
+        detail: pick("Starts at \(clock(next.time))", "Giriş \(clock(next.time))", "Début à \(clock(next.time))"),
         progress: nil
       ))
     }
@@ -365,12 +361,12 @@ struct SiriEngine {
   func jumuah() -> SiriAnswer {
     guard let found = schedule.jumuah() else { return prayersNotCurrent }
     let date = longDate(found.day.date)
-    let time = found.jumuah.time
+    let time = clock(found.jumuah.time)
     let spoken: String
     if found.isToday {
       spoken = pick(
         "Jumu'ah is today at \(time).",
-        "Cuma namazı bugün \(TurkishTime.at(time)).",
+        "Cuma namazı bugün \(TurkishTime.at(found.jumuah.time.tr)).",
         "La prière du vendredi (Joumou'a) est aujourd'hui à \(time)."
       )
     } else {
@@ -437,8 +433,9 @@ struct SiriEngine {
     let table = eid.which == "fitr" ? SiriTerms.eidFitr : SiriTerms.eidAdha
     let title = table[language] ?? "Eid"
     let date = longDate(eid.date)
-    var lines = [pick("Prayer \(eid.first)", "Namaz \(eid.first)", "Prière à \(eid.first)")]
-    if let second = eid.second {
+    let first = clock(eid.first)
+    var lines = [pick("Prayer \(first)", "Namaz \(first)", "Prière à \(first)")]
+    if let second = eid.second.map(clock) {
       lines.append(pick("Second jamaah \(second)", "İkinci cemaat \(second)", "2e prière à \(second)"))
     }
     let spoken = pick(
@@ -449,7 +446,7 @@ struct SiriEngine {
     return SiriAnswer(spoken, card: .prayer(
       eyebrow: date.uppercased(with: Locale(identifier: pick("en_CA", "tr_TR", "fr_CA"))),
       name: title,
-      big: eid.first,
+      big: first,
       lines: lines
     ))
   }

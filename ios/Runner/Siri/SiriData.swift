@@ -3,16 +3,16 @@ import Foundation
 // What the Siri shortcuts read: three JSON documents the Flutter app writes
 // into the App Group (lib/core/siri_data_sync.dart). No network here, ever.
 //
-// Flutter writes each time as an instant AND as display text, using the same
-// code as the reminders. This side compares instants and repeats the text; it
-// never parses or calculates a clock time.
+// Flutter writes each time as an instant AND as display text in each language,
+// using the same code as the reminders. This side compares instants and repeats
+// the text; it never parses or calculates a clock time.
 
 enum SiriStoreKey {
   static let appGroup = "group.ca.papemosque.app"
   static let prayers = "siri_prayers"
   static let events = "siri_events"
   static let mosque = "siri_mosque"
-  static let version = 1
+  static let version = 2
 }
 
 /// The order of a complete day, as prayer_cache names them.
@@ -25,19 +25,35 @@ enum PrayerKey: String, Codable, CaseIterable {
   case isha = "Isha"
 }
 
+/// One time's text in each language: "4:55 PM", "16:55", "16 h 55". All three
+/// are required, so a document missing one is refused rather than guessed from.
+struct SiriClock: Codable, Equatable {
+  let en: String
+  let tr: String
+  let fr: String
+
+  func text(_ language: SiriLanguage) -> String {
+    switch language {
+    case .en: return en
+    case .tr: return tr
+    case .fr: return fr
+    }
+  }
+}
+
 struct SiriPrayer: Codable, Equatable {
   let key: PrayerKey
   let at: Double
-  let time: String
+  let time: SiriClock
   let iqamahAt: Double?
-  let iqamah: String?
+  let iqamah: SiriClock?
 
   var date: Date { Date(timeIntervalSince1970: at) }
 }
 
 struct SiriJumuah: Codable, Equatable {
   let at: Double
-  let time: String
+  let time: SiriClock
 
   var date: Date { Date(timeIntervalSince1970: at) }
 }
@@ -63,9 +79,9 @@ struct SiriEid: Codable, Equatable {
   let which: String // fitr or adha
   let date: String // yyyy-MM-dd, Toronto
   let firstAt: Double
-  let first: String
+  let first: SiriClock
   let secondAt: Double?
-  let second: String?
+  let second: SiriClock?
 
   /// When it stops being "upcoming": after the last prayer of the day.
   var endsAt: Date { Date(timeIntervalSince1970: secondAt ?? firstAt) }

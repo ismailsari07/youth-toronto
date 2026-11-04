@@ -83,10 +83,10 @@ void main() {
       expect(longDate(tr, wed), '30 Eylül Çarşamba');
     });
 
-    test('clock times are 12-hour in every language', () {
+    test('clock times: 12-hour in English, 24-hour in Turkish and French', () {
       expect(heroDateTime(en, wed), 'Wed 30 Sep · 7:30 PM');
-      expect(heroDateTime(tr, wed), '30 Eylül Çarşamba · 7:30 PM');
-      expect(heroDateTime(fr, wed), endsWith('7:30 PM'));
+      expect(heroDateTime(tr, wed), '30 Eylül Çarşamba · 19:30');
+      expect(heroDateTime(fr, wed), endsWith('19\u00A0h\u00A030'));
     });
 
     test('date tiles: no French full stops, Turkish capitals', () {

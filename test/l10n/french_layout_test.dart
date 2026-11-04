@@ -270,6 +270,11 @@ void main() {
             (oneLine && wanted > object.size.width + 0.5)) {
           problems.add('cut: "${object.text.toPlainText()}"');
         }
+        // French clock times read "16 h 55", never "4:55 PM" or "16:55". The
+        // countdown's "0:17:58" isn't a clock time.
+        if (RegExp(r'(?<![:\d])\d{1,2}:\d{2}(?![:\d])|\b[AP]M\b').hasMatch(object.text.toPlainText())) {
+          problems.add('clock: "${object.text.toPlainText()}"');
+        }
       }
       object.visitChildren(visit);
     }
@@ -313,6 +318,36 @@ void main() {
   for (final MapEntry(:key, :value) in screens.entries) {
     testWidgets('$key fits', (tester) => check(tester, key, value));
   }
+
+  testWidgets('the no-cancel note fits on top of the registration form', (tester) {
+    return check(
+      tester,
+      'registration_note',
+      (_) => RegistrationScreen(upcoming: event('e1', 'none', form: true)),
+      after: (tester) async {
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(
+          find.text(
+            "Une inscription ne peut pas être annulée dans l'application. "
+            'Pour la modifier, veuillez communiquer avec la mosquée.',
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+  });
+
+  testWidgets('prayer times on the home screen read the French way', (tester) {
+    return check(
+      tester,
+      'home_clock',
+      (_) => const PrayerHomeScreen(),
+      after: (tester) async {
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(find.textContaining(RegExp(r'^\d{1,2}\u00A0h(\u00A0\d{2})?$')), findsWidgets);
+      },
+    );
+  });
 
   testWidgets('profile signed out fits', (tester) {
     return check(tester, 'profile_signed_out', (_) => const ProfileRootScreen(), signedIn: false);

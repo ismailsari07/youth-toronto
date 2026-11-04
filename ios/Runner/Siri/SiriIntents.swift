@@ -201,7 +201,7 @@ struct HandoffIntent: AppIntent {
 @available(iOS 16.0, *)
 struct DirectionsIntent: AppIntent {
   static var title: LocalizedStringResource = "Directions to the mosque"
-  static var description = IntentDescription("Opens Apple Maps with directions to the mosque.")
+  static var description = IntentDescription("Opens directions to the mosque in Maps.")
   static var openAppWhenRun = false
 
   func perform() async throws -> some IntentResult & OpensIntent & ProvidesDialog {
@@ -222,7 +222,7 @@ struct DirectionsIntent: AppIntent {
 @available(iOS 16.0, *)
 struct CallIntent: AppIntent {
   static var title: LocalizedStringResource = "Call the mosque"
-  static var description = IntentDescription("Calls the mosque, after Siri confirms.")
+  static var description = IntentDescription("Calls the mosque.")
   static var openAppWhenRun = false
 
   func perform() async throws -> some IntentResult & OpensIntent & ProvidesDialog {

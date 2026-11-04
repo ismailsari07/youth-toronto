@@ -208,6 +208,9 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
 - Prayer parameter: Siri matches the name in the phrase's language (Turkish İmsak, Öğle, İkindi, Akşam, Yatsı). No synonyms like
   "Sabah": that initializer needs iOS 17 and the table is read at build time, so it can't vary by iOS version.
 - Turkish sentences say "1:07'de" (`TurkishTime`: the suffix follows the last number said, no AM/PM); cards keep "1:07 PM".
+- No Apple names in any intent text: title, description, parameter, phrase, short title, spoken or snippet text, in any language.
+  App Store Connect rejects the upload otherwise (ITMS-90626, build 23 of 1.4.0, "cannot contain 'siri'"), and only at upload.
+  `test/siri/siri_trademark_test.dart` scans the code's string literals and every `.strings` file for these names.
 - Tests: `tool/siri_swift_test.sh` runs the Foundation-only logic in Docker; workflow `siri-check` in `codemagic.yaml`
   compiles everything (the only compile of `AppIntents` and SwiftUI code; this machine has no Xcode) and runs RunnerTests.
 

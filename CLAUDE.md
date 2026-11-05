@@ -284,6 +284,8 @@ Flutter. Display only: instants and scheduling never read it (`test/l10n/clock_f
 
 ## Release checklist
 
+Full guide: `docs/RELEASE.md`.
+
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;
    the banner is never bundled). Commit the result if it changed.
 2. Bump `version:` in `pubspec.yaml`. `flutter analyze` and `flutter test` clean.

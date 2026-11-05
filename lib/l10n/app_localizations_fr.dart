@@ -124,6 +124,22 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get monthlyTimes => 'Horaires du mois';
+
+  @override
+  String monthlyJumuahAt(String time) {
+    return 'Joumou\'a $time';
+  }
+
+  @override
+  String get monthlyMissingDay => 'Aucun horaire ce jour';
+
+  @override
+  String monthlyLastDay(String date) {
+    return 'Dernier jour publié : $date';
+  }
+
+  @override
   String get fajrWindowCloses => 'Fin du temps du Fajr';
 
   @override

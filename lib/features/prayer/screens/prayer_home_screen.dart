@@ -27,13 +27,14 @@ import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
+import 'monthly_times_screen.dart';
 import '../widgets/community_section.dart';
 import '../widgets/news_rail.dart';
 import '../widgets/hero_identity_row.dart';
 import '../widgets/reminders_sheet.dart';
 
-/// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
-/// deliberately no separate "all times" screen (§7.2).
+/// Spec §7.1 — the Prayer tab root: today's whole list. Other days are in
+/// [MonthlyTimesScreen], from the row under the times.
 class PrayerHomeScreen extends ConsumerStatefulWidget {
   const PrayerHomeScreen({super.key});
 
@@ -224,6 +225,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               leading: const Shimmer(width: 38, height: 38, radius: 19),
               trailing: const Shimmer(width: 64, height: 18),
             ),
+          _monthlyRow(),
           if (kPrayerRemindersEnabled)
             RemindersRow(divided: true, background: context.colors.cardMuted),
         ],
@@ -270,6 +272,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       );
     }
 
+    rows.add(_monthlyRow());
     if (kPrayerRemindersEnabled) {
       rows.add(
         RemindersRow(divided: true, background: context.colors.cardMuted),
@@ -277,6 +280,14 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     }
     return GroupedRows(rows: rows);
   }
+
+  Widget _monthlyRow() => AppListRow(
+        divided: true,
+        icon: AppIcons.calendar,
+        title: context.l10n.monthlyTimes,
+        trailing: const RowChevron(),
+        onTap: () => context.push('/prayer/monthly'),
+      );
 
   Widget _trailing(DailyPrayerItem p, bool isCurrent) {
     final iqamah = p.iqamah;

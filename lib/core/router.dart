@@ -13,6 +13,7 @@ import '../features/marriage/screens/marriage_received_screen.dart';
 import '../features/marriage/screens/marriage_status_screen.dart';
 import '../features/marriage/screens/marriage_upload_screen.dart';
 import '../features/marriage/screens/marriage_viewer_screen.dart';
+import '../features/prayer/screens/monthly_times_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
 import '../features/profile/screens/burial_services_screen.dart';
 import '../features/profile/screens/delete_account_screen.dart';
@@ -62,6 +63,13 @@ final router = GoRouter(
               path: '/prayer',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: PrayerHomeScreen()),
+              routes: [
+                GoRoute(
+                  path: 'monthly',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MonthlyTimesScreen(),
+                ),
+              ],
             ),
           ],
         ),

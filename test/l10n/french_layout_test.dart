@@ -14,6 +14,7 @@ import 'package:myt_flutter/core/content/content_repository.dart';
 import 'package:myt_flutter/core/event_schedule.dart';
 import 'package:myt_flutter/core/models.dart';
 import 'package:myt_flutter/core/mosque_time.dart';
+import 'package:myt_flutter/core/prayer_days.dart';
 import 'package:myt_flutter/core/push/push_api.dart';
 import 'package:myt_flutter/core/push/push_prompt.dart';
 import 'package:myt_flutter/core/push/push_sync.dart';
@@ -30,6 +31,7 @@ import 'package:myt_flutter/features/marriage/screens/marriage_received_screen.d
 import 'package:myt_flutter/features/marriage/screens/marriage_status_screen.dart';
 import 'package:myt_flutter/features/marriage/screens/marriage_upload_screen.dart';
 import 'package:myt_flutter/features/marriage/widgets/withdraw_sheet.dart';
+import 'package:myt_flutter/features/prayer/screens/monthly_times_screen.dart';
 import 'package:myt_flutter/features/prayer/screens/prayer_home_screen.dart';
 import 'package:myt_flutter/features/prayer/widgets/reminders_sheet.dart';
 import 'package:myt_flutter/features/profile/screens/burial_services_screen.dart';
@@ -208,6 +210,25 @@ void main() {
             ),
             myApplicationProvider.overrideWith((ref) async => application),
             prayerProvider.overrideWith((ref) async => payload),
+            prayerMonthProvider.overrideWith((ref) async {
+              final today = mosqueNow();
+              return [
+                for (var i = 0; i < 31; i++)
+                  if (i != 3)
+                    () {
+                      final day = DateTime(today.year, today.month, today.day + i);
+                      return (
+                        date: mosqueDateKey(day),
+                        payload: PrayerCachePayload(
+                          dailyPrayerTimes: payload.dailyPrayerTimes,
+                          hijriDate: '26.5.1448',
+                          gregorianDate: diyanetDate(day),
+                          jumaaPrayerTime: '1:30',
+                        ),
+                      );
+                    }(),
+              ];
+            }),
             eventsProvider.overrideWith(
               (ref) async => [
                 event('e1', 'none', form: true),
@@ -297,6 +318,7 @@ void main() {
 
   final screens = <String, Widget Function(BuildContext)>{
     'prayer_home': (_) => const PrayerHomeScreen(),
+    'monthly_times': (_) => const MonthlyTimesScreen(),
     'community_events': (_) => const CommunityScreen(),
     'event_recurring': (_) => EventDetailScreen(upcoming: event('e2', 'weekly', after: 'maghrib')),
     'event_contribution': (_) => EventDetailScreen(upcoming: event('e5', 'none', contribution: true)),

@@ -226,6 +226,30 @@ abstract class AppLocalizations {
   /// **'Dhuhr athan · Jumu\'ah at {time}'**
   String reminderFridayBody(String time);
 
+  /// No description provided for @monthlyTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly times'**
+  String get monthlyTimes;
+
+  /// Friday's row in the monthly table. Short: it shares a narrow column with the date.
+  ///
+  /// In en, this message translates to:
+  /// **'Jumu\'ah {time}'**
+  String monthlyJumuahAt(String time);
+
+  /// No description provided for @monthlyMissingDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No times for this day'**
+  String get monthlyMissingDay;
+
+  /// No description provided for @monthlyLastDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Last published day: {date}'**
+  String monthlyLastDay(String date);
+
   /// No description provided for @fajrWindowCloses.
   ///
   /// In en, this message translates to:

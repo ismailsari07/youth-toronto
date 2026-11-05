@@ -91,6 +91,25 @@
       }
     }
   },
+  "monthlyTimes": "Monthly times",
+  "monthlyJumuahAt": "Jumu'ah {time}",
+  "@monthlyJumuahAt": {
+    "description": "Friday's row in the monthly table. Short: it shares a narrow column with the date.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyMissingDay": "No times for this day",
+  "monthlyLastDay": "Last published day: {date}",
+  "@monthlyLastDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "fajrWindowCloses": "Fajr window closes",
   "prayerReminders": "Prayer reminders",
   "prayerNotifications": "Prayer notifications",

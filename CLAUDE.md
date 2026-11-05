@@ -186,6 +186,15 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
 - No bell on the Prayer hero: next to the Donate pill it cut the mosque line on an iPhone SE. Reminders open from the
   row under the prayer times, Profile and Settings.
 
+## Monthly times (since 1.4.0)
+
+`/prayer/monthly` (`monthly_times_screen.dart`), from the row under the times on Prayer: every date from today to the last
+`prayer_cache` row, athan over iqamah, Toronto dates. `monthDays` uses `scheduleDays`' rule, so a date without its own valid
+row is listed as missing and nothing is filled or listed past the last row; an unreadable time is a dash, never its raw text.
+Today is green, Fridays gold with the Jumu'ah time in the date column, which stays in view while the prayers scroll sideways.
+Rows: `PrayerRows` (`prayer_month.dart`) keeps the reminders' fetch in memory for 15 minutes, so opening it usually makes no
+call; `refreshPrayerSchedules` (pull, `prayer_refresh`) drops them. With reminders off or after 15 minutes it fetches once.
+
 ## French (audited 2026-11-02)
 
 Canadian French, `vous`, gender-neutral wording. Terms: prière, adhan, iqama, Fajr/Dhohr/Asr/Maghrib/Icha, "Prière du

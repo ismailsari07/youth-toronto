@@ -124,6 +124,22 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get monthlyTimes => 'Aylık vakitler';
+
+  @override
+  String monthlyJumuahAt(String time) {
+    return 'Cuma $time';
+  }
+
+  @override
+  String get monthlyMissingDay => 'Bu gün için vakit yok';
+
+  @override
+  String monthlyLastDay(String date) {
+    return 'Yayınlanan son gün: $date';
+  }
+
+  @override
   String get fajrWindowCloses => 'Sabah namazının vakti çıkar';
 
   @override

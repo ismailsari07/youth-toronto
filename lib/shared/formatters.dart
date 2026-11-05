@@ -252,6 +252,11 @@ String newsDay(AppLocalizations l, DateTime day) =>
 String shortDate(AppLocalizations l, DateTime dt) =>
     _capitalised(_format(l, l.datePatternShort, dt));
 
+/// A date for a narrow column: "Thu 5 Nov", "5 Kas Per", "Jeu. 5 nov.".
+String compactDate(AppLocalizations l, DateTime dt) => _capitalised(
+      _format(l, l.localeName.startsWith('tr') ? 'd MMM EEE' : 'EEE d MMM', dt),
+    );
+
 /// "next: Wed 30 Sep".
 String nextShort(AppLocalizations l, DateTime dt) =>
     l.nextOn(shortDate(l, dt));

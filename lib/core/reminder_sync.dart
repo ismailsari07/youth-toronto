@@ -10,7 +10,7 @@ import 'mosque_time.dart';
 import 'notification_service.dart';
 import 'notification_sounds.dart';
 import 'prayer_days.dart';
-import 'prayer_service.dart';
+import 'prayer_month.dart';
 import 'reminder_settings.dart';
 
 /// Keeps this device's prayer notifications in step with the mosque
@@ -54,7 +54,7 @@ class ReminderSync {
   /// Replaced in tests.
   @visibleForTesting
   static Future<List<PrayerDay>> Function({required int first, required int last})
-      fetchDays = PrayerService.fetchDays;
+      fetchDays = PrayerRows.fetchDays;
   @visibleForTesting
   static Future<void> Function(
     List<Reminder>, {
@@ -146,7 +146,7 @@ class ReminderSync {
 
       final List<PrayerDay> days;
       try {
-        days = await fetchDays(first: 0, last: maxReminderDays - 1);
+        days = await fetchDays(first: 0, last: PrayerRows.windowLastDay);
       } catch (e) {
         // Offline or server error: keep the notifications already
         // scheduled (the notice included). They came from real rows.
@@ -200,7 +200,7 @@ const reminderBudget = iosPendingLimit - otherLocalNotifications - noticeSlots;
 /// Days asked of prayer_cache, today included. Only a ceiling: the table
 /// holds about 30 days, and the budget ends the schedule long before 90
 /// (a day costs a slot unless none of its chosen prayers is ahead).
-const maxReminderDays = 90;
+const maxReminderDays = PrayerRows.windowLastDay + 1;
 
 /// Every notification [settings] asks for, in time order, from real rows
 /// only (a day without its own row gets nothing), as many whole

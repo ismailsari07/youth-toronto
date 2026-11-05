@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'mosque_time.dart';
+import 'prayer_month.dart';
 import 'prayer_widget_sync.dart';
 import 'reminder_sync.dart';
 import 'siri_data_sync.dart';
@@ -25,6 +26,7 @@ bool isPrayerRefresh(Map<String, dynamic> data) => data['type'] == prayerRefresh
 /// reminders were rescheduled from fresh rows.
 Future<bool> refreshPrayerSchedules() async {
   initMosqueTime();
+  PrayerRows.forget();
   final (rescheduled, _, _) = await (
     ReminderSync.sync(),
     PrayerWidgetSync.sync(),

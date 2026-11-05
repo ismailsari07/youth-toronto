@@ -31,6 +31,7 @@ class DonateSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
+    final lang = Localizations.localeOf(context).languageCode;
     final funds = ref.watch(donationFundsProvider);
     final base = ref.watch(contentProvider).links.donation;
 
@@ -88,7 +89,7 @@ class DonateSheet extends ConsumerWidget {
                             AppListRow(
                               divided: i > 0,
                               icon: AppIcons.heart,
-                              title: fund.title,
+                              title: fund.titleIn(lang),
                               trailing: const RowChevron(),
                               onTap: () => open(
                                 DonationFunds.pageUri(base, fund: fund.slug),

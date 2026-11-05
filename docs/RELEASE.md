@@ -42,7 +42,7 @@ It runs the Flutter tests, a simulator build and the Swift tests. It also checks
 This lives in the **Workflow Editor** app, not in `codemagic.yaml`.
 
 - **Flutter:** 3.38.5.
-- **Xcode:** pinned to 26.1, the version of the last successful builds. Change it on purpose, as its own step, followed by a full TestFlight round.
+- **Xcode:** pinned to 26.6, the version of the last successful builds. Change it on purpose, as its own step, followed by a full TestFlight round.
 - **Publishing:** upload to App Store Connect for **TestFlight only**. Don't submit to App Store review automatically.
 - **Push:** the signed app must have `aps-environment = production`. If push is missing, the provisioning profile predates it: delete the old profile so a new one is created.
 
@@ -107,7 +107,7 @@ Nothing is wrong with the code. The Account Holder accepts the new agreement at 
 - [ ] Codemagic app switched back to Workflow Editor, settings intact
 
 **TestFlight**
-- [ ] Release build uses the pinned Xcode (26.1) and uploads to TestFlight only
+- [ ] Release build uses the pinned Xcode (26.6) and uploads to TestFlight only
 - [ ] Internal round passed on a real phone
 - [ ] External round and Beta App Review, if needed
 

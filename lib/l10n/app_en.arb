@@ -954,5 +954,16 @@
   "lastBackgroundRefresh": "Last background refresh",
   "@lastBackgroundRefresh": {
     "description": "About this app: when a prayer_refresh silent push last rescheduled the reminders in the background; the value is a date and time, or a dash if never."
-  }
+  },
+  "newsSection": "Mosque News",
+  "newsSegment": "News",
+  "newsFeatured": "Featured",
+  "newsPhotoCount": "{count, plural, =1{1 photo} other{{count} photos}}",
+  "newsGone": "This news item is no longer available",
+  "newsShare": "Share",
+  "newsOpenPhoto": "Photo {index} of {total}, open full screen",
+  "newsViewerHint": "Pinch to zoom, swipe for more",
+  "newsViewerHintOne": "Pinch to zoom",
+  "@newsPhotoCount": {"placeholders": {"count": {"type": "int"}}},
+  "@newsOpenPhoto": {"placeholders": {"index": {"type": "String"}, "total": {"type": "String"}}}
 }

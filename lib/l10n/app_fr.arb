@@ -461,5 +461,14 @@
   "reminderJumuahNow": "C'est l'heure de la prière du vendredi",
   "reminderJumuahSoon": "Prière du vendredi dans 5 minutes",
   "remindersEndingNotice": "Vos rappels de prière s'arrêteront demain. Ouvrez Pape Mosque une fois pour continuer à les recevoir à l'heure.",
-  "lastBackgroundRefresh": "Dernière actualisation en arrière-plan"
+  "lastBackgroundRefresh": "Dernière actualisation en arrière-plan",
+  "newsSection": "Actualités de la mosquée",
+  "newsSegment": "Actualités",
+  "newsFeatured": "À la une",
+  "newsPhotoCount": "{count, plural, =1{1 photo} other{{count} photos}}",
+  "newsGone": "Cette actualité n’est plus disponible",
+  "newsShare": "Partager",
+  "newsOpenPhoto": "Photo {index} sur {total}, ouvrir en plein écran",
+  "newsViewerHint": "Pincez pour zoomer, balayez pour voir la suite",
+  "newsViewerHintOne": "Pincez pour zoomer"
 }

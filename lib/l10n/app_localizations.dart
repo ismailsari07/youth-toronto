@@ -2517,6 +2517,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last background refresh'**
   String get lastBackgroundRefresh;
+
+  /// No description provided for @newsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Mosque News'**
+  String get newsSection;
+
+  /// No description provided for @newsSegment.
+  ///
+  /// In en, this message translates to:
+  /// **'News'**
+  String get newsSegment;
+
+  /// No description provided for @newsFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get newsFeatured;
+
+  /// No description provided for @newsPhotoCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo} other{{count} photos}}'**
+  String newsPhotoCount(int count);
+
+  /// No description provided for @newsGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This news item is no longer available'**
+  String get newsGone;
+
+  /// No description provided for @newsShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get newsShare;
+
+  /// No description provided for @newsOpenPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {index} of {total}, open full screen'**
+  String newsOpenPhoto(String index, String total);
+
+  /// No description provided for @newsViewerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom, swipe for more'**
+  String get newsViewerHint;
+
+  /// No description provided for @newsViewerHintOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom'**
+  String get newsViewerHintOne;
 }
 
 class _AppLocalizationsDelegate

@@ -6,6 +6,7 @@ import '../app/tab_branch_container.dart';
 import '../features/community/screens/announcement_detail_screen.dart';
 import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
+import '../features/community/screens/news_detail_screen.dart';
 import '../features/marriage/data/marriage_application.dart';
 import '../features/marriage/screens/marriage_gate_screen.dart';
 import '../features/marriage/screens/marriage_received_screen.dart';
@@ -26,6 +27,7 @@ import '../features/registration/registration_screen.dart';
 import 'content/content_bundle.dart';
 import 'event_schedule.dart';
 import 'models.dart';
+import 'news/mosque_news.dart';
 
 final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -92,6 +94,13 @@ final router = GoRouter(
                     item: state.extra! as Announcement,
                   ),
                 ),
+                GoRoute(
+                  path: 'news',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => NewsDetailScreen(
+                    item: state.extra! as MosqueNews,
+                  ),
+                ),
                 // Tapped notifications: loaded by id (lib/core/push/push_route.dart).
                 GoRoute(
                   path: 'event/:id',
@@ -105,6 +114,13 @@ final router = GoRouter(
                   path: 'announcement/:id',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => AnnouncementByIdScreen(
+                    id: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'news/:id',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => NewsByIdScreen(
                     id: state.pathParameters['id']!,
                   ),
                 ),

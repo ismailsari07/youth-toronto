@@ -13,6 +13,7 @@ import '../../../core/prayer_refresh.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/content_provider.dart';
+import '../../../shared/providers/mosque_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -27,6 +28,7 @@ import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
 import '../widgets/community_section.dart';
+import '../widgets/news_rail.dart';
 import '../widgets/hero_identity_row.dart';
 import '../widgets/reminders_sheet.dart';
 
@@ -58,6 +60,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     return RefreshableList(
       onRefresh: () async {
         ref.invalidate(prayerProvider);
+        ref.invalidate(mosqueNewsProvider);
         // The panel's content too, so a new banner shows on a pull.
         ref.read(contentProvider.notifier).refresh(force: true);
         await ref.read(prayerProvider.future);
@@ -71,7 +74,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         AppSpace.scrollBottomInset,
       ),
       // The tab's entrance cascade, top to bottom: the hero (who we are,
-      // the date and the moon), the emergency banner, the Community
+      // the date and the moon), the emergency banner, the news, the Community
       // section, the times, the occasion card, the mosque card.
       // The hero runs under the status bar, which keeps light icons over it
       // in both modes.
@@ -89,6 +92,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       ),
       children: [
         const StaggerItem(index: 0, child: EmergencyBanner()),
+        // Hides when there's no news; brings its own top gap, as below.
+        const StaggerItem(index: 1, child: NewsRail()),
         // Next event and latest announcement; brings its own top gap and
         // hides entirely when there is nothing to show.
         const StaggerItem(index: 1, child: CommunitySection()),

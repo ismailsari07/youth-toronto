@@ -1471,4 +1471,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lastBackgroundRefresh => 'Last background refresh';
+
+  @override
+  String get newsSection => 'Mosque News';
+
+  @override
+  String get newsSegment => 'News';
+
+  @override
+  String get newsFeatured => 'Featured';
+
+  @override
+  String newsPhotoCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos',
+      one: '1 photo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsGone => 'This news item is no longer available';
+
+  @override
+  String get newsShare => 'Share';
+
+  @override
+  String newsOpenPhoto(String index, String total) {
+    return 'Photo $index of $total, open full screen';
+  }
+
+  @override
+  String get newsViewerHint => 'Pinch to zoom, swipe for more';
+
+  @override
+  String get newsViewerHintOne => 'Pinch to zoom';
 }

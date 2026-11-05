@@ -42,6 +42,7 @@ void main() {
       'organisationName', 'city', 'hijriMonth2', 'hijriMonth7', 'hijriMonth9',
       'datePatternLong', 'datePatternShort', 'datePatternDayMonth',
       'datePatternMonthYear', 'date', 'notifications', 'languageAuto',
+    'newsPhotoCount', // "photo" is the same word
       'versionLabel', 'photos', 'appVersion', 'regQuestions',
     };
     expect(

@@ -190,7 +190,7 @@ class _PosterFrameState extends State<PosterFrame> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (backdrop) _PosterBackdrop(image: widget.image),
+            if (backdrop) PosterBackdrop(image: widget.image),
             Image(
               image: widget.image,
               // Fills exactly when the shapes match; otherwise never crops.
@@ -214,8 +214,8 @@ class _PosterFrameState extends State<PosterFrame> {
 
 /// A small decode of the same image, stretched and blurred: at this size it
 /// costs almost nothing to draw while a list of cards scrolls.
-class _PosterBackdrop extends StatelessWidget {
-  const _PosterBackdrop({required this.image});
+class PosterBackdrop extends StatelessWidget {
+  const PosterBackdrop({super.key, required this.image});
 
   final ImageProvider image;
 

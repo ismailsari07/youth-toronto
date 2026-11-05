@@ -1491,4 +1491,41 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get lastBackgroundRefresh => 'Dernière actualisation en arrière-plan';
+
+  @override
+  String get newsSection => 'Actualités de la mosquée';
+
+  @override
+  String get newsSegment => 'Actualités';
+
+  @override
+  String get newsFeatured => 'À la une';
+
+  @override
+  String newsPhotoCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos',
+      one: '1 photo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsGone => 'Cette actualité n’est plus disponible';
+
+  @override
+  String get newsShare => 'Partager';
+
+  @override
+  String newsOpenPhoto(String index, String total) {
+    return 'Photo $index sur $total, ouvrir en plein écran';
+  }
+
+  @override
+  String get newsViewerHint => 'Pincez pour zoomer, balayez pour voir la suite';
+
+  @override
+  String get newsViewerHintOne => 'Pincez pour zoomer';
 }

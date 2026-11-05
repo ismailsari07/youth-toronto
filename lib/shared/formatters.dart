@@ -226,6 +226,10 @@ String _ordinal(AppLocalizations l, int n) {
 }
 
 /// "Wed 30 Sep", "mer. 30 sept.", "30 Eyl Çar".
+/// A news item's day ("12 Ekim 2026"): a date, no time zone involved.
+String newsDay(AppLocalizations l, DateTime day) =>
+    _format(l, 'd MMMM y', day);
+
 String shortDate(AppLocalizations l, DateTime dt) =>
     _capitalised(_format(l, l.datePatternShort, dt));
 

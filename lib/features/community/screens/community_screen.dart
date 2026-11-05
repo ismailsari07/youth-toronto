@@ -7,11 +7,13 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/event_schedule.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
+import '../../../core/news/mosque_news.dart';
 import '../../../core/push/push_prompt.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/content_provider.dart';
 import '../../../shared/providers/events_news_provider.dart';
+import '../../../shared/providers/mosque_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../shared/providers/unread_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -25,11 +27,13 @@ import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
 import '../../push/push_prompt_sheet.dart';
+import '../widgets/news_card.dart';
 
-/// Spec §7.3 / §7.4 — Events and Announcements behind one segmented control.
-/// Phase B builds the structure; card detail work lands in phases D and E.
-/// The panel's feature toggles can turn either off: then the other shows
-/// alone, without the control.
+/// Spec §7.3 / §7.4 — Events, Announcements and News behind one segmented
+/// control. Phase B builds the structure; card detail work lands in phases D
+/// and E. The panel's feature toggles can turn any of them off, and the news
+/// segment waits for the first published item; one left shows alone, without
+/// the control.
 class CommunityScreen extends ConsumerStatefulWidget {
   const CommunityScreen({super.key});
 
@@ -38,7 +42,6 @@ class CommunityScreen extends ConsumerStatefulWidget {
 }
 
 class _CommunityScreenState extends ConsumerState<CommunityScreen> {
-  int _segment = 0;
   bool _visible = false;
 
   /// With events turned off, announcements are the only list, so opening
@@ -47,7 +50,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final visible = TickerMode.of(context);
-    if (visible && !_visible && !ref.read(contentProvider).showEvents) {
+    if (visible && !_visible && _segmentNow() == CommunitySegment.announcements) {
       _markSeenSoon();
     }
     if (visible && !_visible) {
@@ -63,14 +66,12 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final features = ref.watch(contentProvider.select((c) => c.features));
-    final bothShown = features.events && features.announcements;
-    // 0 = events, 1 = announcements; the toggles override the tapped one.
-    final segment = !features.events
-        ? 1
-        : !features.announcements
-            ? 0
-            : _segment;
+    ref.watch(contentProvider.select((c) => c.features));
+    ref.watch(communitySegmentProvider);
+    final mosqueNews = ref.watch(mosqueNewsProvider).valueOrNull ?? const <MosqueNews>[];
+    final segments = _segments();
+    final segment = _segmentNow();
+    final index = segments.indexOf(segment);
     final eventsAsync = ref.watch(eventsProvider);
     final events = eventsAsync.valueOrNull ?? const <UpcomingEvent>[];
     final eventsLoading = eventsAsync.isLoading && !eventsAsync.hasValue;
@@ -84,9 +85,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       onRefresh: () async {
         ref.invalidate(eventsProvider);
         ref.invalidate(newsProvider);
+        ref.invalidate(mosqueNewsProvider);
         await Future.wait([
           ref.read(eventsProvider.future),
           ref.read(newsProvider.future),
+          ref.read(mosqueNewsProvider.future),
         ]);
       },
       padding: EdgeInsets.fromLTRB(
@@ -106,23 +109,32 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               child: KeyedSubtree(
                 key: ValueKey((
                   segment,
-                  segment == 0
-                      ? events.firstOrNull?.event.title
-                      : news.firstOrNull?.title,
+                  switch (segment) {
+                    CommunitySegment.events => events.firstOrNull?.event.title,
+                    CommunitySegment.announcements => news.firstOrNull?.title,
+                    CommunitySegment.news => mosqueNews.firstOrNull?.title,
+                  },
                 )),
-                child: _headerRow(segment, events, news, jumaa),
+                child: _headerRow(segment, events, news, mosqueNews, jumaa),
               ),
             ),
           ),
         ),
         const SizedBox(height: 16),
-        if (bothShown) ...[
+        if (segments.length > 1) ...[
           StaggerItem(
             index: 1,
             child: AppSegmented(
-              labels: [l.events, l.announcements],
-              index: segment,
-              onChanged: _onSegmentChanged,
+              labels: [
+                for (final s in segments)
+                  switch (s) {
+                    CommunitySegment.events => l.events,
+                    CommunitySegment.announcements => l.announcements,
+                    CommunitySegment.news => l.newsSegment,
+                  },
+              ],
+              index: index,
+              onChanged: (i) => _onSegmentChanged(segments[i]),
             ),
           ),
           const SizedBox(height: 16),
@@ -131,35 +143,67 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
         // animation: the lists can be long, and the fade covers the jump.
         FadeSwitch(
           child: Column(
-            key: ValueKey(
-              segment == 0
-                  ? (eventsLoading ? 'events-loading' : 'events')
-                  : (newsLoading ? 'news-loading' : 'news'),
-            ),
+            key: ValueKey(switch (segment) {
+              CommunitySegment.events => eventsLoading ? 'events-loading' : 'events',
+              CommunitySegment.announcements => newsLoading ? 'news-loading' : 'news',
+              CommunitySegment.news => 'mosque-news',
+            }),
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: segment == 0
-                ? (eventsLoading ? _loadingCards() : _events(events))
-                // Shimmer while announcements load, so "No announcements"
-                // never flashes before they arrive.
-                : (newsLoading
-                      ? _loadingCards(announcement: true)
-                      : _announcements(news)),
+            children: switch (segment) {
+              CommunitySegment.events =>
+                eventsLoading ? _loadingCards() : _events(events),
+              // Shimmer while announcements load, so "No announcements"
+              // never flashes before they arrive.
+              CommunitySegment.announcements => newsLoading
+                  ? _loadingCards(announcement: true)
+                  : _announcements(news),
+              CommunitySegment.news => _mosqueNews(mosqueNews),
+            },
           ),
         ),
       ],
     );
   }
 
+  /// What the toggles leave, in order; news waits for its first item.
+  List<CommunitySegment> _segments() {
+    final features = ref.read(contentProvider).features;
+    final hasNews = ref.read(mosqueNewsProvider).valueOrNull?.isNotEmpty ?? false;
+    return [
+      if (features.events) CommunitySegment.events,
+      if (features.announcements) CommunitySegment.announcements,
+      if (features.news && hasNews) CommunitySegment.news,
+    ];
+  }
+
+  /// The chosen segment; when it isn't shown, the first that is.
+  CommunitySegment _segmentNow() {
+    final segments = _segments();
+    final chosen = ref.read(communitySegmentProvider);
+    return segments.contains(chosen)
+        ? chosen
+        : segments.firstOrNull ?? CommunitySegment.events;
+  }
+
   /// The row always carries live content: the next event, else Jumu'ah,
   /// which is never empty (spec §4.7).
   Widget _headerRow(
-    int segment,
+    CommunitySegment segment,
     List<UpcomingEvent> events,
     List<Announcement> news,
+    List<MosqueNews> mosqueNews,
     String? jumaa,
   ) {
     final l = context.l10n;
-    if (segment == 1 && news.isNotEmpty) {
+    if (segment == CommunitySegment.news && mosqueNews.isNotEmpty) {
+      final latest = mosqueNews.first;
+      return HeroRow(
+        icon: AppIcons.photo,
+        title: latest.title,
+        subtitle: newsDay(l, latest.date),
+      );
+    }
+    if (segment == CommunitySegment.announcements && news.isNotEmpty) {
       final latest = news.first;
       return HeroRow(
         icon: AppIcons.announcement,
@@ -177,7 +221,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             : null,
       );
     }
-    if (segment == 0 && events.isNotEmpty) {
+    if (segment == CommunitySegment.events && events.isNotEmpty) {
       final next = events.first;
       return HeroRow(
         icon: AppIcons.calendar,
@@ -204,9 +248,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
 
   /// Opening the announcements list is what marks them read (spec §7.4's
   /// unread dot is derived on-device, never from the server).
-  void _onSegmentChanged(int index) {
-    setState(() => _segment = index);
-    if (index == 1) _markSeenSoon();
+  void _onSegmentChanged(CommunitySegment segment) {
+    ref.read(communitySegmentProvider.notifier).state = segment;
+    if (segment == CommunitySegment.announcements) _markSeenSoon();
   }
 
   void _markSeenSoon() {
@@ -333,6 +377,19 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       ],
     ];
   }
+
+  List<Widget> _mosqueNews(List<MosqueNews> items) => [
+    for (final (i, n) in items.indexed) ...[
+      StaggerItem(
+        index: 2 + i,
+        child: NewsCard(
+          item: n,
+          onTap: () => context.push('/community/news', extra: n),
+        ),
+      ),
+      const SizedBox(height: AppSpace.cardGap),
+    ],
+  ];
 
   List<Widget> _announcements(List<Announcement> items) {
     if (items.isEmpty) {

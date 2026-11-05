@@ -1459,4 +1459,40 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get lastBackgroundRefresh => 'Son arka plan yenileme';
+
+  @override
+  String get newsSection => 'Camimizden Haberler';
+
+  @override
+  String get newsSegment => 'Haberler';
+
+  @override
+  String get newsFeatured => 'Öne çıkan';
+
+  @override
+  String newsPhotoCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotoğraf',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsGone => 'Bu haber artık yayında değil';
+
+  @override
+  String get newsShare => 'Paylaş';
+
+  @override
+  String newsOpenPhoto(String index, String total) {
+    return 'Fotoğraf $index / $total, tam ekran aç';
+  }
+
+  @override
+  String get newsViewerHint => 'İki parmakla yakınlaştırın, kaydırarak geçin';
+
+  @override
+  String get newsViewerHintOne => 'İki parmakla yakınlaştırın';
 }

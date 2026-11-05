@@ -461,5 +461,14 @@
   "reminderJumuahNow": "Cuma namazı vakti",
   "reminderJumuahSoon": "Cuma namazına 5 dakika kaldı",
   "remindersEndingNotice": "Namaz hatırlatmalarınız yarın duracak. Doğru saatte gelmeye devam etmeleri için Pape Mosque'u bir kez açmanız yeterli.",
-  "lastBackgroundRefresh": "Son arka plan yenileme"
+  "lastBackgroundRefresh": "Son arka plan yenileme",
+  "newsSection": "Camimizden Haberler",
+  "newsSegment": "Haberler",
+  "newsFeatured": "Öne çıkan",
+  "newsPhotoCount": "{count, plural, other{{count} fotoğraf}}",
+  "newsGone": "Bu haber artık yayında değil",
+  "newsShare": "Paylaş",
+  "newsOpenPhoto": "Fotoğraf {index} / {total}, tam ekran aç",
+  "newsViewerHint": "İki parmakla yakınlaştırın, kaydırarak geçin",
+  "newsViewerHintOne": "İki parmakla yakınlaştırın"
 }

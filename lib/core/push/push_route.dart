@@ -6,7 +6,8 @@ final _day = RegExp(r'^\d{4}-\d{2}-\d{2}$');
 
 /// Where a tapped notification opens, from its data (all strings):
 /// `event_id` → that event (with `occurrence`, that day's session),
-/// else `announcement_id` → that announcement, else the Community tab.
+/// else `announcement_id` → that announcement, else `news_id` → that news
+/// item, else the Community tab.
 /// Malformed ids count as absent.
 String pushRoute(Map<String, dynamic> data) {
   final eventId = data['event_id'];
@@ -19,6 +20,10 @@ String pushRoute(Map<String, dynamic> data) {
   final announcementId = data['announcement_id'];
   if (announcementId is String && _uuid.hasMatch(announcementId)) {
     return '/community/announcement/$announcementId';
+  }
+  final newsId = data['news_id'];
+  if (newsId is String && _uuid.hasMatch(newsId)) {
+    return '/community/news/$newsId';
   }
   return '/community';
 }

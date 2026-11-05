@@ -229,6 +229,16 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
 - Tests: `tool/siri_swift_test.sh` runs the Foundation-only logic in Docker; workflow `siri-check` in `codemagic.yaml`
   compiles everything (the only compile of `AppIntents` and SwiftUI code; this machine has no Xcode) and runs RunnerTests.
 
+## Camimizden Haberler (since 1.4.0)
+
+`lib/core/news/mosque_news.dart` reads `mosque_news` (published only; admins can read drafts), keeps the last good list in
+shared_preferences. Named apart from `newsProvider`, which means announcements. Home: `NewsRail` under the emergency banner,
+featured first, 188 pt cards so the times stay near; hidden with no news. Community: third segment, shown once something is
+published; the segment lives in `communitySegmentProvider` so the rail's "See all" can open it. Detail: `NewsDetailScreen`
+(4:5 `PageView`, dots, tap for `NewsViewer`, pinch to zoom). `NewsPhotoFrame`: a crop fills it; `fit: contain` shows the whole
+photo over `PosterBackdrop`, and the viewer shows it clean. Push: `news_id` → `/community/news/:id`. Kill switch
+`features.news`. With Events and Announcements both off there's no Community tab, so the rail has no "See all".
+
 ## Announcement photos on cards (since 1.4.0)
 
 `PosterFrame` (`announcement_photo.dart`), the website's rule: the card keeps its 16:9 frame and the whole image shows

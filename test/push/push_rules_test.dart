@@ -37,6 +37,11 @@ void main() {
     });
 
     test('neither, an unknown type or a malformed id: Community', () {
+      expect(
+        pushRoute({'type': 'news', 'news_id': announcement}),
+        '/community/news/$announcement',
+      );
+      expect(pushRoute({'news_id': '../profile'}), '/community');
       expect(pushRoute({'type': 'broadcast', 'nid': 'x'}), '/community');
       expect(pushRoute({'type': 'something-new'}), '/community');
       expect(pushRoute({'event_id': '../profile'}), '/community');

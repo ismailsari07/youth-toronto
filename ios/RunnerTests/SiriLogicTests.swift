@@ -486,6 +486,22 @@ final class SiriLogicTests: XCTestCase {
     XCTAssertNil(SiriStore.decode(SiriPrayersDoc.self, json: oldText) { $0.version })
   }
 
+  func testAnswersFollowSirisLanguageNotTheDevices() {
+    XCTAssertEqual(SiriLanguage.resolve(siri: "tr-TR", device: "en"), .tr)
+    XCTAssertEqual(SiriLanguage.resolve(siri: "tr_TR", device: "en"), .tr)
+    XCTAssertEqual(SiriLanguage.resolve(siri: "fr-CA", device: "en"), .fr)
+    XCTAssertEqual(SiriLanguage.resolve(siri: "en-CA", device: "tr"), .en)
+    XCTAssertEqual(SiriLanguage.resolve(siri: "TR", device: nil), .tr)
+  }
+
+  func testALanguageWeDontHaveFallsBackToTheDeviceThenEnglish() {
+    XCTAssertEqual(SiriLanguage.resolve(siri: "de-DE", device: "tr"), .tr)
+    XCTAssertEqual(SiriLanguage.resolve(siri: "", device: "fr"), .fr)
+    XCTAssertEqual(SiriLanguage.resolve(siri: nil, device: "fr"), .fr)
+    XCTAssertEqual(SiriLanguage.resolve(siri: "de-DE", device: "es"), .en)
+    XCTAssertEqual(SiriLanguage.resolve(siri: nil, device: nil), .en)
+  }
+
   func testTheThreeLanguages() {
     let now = at(2026, 11, 8, 12)
     XCTAssertEqual(

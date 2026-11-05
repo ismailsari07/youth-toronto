@@ -28,9 +28,8 @@ workflows:
           test -f "$app/Runner.debug.dylib" && bin="$app/Runner.debug.dylib"
           otool -l "$bin" | grep -A2 LC_LOAD_WEAK_DYLIB | grep -q AppIntents \
             || { echo "AppIntents is not weak-linked: the app would crash on iOS 15"; exit 1; }
-          for lang in en tr fr; do
-            test -f "$app/$lang.lproj/AppShortcuts.strings" || { echo "No $lang phrases"; exit 1; }
-          done
+      - name: The translations made it into the app
+        script: python3 tool/check_siri_bundle.py build/ios/iphonesimulator/Runner.app
       - name: Swift tests (RunnerTests)
         script: |
           set -e

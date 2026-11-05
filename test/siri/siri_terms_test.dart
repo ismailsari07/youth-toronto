@@ -118,6 +118,31 @@ void main() {
     });
   });
 
+  test('en, tr and fr are declared and built into the Runner target', () {
+    final plist = File('ios/Runner/Info.plist').readAsStringSync();
+    final declared = RegExp(r'<key>CFBundleLocalizations</key>\s*<array>(.*?)</array>', dotAll: true)
+        .firstMatch(plist)![1]!;
+    final project = File('ios/Runner.xcodeproj/project.pbxproj').readAsStringSync();
+    final regions = RegExp(r'knownRegions = \((.*?)\);', dotAll: true).firstMatch(project)![1]!;
+    expect(project, contains('developmentRegion = en;'));
+
+    // The app's main resources phase: the one with the storyboards.
+    final runner = RegExp(r'isa = PBXResourcesBuildPhase;.*?files = \((.*?)\);', dotAll: true)
+        .allMatches(project)
+        .map((m) => m[1]!)
+        .firstWhere((files) => files.contains('Main.storyboard'));
+
+    for (final lang in const ['en', 'tr', 'fr']) {
+      expect(declared, contains('<string>$lang</string>'));
+      expect(regions, contains('$lang,'));
+      for (final name in const ['AppShortcuts', 'Localizable', 'InfoPlist']) {
+        expect(project, contains('path = $lang.lproj/$name.strings;'));
+        expect(File('ios/Runner/$lang.lproj/$name.strings').existsSync(), isTrue);
+        expect(runner, contains('$name.strings in Resources'));
+      }
+    }
+  });
+
   test('the Xcode project includes every Siri file', () {
     final project = File('ios/Runner.xcodeproj/project.pbxproj').readAsStringSync();
     for (final file in Directory('ios/Runner/Siri').listSync()) {

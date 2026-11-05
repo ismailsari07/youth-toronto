@@ -49,7 +49,8 @@ the website in Safari (`LaunchMode.externalApplication`); never add a form or a 
   options" shows.
 - URL: `links.donation` from the bundle, else `https://papemosque.ca/donation`; a fund adds `?fund=<slug>`,
   which the website turns into that fund's open form.
-- Fund titles are Turkish only (one `title` column); translations wait for the panel's fund module.
+- Fund titles (since 1.4.0): `title_i18n` from the panel's Fonlar, in the app language, then EN, then TR. The plain
+  `title` column is a copy of Turkish and the fallback, also for lists cached before 1.4.0.
 
 ## Push notifications (since 1.0.8)
 
@@ -200,8 +201,11 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   network. Flutter writes every time as an instant and as text with the reminders' code; Swift compares instants and
   repeats the text. Prayers: with the widget sync, same rows. Events: after a successful fetch (launch, resume, pull,
   silent push); refused after 7 days. Mosque: after a content refresh and at launch.
-- Answers follow the device's language, not the app's setting, because Siri matches phrases in its own language; events
-  are written in all three. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.
+- Spoken answers and cards follow Siri's language (`INPreferences.siriLanguageCode()`), then the device's, then English;
+  never the app's setting. They are said in Siri's voice, and `Bundle.main.preferredLocalizations` only knows the device. Events
+  are written in all three. iOS itself picks the titles in the Shortcuts app and Spotlight (`Localizable.strings`), from the
+  device's language or the app's language in iOS Settings, not Siri's: Apple documents Siri's language as able to differ. So
+  test those with the device in that language; `tool/check_siri_bundle.py` (in `siri-check`) proves the translations shipped. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.
 - Intents are in the Runner target (Apple's rule for App Shortcuts), so a question launches the app in the background.
   `LaunchGate` keeps that invisible: no launch counted, no pre-prompt, no `register_device`, no reminder reschedule, no
   sync of the panel's content, until the app really comes forward, then all of it once. (The unseen first frame can still

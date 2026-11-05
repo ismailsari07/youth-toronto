@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(Intents)
+import Intents
+#endif
 
 // The sentences Siri speaks and the cards the snippets show, in English,
 // Turkish and Canadian French, with the app's terms
@@ -7,10 +10,28 @@ import Foundation
 enum SiriLanguage: String {
   case en, tr, fr
 
-  /// The language iOS picked for this app from the device's list.
+  /// The language Siri speaks, because the answer is said in Siri's voice. It
+  /// can differ from the device's, which is all Bundle.main.preferredLocalizations
+  /// knows: that gave English sentences in a Turkish voice.
   static var current: SiriLanguage {
-    let code = Bundle.main.preferredLocalizations.first ?? "en"
-    return SiriLanguage(rawValue: String(code.prefix(2)).lowercased()) ?? .en
+    #if canImport(Intents)
+    let siri: String? = INPreferences.siriLanguageCode()
+    #else
+    let siri: String? = nil
+    #endif
+    return resolve(siri: siri, device: Bundle.main.preferredLocalizations.first)
+  }
+
+  /// Siri's language if we have it, else the device's, else English. Codes come
+  /// as "tr-TR", "fr_CA" or "en".
+  static func resolve(siri: String?, device: String?) -> SiriLanguage {
+    for code in [siri, device] {
+      guard let code = code else { continue }
+      if let language = SiriLanguage(rawValue: String(code.prefix(2)).lowercased()) {
+        return language
+      }
+    }
+    return .en
   }
 }
 
@@ -510,7 +531,7 @@ struct SiriEngine {
 }
 
 extension SiriEngine {
-  /// The stored documents, as of now, in the device's language.
+  /// The stored documents, as of now, in Siri's language.
   static func current() -> SiriEngine {
     SiriEngine(
       prayers: SiriStore.prayers,

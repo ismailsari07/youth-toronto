@@ -30,6 +30,10 @@ workflows:
             || { echo "AppIntents is not weak-linked: the app would crash on iOS 15"; exit 1; }
       - name: The translations made it into the app
         script: python3 tool/check_siri_bundle.py build/ios/iphonesimulator/Runner.app
+      - name: The scene manifest made it into the app
+        script: python3 tool/check_scene_manifest.py build/ios/iphonesimulator/Runner.app
+      - name: The app starts through its scene on a simulator
+        script: bash tool/check_simulator_launch.sh build/ios/iphonesimulator/Runner.app
       - name: Swift tests (RunnerTests)
         script: |
           set -e

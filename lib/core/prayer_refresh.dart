@@ -80,9 +80,10 @@ abstract final class BackgroundRefreshLog {
 }
 
 /// FirebaseMessaging.onBackgroundMessage's handler. On iOS FlutterFire calls
-/// it on the app's own engine (the app is woken, or launched, in the
-/// background and main() has run), so the widget's platform channel in
-/// AppDelegate is there too. iOS gives it about 25 seconds.
+/// it on the app's own engine, so the widget's platform channel in AppDelegate
+/// is there too. iOS gives it about 25 seconds. That engine exists once a scene
+/// has connected: a launch with no scene runs no Dart, so this doesn't run. The
+/// owner accepted that (see "UIScene lifecycle" in CLAUDE.md).
 @pragma('vm:entry-point')
 Future<void> onBackgroundPush(RemoteMessage message) =>
     handlePushData(message.data, background: true);

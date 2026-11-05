@@ -5,8 +5,9 @@ import UIKit
 
 // The ten App Shortcuts' intents. They live in the main app because Apple
 // requires that for App Shortcuts, and only there can an intent open the app.
-// So a question launches the app in the background: lib/core/launch_gate.dart
-// keeps that launch from doing anything a member would notice.
+// So a question launches the app in the background, possibly with no scene and
+// so no Flutter. If iOS does connect one, lib/core/launch_gate.dart keeps that
+// launch from doing anything a member would notice. Intents read only the App Group.
 
 /// What this session owes the Flutter side (see AppDelegate's Siri bridge).
 enum SiriSession {

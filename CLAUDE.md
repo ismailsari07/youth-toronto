@@ -177,9 +177,9 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
 - Rescheduled on launch, resume, pull-to-refresh on Prayer, settings/language changes, and the `prayer_refresh` silent
   push (pape-admin sends it after any change to a row dated today or later, debounced; FCM data
   `{"type":"prayer_refresh"}`, `content-available`). Foreground: `PushPlatform.received`; background:
-  `onBackgroundPush`, which FlutterFire runs on iOS on the app's own engine, so the widget bridge is there too. iOS
-  may not deliver it (app swiped away, Low Power Mode, Background App Refresh off); the notice asks the member to open the app before
-  the schedule runs out.
+  `onBackgroundPush`, on the app's own engine, so the widget bridge is there too. It needs a running engine (see "UIScene lifecycle").
+  iOS may not deliver it (app swiped away, Low Power Mode, Background App Refresh off); the notice asks the member to open the app
+  before the schedule runs out.
   A failed fetch keeps what's scheduled (it came from real rows); an empty answer clears it. A background
   prayer_refresh that rescheduled is recorded locally and shown in Profil → Uygulama hakkında as "Son arka plan
   yenileme" (`BackgroundRefreshLog`), to check delivery on TestFlight.
@@ -219,8 +219,9 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   are written in all three. iOS itself picks the titles in the Shortcuts app and Spotlight (`Localizable.strings`), from the
   device's language or the app's language in iOS Settings, not Siri's: Apple documents Siri's language as able to differ. So
   test those with the device in that language; `tool/check_siri_bundle.py` (in `siri-check`) proves the translations shipped. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.
-- Intents are in the Runner target (Apple's rule for App Shortcuts), so a question launches the app in the background.
-  `LaunchGate` keeps that invisible: no launch counted, no pre-prompt, no `register_device`, no reminder reschedule, no
+- Intents are in the Runner target (Apple's rule for App Shortcuts), so a question launches the app in the background, with
+  Flutter only if iOS connects a scene (see "UIScene lifecycle"). They read only the App Group, so they answer either way.
+  `LaunchGate` keeps a Flutter launch invisible: no launch counted, no pre-prompt, no `register_device`, no reminder reschedule, no
   sync of the panel's content, until the app really comes forward, then all of it once. (The unseen first frame can still
   run the home screen's read-only loads, like prayer times and events; they write nothing.)
   (`test/siri/launch_gate_test.dart` pumps the real `MytApp`). Silent pushes get the same gate and still reschedule through
@@ -241,6 +242,22 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   `test/siri/siri_trademark_test.dart` scans the code's string literals and every `.strings` file for these names.
 - Tests: `tool/siri_swift_test.sh` runs the Foundation-only logic in Docker; workflow `siri-check` in `codemagic.yaml`
   compiles everything (the only compile of `AppIntents` and SwiftUI code; this machine has no Xcode) and runs RunnerTests.
+
+## UIScene lifecycle (since 1.4.0)
+
+Apple requires it from Xcode 27: an app built with that SDK without UIScene fails at launch. Flutter's official migration, on
+3.38.5: `UIApplicationSceneManifest` in `Info.plist` with the stock `FlutterSceneDelegate` and no `SceneDelegate` of our own.
+`AppDelegate` is a `FlutterImplicitEngineDelegate`: plugins and the three channels are registered in
+`didInitializeImplicitFlutterEngine`; only the notification delegate is set in `didFinishLaunching`. Launch options are nil
+now, and `UIApplication.delegate.window` is nil: never use them (`test/ios/ui_scene_test.dart`).
+
+- The engine starts when the scene loads the storyboard. A launch with no scene runs no Dart. **Decided by the owner on 2026-11-05:**
+  if a `prayer_refresh` push on a cold background launch does nothing because of this, accept it and document it here; don't add
+  a custom engine or `SceneDelegate`. Reminders then update at the next launch or resume. The 12-day window and the notice cover
+  running out; a corrected time reaches a phone like that only when the app next runs. Pushes to a suspended app with a live engine are not affected.
+- iOS can drop a suspended app's scene and connect a new one, which starts a new engine, so registration must be repeatable.
+- `siri-check`: `tool/check_scene_manifest.py` reads the built `Info.plist`; `tool/check_simulator_launch.sh` launches the app
+  on a simulator and looks for the Debug-only "PapeScene" log line, which only the scene's engine can write.
 
 ## Camimizden Haberler (since 1.4.0)
 

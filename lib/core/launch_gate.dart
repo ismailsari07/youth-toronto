@@ -1,6 +1,7 @@
 /// A Siri question (or a silent push) can launch the app in the background.
-/// [main] and the first frame still run, because Flutter builds its first
-/// frame without a screen, but nothing a member would notice may happen then:
+/// Under UIScene Flutter only starts once iOS connects a scene, which it can
+/// do in the background. [main] and the first frame then run, because Flutter
+/// builds its first frame without a screen, but nothing a member would notice may happen then:
 /// no pre-prompt, no launch counted, no `register_device`, no reminders
 /// rescheduled, no sync of the panel's content. All of that waits until the
 /// app really comes forward, and runs once. (The unseen first frame can still

@@ -52,9 +52,6 @@ class ReminderSettingsNotifier extends AsyncNotifier<ReminderSettings> {
     );
   }
 
-  Future<void> setTiming(ReminderTiming timing) =>
-      _save(_current.copyWith(timing: timing));
-
   Future<void> setSound(ReminderSound sound) =>
       _save(_current.copyWith(sound: sound));
 

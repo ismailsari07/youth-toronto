@@ -119,6 +119,11 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String reminderFridayBody(String time) {
+    return 'Öğle ezanı · Cuma namazı $time';
+  }
+
+  @override
   String get fajrWindowCloses => 'Sabah namazının vakti çıkar';
 
   @override
@@ -129,15 +134,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get remindersPrayers => 'Vakitler';
-
-  @override
-  String get remindersNotifyMe => 'Bildirim zamanı';
-
-  @override
-  String get notifyAtAthan => 'Ezan vaktinde';
-
-  @override
-  String get notifyBeforeIqamah => 'Cemaatten 5 dakika önce';
 
   @override
   String get notificationSound => 'Bildirim sesi';
@@ -164,9 +160,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get remindersSummaryAthan => 'Açık · Ezan vaktinde';
 
   @override
-  String get remindersSummaryIqamah => 'Açık · Cemaatten 5 dk önce';
-
-  @override
   String reminderAthanBody(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'Sabah namazı vakti girdi',
@@ -182,19 +175,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String reminderIqamahAt(String time) {
     return 'Cemaat $time';
-  }
-
-  @override
-  String reminderIqamahSoon(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Sabah namazı cemaatine 5 dakika kaldı',
-      'dhuhr': 'Öğle cemaatine 5 dakika kaldı',
-      'asr': 'İkindi cemaatine 5 dakika kaldı',
-      'maghrib': 'Akşam cemaatine 5 dakika kaldı',
-      'isha': 'Yatsı cemaatine 5 dakika kaldı',
-      'other': '$prayer cemaatine 5 dakika kaldı',
-    });
-    return '$_temp0';
   }
 
   @override
@@ -1446,12 +1426,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get keyboardNext => 'Sonraki alan';
-
-  @override
-  String get reminderJumuahNow => 'Cuma namazı vakti';
-
-  @override
-  String get reminderJumuahSoon => 'Cuma namazına 5 dakika kaldı';
 
   @override
   String get remindersEndingNotice =>

@@ -1,19 +1,13 @@
-/// When a prayer notification arrives. Only one at a time, so each prayer
-/// costs one of iOS's 64 pending slots a day (see reminderBudget).
-enum ReminderTiming { atAthan, beforeIqamah }
-
-/// The sound of the athan-time notification. The 5-minutes-before-iqamah
-/// notification always uses the standard sound.
+/// The sound of a prayer notification.
 enum ReminderSound { athan, standard, silent }
 
-/// The device's prayer-notification choices. Missing values read as the
-/// original behaviour, so members from before these options keep exactly
-/// what they had: all five prayers, 5 minutes before the iqamah.
+/// The device's prayer-notification choices. Every reminder fires at the
+/// athan; there is nothing to choose about when. A missing prayer list reads
+/// as all five.
 class ReminderSettings {
   const ReminderSettings({
     this.enabled = true,
     this.prayers = allPrayers,
-    this.timing = ReminderTiming.beforeIqamah,
     this.sound,
   });
 
@@ -23,7 +17,6 @@ class ReminderSettings {
   /// The master switch.
   final bool enabled;
   final Set<String> prayers;
-  final ReminderTiming timing;
 
   /// The member's choice, or null if they never picked one.
   final ReminderSound? sound;
@@ -48,13 +41,11 @@ class ReminderSettings {
   ReminderSettings copyWith({
     bool? enabled,
     Set<String>? prayers,
-    ReminderTiming? timing,
     ReminderSound? sound,
   }) =>
       ReminderSettings(
         enabled: enabled ?? this.enabled,
         prayers: prayers ?? this.prayers,
-        timing: timing ?? this.timing,
         sound: sound ?? this.sound,
       );
 }

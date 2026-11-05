@@ -149,7 +149,7 @@ The keyboard always has a way out (TestFlight 1.2.0: number, phone and multi-lin
   that slot). The registration form does this and hides its "can't be cancelled" line while the keyboard is up: on an
   iPhone SE that leaves about 150 pt of form between the nav bar and Send.
 
-## Prayer reminders (back since 1.3.0; budget and notice since 1.3.1)
+## Prayer reminders (back since 1.3.0; budget and notice since 1.3.1; athan only since 1.4.0)
 
 Owner's hard rule: a prayer notification must NEVER fire at a wrong time. If real data runs out, reminders stop; no
 estimates, no filling, no carrying a day forward (pape-admin `docs/prayer-range-migrations.md`). `prayer_cache` holds a
@@ -161,12 +161,16 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
 - Reminders fill iOS's 64 pending slots (1.3.1, decided with the owner): 63 for reminders (`reminderBudget`), 1 for the
   notice, `otherLocalNotifications = 0` (event/announcement pushes are remote; count any new local notification there).
   Whole days only, in date order from today, until the next day doesn't fit or the rows run out: 12 days with all five
-  prayers, 21 with three; a Friday's Jumu'ah takes Dhuhr's slot.
+  prayers, 21 with three.
 - The notice (`buildNotice`, id 9999, payload `open_prayer` → Prayer): "your reminders stop tomorrow, open the app" at
   10:00 Toronto on the last scheduled day; if that has passed, the middle of the next prayer gap still ahead, never in
   21:30–08:00, else none. Rebuilt with every sync, so a regular user never sees it; none when reminders are off.
-- Friday's Dhuhr is Jumu'ah: title `jumuah`, at that Friday row's `jumaaPrayerTime` (as both athan and iqamah, so "5 min
-  before" = 5 min before it); no readable Jumu'ah time → no Dhuhr reminder that day. Follows the Dhuhr switch.
+- Every reminder fires at the athan; the owner removed "5 minutes before the iqamah" in 1.4.0. `loadSettings` deletes the old
+  `prayer_reminders_timing` key, and the launch's sync replaces what was pending. Offline, or until the updated app first
+  runs, the old iqamah-time reminders stay pending; the next successful sync replaces them.
+- Friday's Dhuhr fires at the Dhuhr athan; its body gives that row's `jumaaPrayerTime` ("Öğle ezanı · Cuma namazı 13:00'te",
+  `reminderFridayBody`, `clockInSentence` adds the Turkish suffix). No readable Jumu'ah time: the plain athan text, never an
+  invented time. Follows the Dhuhr switch. The notice's gaps still go around Jumu'ah.
 - Default: a saved on/off wins; with none, on only if iOS already allows notifications (e.g. after the push pre-prompt).
   The iOS prompt never appears on its own: only `sync(ask: true)` from the reminders sheet asks. The owner rejected a
   "reminders stop" notice on 2026-10-10 and decided the local one above for 1.3.1.

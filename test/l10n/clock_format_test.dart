@@ -104,13 +104,37 @@ void main() {
         final now = tz.TZDateTime(mosqueTz, 2026, 10, 4, 3);
         final dhuhr = buildReminders(
           [_row(DateTime(2026, 10, 4))],
-          const ReminderSettings(timing: ReminderTiming.atAthan),
+          const ReminderSettings(),
           l,
           now: now,
           sound: ReminderSound.standard,
         ).firstWhere((r) => r.id % 10 == 1);
         expect(dhuhr.body, endsWith(iqamah), reason: l.localeName);
       }
+    });
+  });
+
+  group('a time inside a sentence', () {
+    test("Turkish adds the suffix of the last number said, like Siri's", () {
+      for (final (clock, said) in [
+        ('13:00', "13:00'te"),
+        ('16:00', "16:00'da"),
+        ('20:00', "20:00'de"),
+        ('00:00', "00:00'da"),
+        ('13:07', "13:07'de"),
+        ('13:30', "13:30'da"),
+        ('13:40', "13:40'ta"),
+        ('13:50', "13:50'de"),
+        ('13:05', "13:05'te"),
+        ('13:09', "13:09'da"),
+      ]) {
+        expect(clockInSentence(tr, clock), said);
+      }
+    });
+
+    test('English and French are unchanged: their word comes before the time', () {
+      expect(clockInSentence(en, '1:00 PM'), '1:00 PM');
+      expect(clockInSentence(fr, '13${_nb}h'), '13${_nb}h');
     });
   });
 
@@ -133,7 +157,7 @@ void main() {
           for (final l in [en, tr, fr])
             l.localeName: buildReminders(
               [_row(day)],
-              const ReminderSettings(timing: ReminderTiming.atAthan),
+              const ReminderSettings(),
               l,
               now: now,
               sound: ReminderSound.standard,

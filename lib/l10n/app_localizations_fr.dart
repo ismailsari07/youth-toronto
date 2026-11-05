@@ -119,6 +119,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String reminderFridayBody(String time) {
+    return 'Adhan du Dhohr · Prière du vendredi à $time';
+  }
+
+  @override
   String get fajrWindowCloses => 'Fin du temps du Fajr';
 
   @override
@@ -129,15 +134,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get remindersPrayers => 'Prières';
-
-  @override
-  String get remindersNotifyMe => 'Me prévenir';
-
-  @override
-  String get notifyAtAthan => 'À l\'heure de l\'adhan';
-
-  @override
-  String get notifyBeforeIqamah => '5 minutes avant l\'iqama';
 
   @override
   String get notificationSound => 'Son de la notification';
@@ -164,9 +160,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get remindersSummaryAthan => 'Activés · À l\'heure de l\'adhan';
 
   @override
-  String get remindersSummaryIqamah => 'Activés · 5 min avant l\'iqama';
-
-  @override
   String reminderAthanBody(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'C\'est l\'heure de la prière du Fajr',
@@ -182,19 +175,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String reminderIqamahAt(String time) {
     return 'Iqama à $time';
-  }
-
-  @override
-  String reminderIqamahSoon(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Iqama du Fajr dans 5 minutes',
-      'dhuhr': 'Iqama du Dhohr dans 5 minutes',
-      'asr': 'Iqama de l\'Asr dans 5 minutes',
-      'maghrib': 'Iqama du Maghrib dans 5 minutes',
-      'isha': 'Iqama de l\'Icha dans 5 minutes',
-      'other': 'Iqama ($prayer) dans 5 minutes',
-    });
-    return '$_temp0';
   }
 
   @override
@@ -1478,12 +1458,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get keyboardNext => 'Champ suivant';
-
-  @override
-  String get reminderJumuahNow => 'C\'est l\'heure de la prière du vendredi';
-
-  @override
-  String get reminderJumuahSoon => 'Prière du vendredi dans 5 minutes';
 
   @override
   String get remindersEndingNotice =>

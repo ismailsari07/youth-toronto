@@ -220,6 +220,12 @@ abstract class AppLocalizations {
   /// **'{prayer} · now'**
   String prayerNow(String prayer);
 
+  /// Body of Friday's Dhuhr notification, at the Dhuhr athan. [time] is the Jumu'ah time; Turkish already carries its suffix (13:00'te).
+  ///
+  /// In en, this message translates to:
+  /// **'Dhuhr athan · Jumu\'ah at {time}'**
+  String reminderFridayBody(String time);
+
   /// No description provided for @fajrWindowCloses.
   ///
   /// In en, this message translates to:
@@ -243,24 +249,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Prayers'**
   String get remindersPrayers;
-
-  /// No description provided for @remindersNotifyMe.
-  ///
-  /// In en, this message translates to:
-  /// **'Notify me'**
-  String get remindersNotifyMe;
-
-  /// No description provided for @notifyAtAthan.
-  ///
-  /// In en, this message translates to:
-  /// **'At athan time'**
-  String get notifyAtAthan;
-
-  /// No description provided for @notifyBeforeIqamah.
-  ///
-  /// In en, this message translates to:
-  /// **'5 minutes before iqamah'**
-  String get notifyBeforeIqamah;
 
   /// No description provided for @notificationSound.
   ///
@@ -310,12 +298,6 @@ abstract class AppLocalizations {
   /// **'On · At athan time'**
   String get remindersSummaryAthan;
 
-  /// No description provided for @remindersSummaryIqamah.
-  ///
-  /// In en, this message translates to:
-  /// **'On · 5 min before iqamah'**
-  String get remindersSummaryIqamah;
-
   /// Body of the notification at athan time. [prayer] is the lower-case English key. Turkish uses the namaz form (Fajr: Sabah namazı).
   ///
   /// In en, this message translates to:
@@ -327,12 +309,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Iqamah at {time}'**
   String reminderIqamahAt(String time);
-
-  /// Body of the notification 5 minutes before the iqamah. [prayer] is the lower-case English key.
-  ///
-  /// In en, this message translates to:
-  /// **'{prayer, select, fajr{Fajr iqamah in 5 minutes} dhuhr{Dhuhr iqamah in 5 minutes} asr{Asr iqamah in 5 minutes} maghrib{Maghrib iqamah in 5 minutes} isha{Isha iqamah in 5 minutes} other{{prayer} iqamah in 5 minutes}}'**
-  String reminderIqamahSoon(String prayer);
 
   /// No description provided for @remindersDeniedNote.
   ///
@@ -2493,18 +2469,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next field'**
   String get keyboardNext;
-
-  /// Friday's Dhuhr reminder, at the Jumu'ah time (title: jumuah).
-  ///
-  /// In en, this message translates to:
-  /// **'It\'s time for Jumu\'ah prayer'**
-  String get reminderJumuahNow;
-
-  /// Friday's reminder 5 minutes before the Jumu'ah time (title: jumuah).
-  ///
-  /// In en, this message translates to:
-  /// **'Jumu\'ah in 5 minutes'**
-  String get reminderJumuahSoon;
 
   /// Local notification on the last day with scheduled prayer reminders (title: prayerReminders). Moved forward every time the app syncs.
   ///

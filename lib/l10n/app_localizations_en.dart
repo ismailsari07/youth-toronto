@@ -119,6 +119,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String reminderFridayBody(String time) {
+    return 'Dhuhr athan · Jumu\'ah at $time';
+  }
+
+  @override
   String get fajrWindowCloses => 'Fajr window closes';
 
   @override
@@ -129,15 +134,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remindersPrayers => 'Prayers';
-
-  @override
-  String get remindersNotifyMe => 'Notify me';
-
-  @override
-  String get notifyAtAthan => 'At athan time';
-
-  @override
-  String get notifyBeforeIqamah => '5 minutes before iqamah';
 
   @override
   String get notificationSound => 'Notification sound';
@@ -164,9 +160,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remindersSummaryAthan => 'On · At athan time';
 
   @override
-  String get remindersSummaryIqamah => 'On · 5 min before iqamah';
-
-  @override
   String reminderAthanBody(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'It\'s time for Fajr prayer',
@@ -182,19 +175,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String reminderIqamahAt(String time) {
     return 'Iqamah at $time';
-  }
-
-  @override
-  String reminderIqamahSoon(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Fajr iqamah in 5 minutes',
-      'dhuhr': 'Dhuhr iqamah in 5 minutes',
-      'asr': 'Asr iqamah in 5 minutes',
-      'maghrib': 'Maghrib iqamah in 5 minutes',
-      'isha': 'Isha iqamah in 5 minutes',
-      'other': '$prayer iqamah in 5 minutes',
-    });
-    return '$_temp0';
   }
 
   @override
@@ -1458,12 +1438,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keyboardNext => 'Next field';
-
-  @override
-  String get reminderJumuahNow => 'It\'s time for Jumu\'ah prayer';
-
-  @override
-  String get reminderJumuahSoon => 'Jumu\'ah in 5 minutes';
 
   @override
   String get remindersEndingNotice =>

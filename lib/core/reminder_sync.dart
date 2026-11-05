@@ -14,9 +14,8 @@ import 'prayer_service.dart';
 import 'reminder_settings.dart';
 
 /// Keeps this device's prayer notifications in step with the mosque
-/// schedule and the member's choices: the chosen prayers, at athan time or
-/// 5 minutes before the iqamah, as many whole days ahead as fit in iOS's
-/// pending limit ([reminderBudget]), in Toronto time, only from real
+/// schedule and the member's choices: the chosen prayers, at the athan, as
+/// many whole days ahead as fit in iOS's pending limit ([reminderBudget]), in Toronto time, only from real
 /// prayer_cache rows (see [scheduleDays]), plus the "open the app" notice on
 /// the last of those days (see [buildNotice]).
 ///
@@ -27,7 +26,13 @@ import 'reminder_settings.dart';
 class ReminderSync {
   static const _enabledKey = 'prayer_reminders_enabled';
   static const _prayersKey = 'prayer_reminders_prayers';
-  static const _timingKey = 'prayer_reminders_timing';
+
+  /// Before 1.4.0 a member could pick "5 minutes before the iqamah", and that
+  /// was the default. Nothing reads this any more: [loadSettings] removes it,
+  /// and the launch's sync replaces what was pending with athan-time reminders
+  /// from fresh rows. Offline, the old ones stay until a sync gets through
+  /// (their times came from real rows too).
+  static const _retiredTimingKey = 'prayer_reminders_timing';
   static const _soundKey = 'prayer_reminders_sound';
 
   static Future<bool>? _inFlight;
@@ -64,14 +69,13 @@ class ReminderSync {
   static Future<ReminderSettings> loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_retiredTimingKey);
       final prayers = prefs.getStringList(_prayersKey);
       return ReminderSettings(
         enabled: prefs.getBool(_enabledKey) ?? await permissionGranted() == true,
         prayers: prayers == null
             ? ReminderSettings.allPrayers
             : prayers.where(ReminderSettings.allPrayers.contains).toSet(),
-        timing: ReminderTiming.values.asNameMap()[prefs.getString(_timingKey)] ??
-            ReminderTiming.beforeIqamah,
         sound: ReminderSound.values.asNameMap()[prefs.getString(_soundKey)],
       );
     } catch (e) {
@@ -84,7 +88,6 @@ class ReminderSync {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_enabledKey, s.enabled);
     await prefs.setStringList(_prayersKey, s.prayers.toList());
-    await prefs.setString(_timingKey, s.timing.name);
     final sound = s.sound;
     if (sound != null) await prefs.setString(_soundKey, sound.name);
   }
@@ -176,7 +179,6 @@ class ReminderSync {
 }
 
 const _prayerOrder = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-const _leadTime = Duration(minutes: 5);
 
 /// iOS keeps at most 64 pending local notifications per app and silently
 /// drops the rest.
@@ -203,13 +205,12 @@ const maxReminderDays = 90;
 /// Every notification [settings] asks for, in time order, from real rows
 /// only (a day without its own row gets nothing), as many whole
 /// mosque-calendar days from [now] as fit in [budget]: the first day that
-/// doesn't fit ends the schedule, so no day is ever half-scheduled. At athan
-/// time they use [sound]; 5 minutes before the iqamah, always the standard
-/// sound.
+/// doesn't fit ends the schedule, so no day is ever half-scheduled. Each fires
+/// at its prayer's athan with [sound].
 ///
-/// Friday's Dhuhr is Jumu'ah: "Cuma namazı" at that row's
-/// `jumaaPrayerTime`, used as both the athan and the iqamah time. A Friday
-/// without a readable Jumu'ah time gets no Dhuhr reminder (never Dhuhr's).
+/// Friday's Dhuhr fires at the Dhuhr athan like any other day's, and its text
+/// gives that row's `jumaaPrayerTime`. Without a readable Jumu'ah time it just
+/// says the athan's in: the athan is still real, and no Jumu'ah time is invented.
 List<Reminder> buildReminders(
   List<PrayerDay> days,
   ReminderSettings settings,
@@ -219,7 +220,6 @@ List<Reminder> buildReminders(
   int budget = reminderBudget,
 }) {
   if (!settings.active) return const [];
-  final atAthan = settings.timing == ReminderTiming.atAthan;
   final reminders = <Reminder>[];
 
   for (final (offset: i, :day, :payload)
@@ -228,44 +228,40 @@ List<Reminder> buildReminders(
     for (final item in payload.dailyPrayerTimes) {
       final index = _prayerOrder.indexOf(item.name);
       if (index < 0 || !settings.prayers.contains(item.name)) continue;
-      if (item.name == 'Dhuhr' && day.weekday == DateTime.friday) {
-        final jumuah = _jumuah(i, index, day, payload, l,
-            now: now, atAthan: atAthan, sound: sound);
-        if (jumuah != null) daily.add(jumuah);
-        continue;
-      }
-      final key = item.name.toLowerCase();
-      final iqamah = item.iqamah;
-      final iqamahKnown =
-          iqamah != null && prayerClock(item.name, iqamah) != null;
-
-      final tz.TZDateTime? at;
-      final String body;
-      if (atAthan) {
-        at = prayerMoment(day, item.name, item.time);
-        body = iqamahKnown
-            ? '${l.reminderAthanBody(key)} · '
-                '${l.reminderIqamahAt(prayerClockText(l, item.name, iqamah))}'
-            : l.reminderAthanBody(key);
-      } else {
-        if (!iqamahKnown) continue;
-        at = prayerMoment(day, item.name, iqamah)?.subtract(_leadTime);
-        body = l.reminderIqamahSoon(key);
-      }
+      final at = prayerMoment(day, item.name, item.time);
       if (at == null || !at.isAfter(now)) continue;
-
+      final key = item.name.toLowerCase();
       daily.add((
         id: i * 10 + index,
         title: l.prayer(key),
-        body: body,
+        body: item.name == 'Dhuhr' && day.weekday == DateTime.friday
+            ? _fridayBody(payload, l)
+            : _athanBody(item, key, l),
         at: at,
-        sound: atAthan ? sound : ReminderSound.standard,
+        sound: sound,
       ));
     }
     if (reminders.length + daily.length > budget) break;
     reminders.addAll(daily);
   }
   return reminders;
+}
+
+String _athanBody(DailyPrayerItem item, String key, AppLocalizations l) {
+  final iqamah = item.iqamah;
+  if (iqamah == null || prayerClock(item.name, iqamah) == null) {
+    return l.reminderAthanBody(key);
+  }
+  return '${l.reminderAthanBody(key)} · '
+      '${l.reminderIqamahAt(prayerClockText(l, item.name, iqamah))}';
+}
+
+String _fridayBody(PrayerCachePayload payload, AppLocalizations l) {
+  final jumuah = payload.jumaaPrayerTime;
+  if (jumuah == null || prayerClock('Dhuhr', jumuah) == null) {
+    return l.reminderAthanBody('dhuhr');
+  }
+  return l.reminderFridayBody(clockInSentence(l, prayerClockText(l, 'Dhuhr', jumuah)));
 }
 
 /// The notice's id: clear of the reminders' `day * 10 + prayer` ids.
@@ -349,28 +345,4 @@ tz.TZDateTime? noticeTime(
     }
   }
   return null;
-}
-
-Reminder? _jumuah(
-  int offset,
-  int index,
-  DateTime day,
-  PrayerCachePayload payload,
-  AppLocalizations l, {
-  required tz.TZDateTime now,
-  required bool atAthan,
-  required ReminderSound sound,
-}) {
-  final time = payload.jumaaPrayerTime;
-  final moment = time == null ? null : prayerMoment(day, 'Dhuhr', time);
-  if (moment == null) return null;
-  final at = atAthan ? moment : moment.subtract(_leadTime);
-  if (!at.isAfter(now)) return null;
-  return (
-    id: offset * 10 + index,
-    title: l.jumuah,
-    body: atAthan ? l.reminderJumuahNow : l.reminderJumuahSoon,
-    at: at,
-    sound: atAthan ? sound : ReminderSound.standard,
-  );
 }

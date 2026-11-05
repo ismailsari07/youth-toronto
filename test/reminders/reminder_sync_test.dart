@@ -128,6 +128,71 @@ void main() {
     });
   });
 
+  group('migration from "5 minutes before the iqamah"', () {
+    const old = {
+      'prayer_reminders_enabled': true,
+      'prayer_reminders_timing': 'beforeIqamah',
+      'prayer_reminders_prayers': ['Fajr', 'Isha'],
+      'prayer_reminders_sound': 'silent',
+    };
+
+    // Tomorrow's row: Fajr 00:01, iqamah 00:02.
+    tz.TZDateTime tomorrowFajr() {
+      final n = mosqueNow();
+      return tz.TZDateTime(mosqueTz, n.year, n.month, n.day + 1, 0, 1);
+    }
+
+    test('first launch: athan times from the same rows, other choices kept', () async {
+      SharedPreferences.setMockInitialValues(old);
+      fetchResult = [_today(), _day(1)];
+      expect(await ReminderSync.sync(), isTrue);
+
+      final fajr = scheduled.single.firstWhere((r) => r.at.isAtSameMomentAs(tomorrowFajr()));
+      expect(fajr.sound, ReminderSound.silent);
+      expect(scheduled.single.map((r) => r.title).toSet(), {'Fajr', 'Isha'});
+      expect(notices.single, isNotNull);
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.containsKey('prayer_reminders_timing'), isFalse);
+      expect(prefs.getStringList('prayer_reminders_prayers'), ['Fajr', 'Isha']);
+    });
+
+    test('no prompt and no sheet: it never asks iOS', () async {
+      SharedPreferences.setMockInitialValues({...old});
+      granted = null;
+      await ReminderSync.sync();
+      expect(asked, 0);
+    });
+
+    test('offline: what is pending stays, and the next sync replaces it', () async {
+      SharedPreferences.setMockInitialValues(old);
+      fetchResult = Exception('offline');
+      expect(await ReminderSync.sync(), isFalse);
+      expect(scheduled, isEmpty);
+
+      fetchResult = [_today(), _day(1)];
+      expect(await ReminderSync.sync(), isTrue);
+      expect(
+        scheduled.single.any((r) => r.at.isAtSameMomentAs(tomorrowFajr())),
+        isTrue,
+      );
+    });
+
+    test('someone who chose athan time sees no difference', () async {
+      SharedPreferences.setMockInitialValues({...old, 'prayer_reminders_timing': 'atAthan'});
+      fetchResult = [_today(), _day(1)];
+      await ReminderSync.sync();
+      expect(scheduled.single.any((r) => r.at.isAtSameMomentAs(tomorrowFajr())), isTrue);
+    });
+
+    test('saving never writes the old key back', () async {
+      SharedPreferences.setMockInitialValues(old);
+      await ReminderSync.saveSettings(await ReminderSync.loadSettings());
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.containsKey('prayer_reminders_timing'), isFalse);
+    });
+  });
+
   group('data', () {
     test('asks prayer_cache for as many days as the budget could use', () async {
       expect(await ReminderSync.sync(), isTrue);

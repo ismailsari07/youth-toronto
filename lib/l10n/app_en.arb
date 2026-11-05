@@ -82,13 +82,19 @@
       }
     }
   },
+  "reminderFridayBody": "Dhuhr athan · Jumu'ah at {time}",
+  "@reminderFridayBody": {
+    "description": "Body of Friday's Dhuhr notification, at the Dhuhr athan. [time] is the Jumu'ah time; Turkish already carries its suffix (13:00'te).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "fajrWindowCloses": "Fajr window closes",
   "prayerReminders": "Prayer reminders",
   "prayerNotifications": "Prayer notifications",
   "remindersPrayers": "Prayers",
-  "remindersNotifyMe": "Notify me",
-  "notifyAtAthan": "At athan time",
-  "notifyBeforeIqamah": "5 minutes before iqamah",
   "notificationSound": "Notification sound",
   "soundAthan": "Athan",
   "@soundAthan": {
@@ -100,7 +106,6 @@
   "stopSound": "Stop",
   "remindersSummaryOff": "Off",
   "remindersSummaryAthan": "On · At athan time",
-  "remindersSummaryIqamah": "On · 5 min before iqamah",
   "reminderAthanBody": "{prayer, select, fajr{It's time for Fajr prayer} dhuhr{It's time for Dhuhr prayer} asr{It's time for Asr prayer} maghrib{It's time for Maghrib prayer} isha{It's time for Isha prayer} other{It's time for {prayer} prayer}}",
   "@reminderAthanBody": {
     "description": "Body of the notification at athan time. [prayer] is the lower-case English key. Turkish uses the namaz form (Fajr: Sabah namazı).",
@@ -115,15 +120,6 @@
     "description": "Appended to the athan-time body after ' · '. [time] follows the language: 1:45 PM, 13:45, 13 h 45.",
     "placeholders": {
       "time": {
-        "type": "String"
-      }
-    }
-  },
-  "reminderIqamahSoon": "{prayer, select, fajr{Fajr iqamah in 5 minutes} dhuhr{Dhuhr iqamah in 5 minutes} asr{Asr iqamah in 5 minutes} maghrib{Maghrib iqamah in 5 minutes} isha{Isha iqamah in 5 minutes} other{{prayer} iqamah in 5 minutes}}",
-  "@reminderIqamahSoon": {
-    "description": "Body of the notification 5 minutes before the iqamah. [prayer] is the lower-case English key.",
-    "placeholders": {
-      "prayer": {
         "type": "String"
       }
     }
@@ -938,14 +934,6 @@
   "keyboardNext": "Next field",
   "@keyboardNext": {
     "description": "VoiceOver label of an arrow on the keyboard accessory bar."
-  },
-  "reminderJumuahNow": "It's time for Jumu'ah prayer",
-  "@reminderJumuahNow": {
-    "description": "Friday's Dhuhr reminder, at the Jumu'ah time (title: jumuah)."
-  },
-  "reminderJumuahSoon": "Jumu'ah in 5 minutes",
-  "@reminderJumuahSoon": {
-    "description": "Friday's reminder 5 minutes before the Jumu'ah time (title: jumuah)."
   },
   "remindersEndingNotice": "Your prayer reminders will stop tomorrow. Open Pape Mosque once to keep them coming at the right times.",
   "@remindersEndingNotice": {

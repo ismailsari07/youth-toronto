@@ -49,6 +49,25 @@ String clockText(String language, int hour, int minute) {
   }
 }
 
+/// [clock] as it reads inside a sentence. Turkish adds the locative after the
+/// last number said: "13:07'de", "16:30'da", on the hour "13:00'te". Other
+/// languages put a word before the time, in their ARB text. Same rule as
+/// `TurkishTime` in ios/Runner/Siri/SiriText.swift.
+String clockInSentence(AppLocalizations l, String clock) {
+  if (l.localeName.split(RegExp('[-_]')).first != 'tr') return clock;
+  final parts = clock.split(':').map(int.tryParse).toList();
+  if (parts.length != 2 || parts.contains(null)) return clock;
+  final said = parts[1] == 0 ? parts[0]! : parts[1]!;
+  return "$clock'${_locative(said)}";
+}
+
+String _locative(int number) => switch (number % 10) {
+      1 || 2 || 7 || 8 => 'de',
+      3 || 4 || 5 => 'te',
+      6 || 9 => 'da',
+      _ => const {0: 'da', 10: 'da', 20: 'de', 30: 'da', 40: 'ta', 50: 'de'}[number] ?? 'de',
+    };
+
 /// An event's clock time: "7:30 PM", "19:30", "19 h 30".
 String eventTime(AppLocalizations l, DateTime dt) =>
     clockText(l.localeName, dt.hour, dt.minute);

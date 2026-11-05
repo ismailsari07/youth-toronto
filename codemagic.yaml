@@ -1,6 +1,7 @@
-# Only for the yaml-configured Codemagic app (it also runs `screenshots` from the
-# screenshots branch). The release build stays in the Workflow Editor app, which
-# ignores this file.
+# Only read while the Codemagic app is switched to YAML configuration. There is one
+# app, because Codemagic doesn't allow adding the same repo twice: switch it to YAML,
+# run this workflow (or `screenshots`, from the screenshots branch), then switch it
+# back. The release build runs in Workflow Editor mode, which ignores this file.
 workflows:
   siri-check:
     name: Siri check (simulator build + Swift tests, no signing)

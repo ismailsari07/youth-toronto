@@ -27,13 +27,11 @@ Commit `assets/content_defaults.json` if it changed. It's what a first launch wi
 
 ## 4. `siri-check` (compile check)
 
-This is the only place the App Intents, SwiftUI and `AppDelegate` code gets compiled before a release build, so run it first. It's defined in `codemagic.yaml` and needs the Codemagic app in YAML mode.
+This is the only place the App Intents, SwiftUI and `AppDelegate` code gets compiled before a release build, so run it first. It's defined in `codemagic.yaml`. There's one Codemagic app, because Codemagic doesn't allow adding the same repo twice, so it's switched temporarily:
 
-1. Open the YAML-configured app. If you only have one Codemagic app, switch it to YAML configuration.
+1. Switch the Codemagic app to YAML configuration.
 2. Start a build: your branch, workflow **Siri check**.
-3. If you switched the release app, switch it back to Workflow Editor and confirm its settings are intact, including the Xcode version and publishing options.
-
-A separate YAML-only app avoids the switching, and the release app never reads `codemagic.yaml`.
+3. Switch the app back to Workflow Editor and confirm its settings are intact, including the Xcode version and publishing options. Don't start a release build until you have.
 
 It runs the Flutter tests, a simulator build and the Swift tests. It also checks the built app for the shortcuts, weak-linked `AppIntents`, translations and scene manifest, and launches it on a simulator. `WARNING` in the launch step means the app stayed running but the scene path wasn't confirmed.
 
@@ -59,7 +57,7 @@ Test on a real phone, because simulators can't confirm notification taps, push, 
 
 ## 7. App Store submission
 
-1. **Screenshots:** the `screenshots` workflow is on the `screenshots` branch and needs a YAML-mode app. It takes 10 shots at 6.9" (1320×2868) in **English and Turkish** and saves them as build artifacts, with no signing. That branch doesn't follow `main`, so merge the release into it first. French isn't covered.
+1. **Screenshots:** the `screenshots` workflow is on the `screenshots` branch, and the app is switched to YAML and back for it, as in section 4. It takes 10 shots at 6.9" (1320×2868) in **English and Turkish** and saves them as build artifacts, with no signing. That branch doesn't follow `main`, so merge the release into it first. French isn't covered.
 2. **Metadata:** "What's New" in each store language, plus description or keywords if they changed. Update App Privacy if data use changed.
 3. **Review notes:** include the following.
    - The email demo account and how to reach the main features.
@@ -93,7 +91,11 @@ Do these only once the version is **on the App Store**, not when it's approved.
 
 **ITMS-90626: invalid App Intent text (upload rejected).** App Store Connect rejects any intent title, description, parameter, phrase or spoken text that names Apple products. Build 23 of 1.4.0 failed with "cannot contain 'siri'" and "'apple'", and this only shows at upload, after a full build. Reword neutrally ("Opens directions to the mosque in Maps"). `test/siri/siri_trademark_test.dart` now catches it in `flutter test`.
 
-**403 on upload: agreement not accepted.** Apple publishes an updated Program License Agreement (PLA), and uploads return 403 until it's accepted. Nothing is wrong with the build. The Account Holder accepts it at developer.apple.com/account or in App Store Connect. Then run the build again.
+**403 from App Store Connect: PLA update.** Apple published a new Program License Agreement, and the build stopped with:
+
+> GET https://api.appstoreconnect.apple.com/v1/bundleIds ... returned 403: Unable to process request - PLA Update available - You currently don't have access to this membership resource. To resolve this issue, your team's Account Holder, Ismail Sari, must agree to the latest Program License Agreement.
+
+Nothing is wrong with the code. The Account Holder accepts the new agreement at developer.apple.com/account, then you rebuild.
 
 ## Checklist
 
@@ -102,7 +104,7 @@ Do these only once the version is **on the App Store**, not when it's approved.
 - [ ] `dart run tool/gen_content_defaults.dart`, committed if changed
 - [ ] `flutter analyze`, `flutter test` and `tool/siri_swift_test.sh` clean
 - [ ] `siri-check` passed on the branch, with no `WARNING` in the launch step
-- [ ] Release app back on Workflow Editor with its settings intact, if it was switched
+- [ ] Codemagic app switched back to Workflow Editor, settings intact
 
 **TestFlight**
 - [ ] Release build uses the pinned Xcode and uploads to TestFlight only

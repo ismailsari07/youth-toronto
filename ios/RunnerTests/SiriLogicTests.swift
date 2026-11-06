@@ -486,20 +486,47 @@ final class SiriLogicTests: XCTestCase {
     XCTAssertNil(SiriStore.decode(SiriPrayersDoc.self, json: oldText) { $0.version })
   }
 
-  func testAnswersFollowSirisLanguageNotTheDevices() {
-    XCTAssertEqual(SiriLanguage.resolve(siri: "tr-TR", device: "en"), .tr)
-    XCTAssertEqual(SiriLanguage.resolve(siri: "tr_TR", device: "en"), .tr)
-    XCTAssertEqual(SiriLanguage.resolve(siri: "fr-CA", device: "en"), .fr)
-    XCTAssertEqual(SiriLanguage.resolve(siri: "en-CA", device: "tr"), .en)
-    XCTAssertEqual(SiriLanguage.resolve(siri: "TR", device: nil), .tr)
+  private func lang(_ siri: String?, authorized: Bool, app: String?, device: String?) -> SiriLanguage {
+    SiriLanguage.resolve(siri: siri, siriAuthorized: authorized, app: app, device: device)
   }
 
-  func testALanguageWeDontHaveFallsBackToTheDeviceThenEnglish() {
-    XCTAssertEqual(SiriLanguage.resolve(siri: "de-DE", device: "tr"), .tr)
-    XCTAssertEqual(SiriLanguage.resolve(siri: "", device: "fr"), .fr)
-    XCTAssertEqual(SiriLanguage.resolve(siri: nil, device: "fr"), .fr)
-    XCTAssertEqual(SiriLanguage.resolve(siri: "de-DE", device: "es"), .en)
-    XCTAssertEqual(SiriLanguage.resolve(siri: nil, device: nil), .en)
+  func testAuthorizedSiriLanguageWins() {
+    XCTAssertEqual(lang("tr-TR", authorized: true, app: "en", device: "en"), .tr)
+    XCTAssertEqual(lang("tr_TR", authorized: true, app: nil, device: "en"), .tr)
+    XCTAssertEqual(lang("fr-CA", authorized: true, app: "tr", device: "en"), .fr)
+    XCTAssertEqual(lang("en-CA", authorized: true, app: "tr", device: "tr"), .en)
+    XCTAssertEqual(lang("TR", authorized: true, app: nil, device: nil), .tr)
+  }
+
+  /// TestFlight 1.4.0: Turkish Siri, English iPhone, the app in Turkish (iOS
+  /// Settings), authorization never asked for. iOS gave an English code.
+  func testUnauthorizedSiriCodeIsIgnoredForTheAppsLanguage() {
+    XCTAssertEqual(lang("en-US", authorized: false, app: "tr", device: "en"), .tr)
+    XCTAssertEqual(lang("en", authorized: false, app: "fr", device: "en"), .fr)
+    XCTAssertEqual(lang("tr-TR", authorized: false, app: "en", device: "en"), .en)
+  }
+
+  func testThenTheDeviceThenEnglish() {
+    XCTAssertEqual(lang("", authorized: true, app: nil, device: "fr"), .fr)
+    XCTAssertEqual(lang(nil, authorized: true, app: "", device: "tr"), .tr)
+    XCTAssertEqual(lang("de-DE", authorized: true, app: "es", device: "tr"), .tr)
+    XCTAssertEqual(lang("en-US", authorized: false, app: nil, device: "tr"), .tr)
+    XCTAssertEqual(lang("de-DE", authorized: true, app: nil, device: "es"), .en)
+    XCTAssertEqual(lang(nil, authorized: false, app: nil, device: nil), .en)
+  }
+
+  func testTheAppsLanguageComesFromTheWidgetData() {
+    XCTAssertEqual(SiriStore.widgetLocale(json: #"{"version":1,"locale":"tr","prayers":[]}"#), "tr")
+    XCTAssertNil(SiriStore.widgetLocale(json: #"{"version":1,"locale":""}"#))
+    XCTAssertNil(SiriStore.widgetLocale(json: #"{"version":1}"#))
+    XCTAssertNil(SiriStore.widgetLocale(json: "not json"))
+  }
+
+  func testTheLanguageNoteSaysWhatWasRead() {
+    let note = SiriLanguageNote(language: .tr, assistant: "en-US", status: "notDetermined", app: "tr", device: "en")
+    XCTAssertEqual(note.text, "tr · assistant en-US (notDetermined) · app tr · device en")
+    let empty = SiriLanguageNote(language: .en, assistant: "", status: "authorized", app: nil, device: nil)
+    XCTAssertEqual(empty.text, "en · assistant - (authorized) · app - · device -")
   }
 
   func testTheThreeLanguages() {

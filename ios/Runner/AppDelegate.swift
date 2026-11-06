@@ -89,6 +89,8 @@ import WidgetKit
         SiriSession.pendingAction = nil
       case "hadAction":
         result(SiriSession.hadAction)
+      case "languageNote":
+        result(UserDefaults(suiteName: SiriStoreKey.appGroup)?.string(forKey: SiriStoreKey.lastLanguage))
       default:
         result(FlutterMethodNotImplemented)
       }

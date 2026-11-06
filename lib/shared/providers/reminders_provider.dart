@@ -4,6 +4,7 @@ import '../../core/notification_sounds.dart';
 import '../../core/prayer_refresh.dart';
 import '../../core/reminder_settings.dart';
 import '../../core/reminder_sync.dart';
+import '../../core/siri_bridge.dart';
 
 /// The device's prayer-notification settings: the one source for the bell,
 /// its sheet and the summary rows on Prayer, Profile and Settings, so every
@@ -22,6 +23,11 @@ final athanBundledProvider =
 /// background (null: never). Read again each time the About sheet opens.
 final lastBackgroundRefreshProvider =
     FutureProvider.autoDispose<DateTime?>((ref) => BackgroundRefreshLog.load());
+
+/// How the last shortcut answer's language was chosen (null: none yet).
+/// Read again each time the About sheet opens.
+final voiceAnswerLanguageProvider =
+    FutureProvider.autoDispose<String?>((ref) => SiriBridge.languageNote());
 
 class ReminderSettingsNotifier extends AsyncNotifier<ReminderSettings> {
   @override

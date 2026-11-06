@@ -39,6 +39,18 @@ abstract final class SiriBridge {
     }
   }
 
+  /// How the last shortcut answer's language was chosen, e.g.
+  /// "tr · assistant en-US (notDetermined) · app tr · device en"; null before
+  /// the first answer. Shown in About this app, to check on TestFlight.
+  static Future<String?> languageNote() async {
+    if (!_ios) return null;
+    try {
+      return await channel.invokeMethod<String>('languageNote');
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Stores one document in the App Group. Never throws.
   static Future<void> write(String key, String json) async {
     if (!_ios) return;

@@ -2506,6 +2506,12 @@ abstract class AppLocalizations {
   /// **'Last background refresh'**
   String get lastBackgroundRefresh;
 
+  /// About this app: how the last voice-assistant shortcut answer chose its language, shown as raw codes for TestFlight checks, or a dash if none yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Last voice answer language'**
+  String get lastVoiceAnswerLanguage;
+
   /// No description provided for @newsSection.
   ///
   /// In en, this message translates to:

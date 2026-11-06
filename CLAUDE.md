@@ -218,9 +218,14 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   exception Swift can't catch, and build 26 of 1.4.0 crashed on every question ("Something went wrong"). Not the UIScene
   migration: the Siri launch had a running engine. `test/siri/siri_entitlement_test.dart` keeps the call and the entitlement
   together; `siri-check` signs RunnerTests ad hoc, runs the intents' `perform()` in the app and checks the entitlement.
-- Spoken answers and cards follow Siri's language (`INPreferences.siriLanguageCode()`), then the device's, then English;
-  never the app's setting. They are said in Siri's voice, and `Bundle.main.preferredLocalizations` only knows the device. Events
-  are written in all three. iOS itself picks the titles in the Shortcuts app and Spotlight (`Localizable.strings`), from the
+- Spoken answers and cards follow Siri's language (`INPreferences.siriLanguageCode()`) only when `siriAuthorizationStatus()` is
+  `.authorized`; then the language the app shows (`locale` in the widget's `prayer_widget_data`: the in-app choice or iOS's
+  per-app language), then the bundle's, then English. Never the device's first. TestFlight 1.4.0 (Turkish Siri, English
+  iPhone, app in Turkish, authorization never asked) got an English code from `siriLanguageCode()` and answered in English.
+  We don't ask for Siri authorization (no prompt, no `NSSiriUsageDescription`): asking is the owner's call. Each answer
+  records how its language was chosen; Profil → Uygulama hakkında shows it ("Son sesli yanıtın dili",
+  e.g. `tr · assistant en-US (notDetermined) · app tr · device en`). Tests: `SiriLogicTests`, `test/siri/siri_language_test.dart`.
+  Events are written in all three. iOS itself picks the titles in the Shortcuts app and Spotlight (`Localizable.strings`), from the
   device's language or the app's language in iOS Settings, not Siri's: Apple documents Siri's language as able to differ. So
   test those with the device in that language; `tool/check_siri_bundle.py` (in `siri-check`) proves the translations shipped. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.
 - Intents are in the Runner target (Apple's rule for App Shortcuts), so a question launches the app in the background, with

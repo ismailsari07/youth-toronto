@@ -1463,6 +1463,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lastBackgroundRefresh => 'Last background refresh';
 
   @override
+  String get lastVoiceAnswerLanguage => 'Last voice answer language';
+
+  @override
   String get newsSection => 'Mosque News';
 
   @override

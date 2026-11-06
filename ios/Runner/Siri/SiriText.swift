@@ -10,9 +10,12 @@ import Intents
 enum SiriLanguage: String {
   case en, tr, fr
 
-  /// The language Siri speaks, because the answer is said in Siri's voice. It
-  /// can differ from the device's, which is all Bundle.main.preferredLocalizations
-  /// knows: that gave English sentences in a Turkish voice.
+  /// The language of the answer. It is said in Siri's voice, so Siri's
+  /// language first, but only when iOS says the app may know it: with Siri
+  /// authorization never asked for (we don't ask), TestFlight 1.4.0 got an
+  /// English code from a Turkish Siri on an English iPhone, and answered in
+  /// English. Then the language the app shows (the member's choice in the app
+  /// or in iOS Settings, as the widget data records it), then the bundle's.
   ///
   /// siriLanguageCode() needs `com.apple.developer.siri` in Runner.entitlements
   /// (and SiriKit on the App ID). Without it iOS throws an Objective-C exception
@@ -20,17 +23,37 @@ enum SiriLanguage: String {
   /// test/siri/siri_entitlement_test.dart keeps the two together.
   static var current: SiriLanguage {
     #if canImport(Intents)
+    let status = INPreferences.siriAuthorizationStatus()
+    let authorized = status == .authorized
     let siri: String? = INPreferences.siriLanguageCode()
+    let statusName: String
+    switch status {
+    case .authorized: statusName = "authorized"
+    case .denied: statusName = "denied"
+    case .restricted: statusName = "restricted"
+    case .notDetermined: statusName = "notDetermined"
+    @unknown default: statusName = "unknown"
+    }
     #else
+    let authorized = false
     let siri: String? = nil
+    let statusName = "unavailable"
     #endif
-    return resolve(siri: siri, device: Bundle.main.preferredLocalizations.first)
+    let app = SiriStore.appLanguage
+    let device = Bundle.main.preferredLocalizations.first
+    let language = resolve(siri: siri, siriAuthorized: authorized, app: app, device: device)
+    SiriStore.recordLanguage(
+      SiriLanguageNote(
+        language: language, assistant: siri, status: statusName, app: app, device: device
+      )
+    )
+    return language
   }
 
-  /// Siri's language if we have it, else the device's, else English. Codes come
-  /// as "tr-TR", "fr_CA" or "en".
-  static func resolve(siri: String?, device: String?) -> SiriLanguage {
-    for code in [siri, device] {
+  /// Siri's language if iOS lets us trust it, else the app's, else the
+  /// device's, else English. Codes come as "tr-TR", "fr_CA", "tr" or "".
+  static func resolve(siri: String?, siriAuthorized: Bool, app: String?, device: String?) -> SiriLanguage {
+    for code in [siriAuthorized ? siri : nil, app, device] {
       guard let code = code else { continue }
       if let language = SiriLanguage(rawValue: String(code.prefix(2)).lowercased()) {
         return language

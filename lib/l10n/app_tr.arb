@@ -460,6 +460,7 @@
   "keyboardNext": "Sonraki alan",
   "remindersEndingNotice": "Namaz hatırlatmalarınız yarın duracak. Doğru saatte gelmeye devam etmeleri için Pape Mosque'u bir kez açmanız yeterli.",
   "lastBackgroundRefresh": "Son arka plan yenileme",
+  "lastVoiceAnswerLanguage": "Son sesli yanıtın dili",
   "newsSection": "Camimizden Haberler",
   "newsSegment": "Haberler",
   "newsFeatured": "Öne çıkan",

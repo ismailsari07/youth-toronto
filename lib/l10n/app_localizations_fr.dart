@@ -1483,6 +1483,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get lastBackgroundRefresh => 'Dernière actualisation en arrière-plan';
 
   @override
+  String get lastVoiceAnswerLanguage => 'Langue de la dernière réponse vocale';
+
+  @override
   String get newsSection => 'Actualités de la mosquée';
 
   @override

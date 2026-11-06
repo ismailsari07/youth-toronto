@@ -1451,6 +1451,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get lastBackgroundRefresh => 'Son arka plan yenileme';
 
   @override
+  String get lastVoiceAnswerLanguage => 'Son sesli yanıtın dili';
+
+  @override
   String get newsSection => 'Camimizden Haberler';
 
   @override

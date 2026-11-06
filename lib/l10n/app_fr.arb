@@ -460,6 +460,7 @@
   "keyboardNext": "Champ suivant",
   "remindersEndingNotice": "Vos rappels de prière s'arrêteront demain. Ouvrez Pape Mosque une fois pour continuer à les recevoir à l'heure.",
   "lastBackgroundRefresh": "Dernière actualisation en arrière-plan",
+  "lastVoiceAnswerLanguage": "Langue de la dernière réponse vocale",
   "newsSection": "Actualités de la mosquée",
   "newsSegment": "Actualités",
   "newsFeatured": "À la une",

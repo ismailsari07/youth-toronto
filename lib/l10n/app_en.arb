@@ -962,6 +962,10 @@
   "@lastBackgroundRefresh": {
     "description": "About this app: when a prayer_refresh silent push last rescheduled the reminders in the background; the value is a date and time, or a dash if never."
   },
+  "lastVoiceAnswerLanguage": "Last voice answer language",
+  "@lastVoiceAnswerLanguage": {
+    "description": "About this app: how the last voice-assistant shortcut answer chose its language, shown as raw codes for TestFlight checks, or a dash if none yet."
+  },
   "newsSection": "Mosque News",
   "newsSegment": "News",
   "newsFeatured": "Featured",

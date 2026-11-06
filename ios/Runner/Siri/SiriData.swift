@@ -12,6 +12,11 @@ enum SiriStoreKey {
   static let prayers = "siri_prayers"
   static let events = "siri_events"
   static let mosque = "siri_mosque"
+  /// What the last answer's language was decided from (About this app).
+  static let lastLanguage = "siri_last_language"
+  /// The widget's document, written by lib/core/prayer_widget_sync.dart; its
+  /// `locale` is the language the app shows.
+  static let widgetData = "prayer_widget_data"
   static let version = 2
 }
 
@@ -147,5 +152,40 @@ enum SiriStore {
 
   static var mosque: SiriMosqueDoc? {
     decode(SiriMosqueDoc.self, key: SiriStoreKey.mosque) { $0.version }
+  }
+
+  /// The language the app shows, from the widget's document: "tr", "en", "fr".
+  static var appLanguage: String? {
+    guard let json = UserDefaults(suiteName: SiriStoreKey.appGroup)?.string(forKey: SiriStoreKey.widgetData)
+    else { return nil }
+    return widgetLocale(json: json)
+  }
+
+  static func widgetLocale(json: String) -> String? {
+    guard let bytes = json.data(using: .utf8),
+          let object = try? JSONSerialization.jsonObject(with: bytes) as? [String: Any],
+          let locale = object["locale"] as? String, !locale.isEmpty
+    else { return nil }
+    return locale
+  }
+
+  static func recordLanguage(_ note: SiriLanguageNote) {
+    UserDefaults(suiteName: SiriStoreKey.appGroup)?.set(note.text, forKey: SiriStoreKey.lastLanguage)
+  }
+}
+
+/// How an answer's language was chosen, for About this app on TestFlight:
+/// "tr · assistant en-US (notDetermined) · app tr · device en". Codes only,
+/// nothing personal.
+struct SiriLanguageNote: Equatable {
+  let language: SiriLanguage
+  let assistant: String?
+  let status: String
+  let app: String?
+  let device: String?
+
+  var text: String {
+    let assistantCode = (assistant?.isEmpty ?? true) ? "-" : assistant!
+    return "\(language.rawValue) · assistant \(assistantCode) (\(status)) · app \(app ?? "-") · device \(device ?? "-")"
   }
 }

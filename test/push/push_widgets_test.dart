@@ -14,6 +14,7 @@ import 'package:myt_flutter/l10n/l10n.dart';
 import 'package:myt_flutter/shared/providers/auth_provider.dart';
 import 'package:myt_flutter/shared/providers/content_provider.dart';
 import 'package:myt_flutter/shared/providers/push_provider.dart';
+import 'package:myt_flutter/shared/providers/reminders_provider.dart';
 import 'package:myt_flutter/theme/app_theme.dart';
 import 'package:myt_flutter/ui/components/app_controls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'fakes.dart';
 
 const eventId = '0b9f3c8e-2d1a-4c5b-9e7f-112233445566';
+const _voiceNote = 'tr · assistant en-US (notDetermined) · app tr · device en';
 
 Future<void> pump(
   WidgetTester tester,
@@ -28,6 +30,7 @@ Future<void> pump(
   PushPermission permission = PushPermission.authorized,
   PushLocal local = const PushLocal(saved: true),
   FakePushApi? api,
+  String? voiceNote = _voiceNote,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -38,6 +41,7 @@ Future<void> pump(
         currentUserProvider.overrideWithValue(null),
         pushApiProvider.overrideWithValue(api ?? FakePushApi()),
         identityStoreProvider.overrideWithValue(MemoryIdentityStore()),
+        voiceAnswerLanguageProvider.overrideWith((ref) async => voiceNote),
       ],
       child: MaterialApp(
         theme: appLightTheme,
@@ -252,6 +256,31 @@ void main() {
       expect(find.text('—'), findsNothing);
     });
 
+    testWidgets('how the last voice answer chose its language, or a dash', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const AboutSheet(),
+        local: const PushLocal(saved: true, deviceCode: 'K7QM2X9P'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Last voice answer language'), findsOneWidget);
+      expect(find.text(_voiceNote), findsOneWidget);
+
+      await pump(tester, const SizedBox());
+      await pump(
+        tester,
+        const AboutSheet(),
+        local: const PushLocal(saved: true, deviceCode: 'K7QM2X9P'),
+        voiceNote: null,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(_voiceNote), findsNothing);
+      // The background refresh that never happened, and no answer yet.
+      expect(find.text('—'), findsNWidgets(2));
+    });
+
     testWidgets('no line where push is unsupported', (tester) async {
       await pump(
         tester,
@@ -259,6 +288,7 @@ void main() {
         permission: PushPermission.unsupported,
       );
       expect(find.text('Last background refresh'), findsNothing);
+      expect(find.text('Last voice answer language'), findsNothing);
     });
 
     testWidgets('opens from the About row on Profile', (tester) async {

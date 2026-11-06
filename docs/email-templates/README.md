@@ -46,8 +46,8 @@ Authentication → Rate Limits:
 - **Emails sent per hour:** at least 30, Resend's default once custom SMTP is on. Raise it if sign-ups come in bursts.
 
 Authentication → URL Configuration:
-- **Site URL:** unchanged (the panel). It is the fallback for anything not on the list.
-- **Redirect URLs:** add exactly `https://papemosque.ca/hesap/onaylandi`, and keep the panel's `https://<panel>.vercel.app/**`.
+- **Site URL:** unchanged (the panel, `https://panel.papemosque.ca` since 2026-11-06). It is the fallback for anything not on the list.
+- **Redirect URLs:** add exactly `https://papemosque.ca/hesap/onaylandi`, and keep the panel's `https://panel.papemosque.ca/**` (and, while it is still allowed, `https://pape-admin.vercel.app/**`).
 
 Website: `https://papemosque.ca/hesap/onaylandi` is live (since 2026-11-06). It is a static page with
 no script: "E-postanız onaylandı. Pape Mosque uygulamasına dönüp giriş yapabilirsiniz." in TR/EN/FR. Supabase confirms

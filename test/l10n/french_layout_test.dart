@@ -172,6 +172,7 @@ void main() {
     double height = 1800,
     Future<void> Function(WidgetTester)? after,
     Locale locale = const Locale('fr'),
+    ThemeData? theme,
   }) async {
     SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = Size(390 * 2, height * 2);
@@ -260,7 +261,7 @@ void main() {
           ],
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            theme: appLightTheme,
+            theme: theme ?? appLightTheme,
             locale: locale,
             supportedLocales: AppLocalizations.supportedLocales,
             localizationsDelegates: const [
@@ -402,6 +403,34 @@ void main() {
       },
     );
   });
+
+  // The top of Prayer with the emblem tile next to the mosque name (1.4.0):
+  // the navy hero in light mode, the green one in dark mode.
+  for (final (lang, mode, theme) in [
+    ('tr', 'light', appLightTheme),
+    ('tr', 'dark', appDarkTheme),
+    ('fr', 'light', appLightTheme),
+  ]) {
+    testWidgets('prayer home top with the emblem tile ($lang, $mode)', (tester) {
+      return check(
+        tester,
+        'prayer_top_${lang}_$mode',
+        (_) => const PrayerHomeScreen(),
+        locale: Locale(lang),
+        theme: theme,
+        height: 852,
+        after: (tester) async {
+          final tile = find.image(const AssetImage('assets/brand/emblem-tile.png'));
+          expect(tile, findsOneWidget);
+          await tester.runAsync(() => precacheImage(
+                const AssetImage('assets/brand/emblem-tile.png'),
+                tester.element(tile),
+              ));
+          await tester.pump();
+        },
+      );
+    });
+  }
 
   // The monthly table and the reminders are their own untitled card under
   // today's times, not rows of it (1.4.0).

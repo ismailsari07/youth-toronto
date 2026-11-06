@@ -31,6 +31,7 @@ Future<void> pump(
   PushLocal local = const PushLocal(saved: true),
   FakePushApi? api,
   String? voiceNote = _voiceNote,
+  bool testLines = true,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -42,6 +43,7 @@ Future<void> pump(
         pushApiProvider.overrideWithValue(api ?? FakePushApi()),
         identityStoreProvider.overrideWithValue(MemoryIdentityStore()),
         voiceAnswerLanguageProvider.overrideWith((ref) async => voiceNote),
+        testLinesVisibleProvider.overrideWith((ref) async => testLines),
       ],
       child: MaterialApp(
         theme: appLightTheme,
@@ -279,6 +281,27 @@ void main() {
       expect(find.text(_voiceNote), findsNothing);
       // The background refresh that never happened, and no answer yet.
       expect(find.text('—'), findsNWidgets(2));
+    });
+
+    testWidgets('the App Store release hides the voice answer language', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const AboutSheet(),
+        local: const PushLocal(saved: true, deviceCode: 'K7QM2X9P'),
+        testLines: false,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Last voice answer language'), findsNothing);
+      expect(find.text(_voiceNote), findsNothing);
+      expect(find.text('Last background refresh'), findsOneWidget);
+    });
+
+    test('test lines: debug or TestFlight, never the App Store', () {
+      expect(showsTestLines(debug: false, testFlight: false), isFalse);
+      expect(showsTestLines(debug: false, testFlight: true), isTrue);
+      expect(showsTestLines(debug: true, testFlight: false), isTrue);
     });
 
     testWidgets('no line where push is unsupported', (tester) async {

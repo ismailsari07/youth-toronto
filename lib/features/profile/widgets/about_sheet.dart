@@ -61,6 +61,7 @@ class _AboutSheetState extends ConsumerState<AboutSheet> {
     final code = push.deviceCode;
     final lastRefresh = ref.watch(lastBackgroundRefreshProvider).valueOrNull;
     final voiceLanguage = ref.watch(voiceAnswerLanguageProvider).valueOrNull;
+    final testLines = ref.watch(testLinesVisibleProvider).valueOrNull ?? false;
 
     return Container(
       decoration: BoxDecoration(
@@ -117,7 +118,8 @@ class _AboutSheetState extends ConsumerState<AboutSheet> {
                         lastRefresh == null ? '—' : heroDateTime(l, lastRefresh),
                     divided: true,
                   ),
-                if (push.supported)
+                // TestFlight and debug only, never the App Store.
+                if (push.supported && testLines)
                   AppListRow(
                     icon: AppIcons.info,
                     title: l.lastVoiceAnswerLanguage,

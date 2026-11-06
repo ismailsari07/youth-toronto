@@ -46,6 +46,29 @@ void main() {
     );
   });
 
+  test('the note is recorded on every answer, shown only on TestFlight or debug', () {
+    // Recorded in every build, App Store included.
+    final current = swiftText.substring(
+      swiftText.indexOf('static var current: SiriLanguage'),
+      swiftText.indexOf('static func resolve('),
+    );
+    expect(current, contains('SiriStore.recordLanguage('));
+    expect(current, isNot(contains('#if DEBUG')));
+
+    // TestFlight: the sandbox receipt; the App Store's is "receipt".
+    final isTest = delegate.substring(delegate.indexOf('static var isTestBuild: Bool {'));
+    expect(isTest, contains('appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"'));
+    expect(delegate, contains('case "isTestBuild":'));
+
+    final about = File('lib/features/profile/widgets/about_sheet.dart').readAsStringSync();
+    final row = about.indexOf('l.lastVoiceAnswerLanguage');
+    expect(about.lastIndexOf('if (push.supported && testLines)', row), greaterThan(-1));
+    expect(
+      about.substring(about.lastIndexOf('if (push.supported && testLines)', row), row),
+      isNot(contains('AppListRow(\n                    icon: AppIcons.clock')),
+    );
+  });
+
   test('no Siri permission prompt: the app never asks for authorization', () {
     final files = Directory('ios/Runner')
         .listSync(recursive: true)

@@ -223,8 +223,10 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   per-app language), then the bundle's, then English. Never the device's first. TestFlight 1.4.0 (Turkish Siri, English
   iPhone, app in Turkish, authorization never asked) got an English code from `siriLanguageCode()` and answered in English.
   We don't ask for Siri authorization (no prompt, no `NSSiriUsageDescription`): asking is the owner's call. Each answer
-  records how its language was chosen; Profil → Uygulama hakkında shows it ("Son sesli yanıtın dili",
-  e.g. `tr · assistant en-US (notDetermined) · app tr · device en`). Tests: `SiriLogicTests`, `test/siri/siri_language_test.dart`.
+  records how its language was chosen, in every build; Profil → Uygulama hakkında shows it ("Son sesli yanıtın dili",
+  e.g. `tr · assistant en-US (notDetermined) · app tr · device en`) only on TestFlight or a debug build, never in the App
+  Store release. The App Store ships the TestFlight binary, so `AppDelegate.isTestBuild` reads the receipt
+  (`sandboxReceipt`), not a build flag; `showsTestLines` in `reminders_provider.dart`. Option A for 1.4.0 (owner, 2026-11-06). Tests: `SiriLogicTests`, `test/siri/siri_language_test.dart`.
   Events are written in all three. iOS itself picks the titles in the Shortcuts app and Spotlight (`Localizable.strings`), from the
   device's language or the app's language in iOS Settings, not Siri's: Apple documents Siri's language as able to differ. So
   test those with the device in that language; `tool/check_siri_bundle.py` (in `siri-check`) proves the translations shipped. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.

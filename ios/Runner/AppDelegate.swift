@@ -91,6 +91,8 @@ import WidgetKit
         result(SiriSession.hadAction)
       case "languageNote":
         result(UserDefaults(suiteName: SiriStoreKey.appGroup)?.string(forKey: SiriStoreKey.lastLanguage))
+      case "isTestBuild":
+        result(AppDelegate.isTestBuild)
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -104,6 +106,18 @@ import WidgetKit
     ) { [weak self] _ in
       self?.siriChannel?.invokeMethod("action", arguments: nil)
     }
+  }
+
+  /// A TestFlight install (or one run from Xcode): only there does About this
+  /// app show test lines. The App Store ships the very binary TestFlight had,
+  /// so no build flag can tell them apart; the receipt can. An App Store
+  /// install's receipt is "receipt", TestFlight's is "sandboxReceipt".
+  static var isTestBuild: Bool {
+    #if DEBUG
+    return true
+    #else
+    return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+    #endif
   }
 
   /// The athan recording, if this build carries it: ios/Runner/Sounds/athan.caf

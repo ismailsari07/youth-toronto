@@ -51,6 +51,17 @@ abstract final class SiriBridge {
     }
   }
 
+  /// Whether this is a TestFlight or debug install (sandbox receipt). False
+  /// off iOS and on any failure, so the App Store never shows test lines.
+  static Future<bool> isTestBuild() async {
+    if (!_ios) return false;
+    try {
+      return await channel.invokeMethod<bool>('isTestBuild') ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Stores one document in the App Group. Never throws.
   static Future<void> write(String key, String json) async {
     if (!_ios) return;

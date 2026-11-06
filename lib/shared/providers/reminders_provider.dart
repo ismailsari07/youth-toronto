@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/notification_sounds.dart';
@@ -24,7 +25,20 @@ final athanBundledProvider =
 final lastBackgroundRefreshProvider =
     FutureProvider.autoDispose<DateTime?>((ref) => BackgroundRefreshLog.load());
 
+/// Test lines in About this app (the voice answer language) show only in a
+/// debug build or a TestFlight install, never in the App Store release.
+bool showsTestLines({required bool debug, required bool testFlight}) =>
+    debug || testFlight;
+
+final testLinesVisibleProvider = FutureProvider<bool>(
+  (ref) async => showsTestLines(
+    debug: kDebugMode,
+    testFlight: await SiriBridge.isTestBuild(),
+  ),
+);
+
 /// How the last shortcut answer's language was chosen (null: none yet).
+/// Recorded on every answer, App Store builds included; only shown in tests.
 /// Read again each time the About sheet opens.
 final voiceAnswerLanguageProvider =
     FutureProvider.autoDispose<String?>((ref) => SiriBridge.languageNote());

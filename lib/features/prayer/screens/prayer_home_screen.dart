@@ -120,6 +120,10 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: _timesCard(payload, loading),
                 ),
               ),
+              const SizedBox(height: AppSpace.cardGap),
+              // No title: the monthly table and the reminders, in every
+              // state, so they stay reachable when today's times fail.
+              _linksCard(),
             ],
           ),
         ),
@@ -225,9 +229,6 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               leading: const Shimmer(width: 38, height: 38, radius: 19),
               trailing: const Shimmer(width: 64, height: 18),
             ),
-          _monthlyRow(),
-          if (kPrayerRemindersEnabled)
-            RemindersRow(divided: true, background: context.colors.cardMuted),
         ],
       );
     }
@@ -272,21 +273,23 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       );
     }
 
-    rows.add(_monthlyRow());
-    if (kPrayerRemindersEnabled) {
-      rows.add(
-        RemindersRow(divided: true, background: context.colors.cardMuted),
-      );
-    }
     return GroupedRows(rows: rows);
   }
 
-  Widget _monthlyRow() => AppListRow(
-        divided: true,
-        icon: AppIcons.calendar,
-        title: context.l10n.monthlyTimes,
-        trailing: const RowChevron(),
-        onTap: () => context.push('/prayer/monthly'),
+  /// Under the times: the monthly table (its own screen) and the reminders
+  /// (the same sheet as everywhere else).
+  Widget _linksCard() => GroupedRows(
+        key: const ValueKey('prayer-links'),
+        rows: [
+          AppListRow(
+            icon: AppIcons.calendar,
+            title: context.l10n.monthlyTimes,
+            trailing: const RowChevron(),
+            onTap: () => context.push('/prayer/monthly'),
+          ),
+          if (kPrayerRemindersEnabled)
+            RemindersRow(divided: true, title: context.l10n.prayerNotificationsRow),
+        ],
       );
 
   Widget _trailing(DailyPrayerItem p, bool isCurrent) {

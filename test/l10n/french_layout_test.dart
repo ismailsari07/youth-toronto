@@ -169,6 +169,7 @@ void main() {
     PushPermission permission = PushPermission.authorized,
     double height = 1800,
     Future<void> Function(WidgetTester)? after,
+    Locale locale = const Locale('fr'),
   }) async {
     SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = Size(390 * 2, height * 2);
@@ -189,6 +190,7 @@ void main() {
     final router = GoRouter(
       routes: [
         GoRoute(path: '/', builder: (context, _) => Material(child: home(context))),
+        GoRoute(path: '/prayer/monthly', builder: (_, _) => const MonthlyTimesScreen()),
       ],
     );
     final api = reg.FakeRegistrationApi([
@@ -257,7 +259,7 @@ void main() {
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
             theme: appLightTheme,
-            locale: const Locale('fr'),
+            locale: locale,
             supportedLocales: AppLocalizations.supportedLocales,
             localizationsDelegates: const [
               AppLocalizations.delegate,
@@ -293,7 +295,8 @@ void main() {
         }
         // French clock times read "16 h 55", never "4:55 PM" or "16:55". The
         // countdown's "0:17:58" isn't a clock time.
-        if (RegExp(r'(?<![:\d])\d{1,2}:\d{2}(?![:\d])|\b[AP]M\b').hasMatch(object.text.toPlainText())) {
+        if (locale.languageCode == 'fr' &&
+            RegExp(r'(?<![:\d])\d{1,2}:\d{2}(?![:\d])|\b[AP]M\b').hasMatch(object.text.toPlainText())) {
           problems.add('clock: "${object.text.toPlainText()}"');
         }
       }
@@ -367,6 +370,59 @@ void main() {
       after: (tester) async {
         await tester.pump(const Duration(milliseconds: 300));
         expect(find.textContaining(RegExp(r'^\d{1,2}\u00A0h(\u00A0\d{2})?$')), findsWidgets);
+      },
+    );
+  });
+
+  // The monthly table and the reminders are their own untitled card under
+  // today's times, not rows of it (1.4.0).
+  for (final (lang, monthly, reminders) in const [
+    ('fr', 'Horaires du mois', 'Notifications de prière'),
+    ('tr', 'Aylık vakitler', 'Namaz bildirimleri'),
+    ('en', 'Monthly times', 'Prayer notifications'),
+  ]) {
+    testWidgets('prayer home: the links card under the times ($lang)', (tester) {
+      return check(
+        tester,
+        'prayer_links_$lang',
+        (_) => const PrayerHomeScreen(),
+        locale: Locale(lang),
+        height: 852,
+        after: (tester) async {
+          final links = find.byKey(const ValueKey('prayer-links'));
+          await tester.scrollUntilVisible(links, 300, scrollable: find.byType(Scrollable).first);
+          // The times card above, the links card near the bottom: the shot.
+          await tester.runAsync(
+            () => Scrollable.ensureVisible(tester.element(links), alignment: 0.85),
+          );
+          await tester.pump(const Duration(milliseconds: 400));
+          expect(find.descendant(of: links, matching: find.text(monthly)), findsOneWidget);
+          expect(find.descendant(of: links, matching: find.text(reminders)), findsOneWidget);
+          expect(find.text(monthly), findsOneWidget, reason: 'not in the times card too');
+          expect(find.text(reminders), findsOneWidget);
+
+          // Below the times card: the Isha row is above it.
+          final isha = find.text(lang == 'tr' ? 'Yatsı' : lang == 'fr' ? 'Icha' : 'Isha');
+          expect(tester.getTopLeft(links).dy, greaterThan(tester.getBottomLeft(isha.first).dy));
+          expect(find.ancestor(of: isha.first, matching: links), findsNothing);
+        },
+      );
+    });
+  }
+
+  testWidgets('the monthly row opens the monthly screen', (tester) {
+    return check(
+      tester,
+      'prayer_links_open',
+      (_) => const PrayerHomeScreen(),
+      after: (tester) async {
+        final row = find.text('Horaires du mois');
+        await tester.scrollUntilVisible(row, 300, scrollable: find.byType(Scrollable).first);
+        await tester.tap(row);
+        for (var i = 0; i < 4; i++) {
+          await tester.pump(const Duration(milliseconds: 300));
+        }
+        expect(find.byType(MonthlyTimesScreen), findsOneWidget);
       },
     );
   });

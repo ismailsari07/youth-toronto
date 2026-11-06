@@ -21,6 +21,7 @@
   "iqamahAt": "Iqama {time}",
   "prayerNow": "{prayer} · maintenant",
   "monthlyTimes": "Horaires du mois",
+  "prayerNotificationsRow": "Notifications de prière",
   "monthlyJumuahAt": "Joumou'a {time}",
   "monthlyMissingDay": "Aucun horaire ce jour",
   "monthlyLastDay": "Dernier jour publié : {date}",

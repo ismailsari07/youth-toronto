@@ -127,6 +127,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get monthlyTimes => 'Horaires du mois';
 
   @override
+  String get prayerNotificationsRow => 'Notifications de prière';
+
+  @override
   String monthlyJumuahAt(String time) {
     return 'Joumou\'a $time';
   }

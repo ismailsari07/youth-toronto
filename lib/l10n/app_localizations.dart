@@ -232,6 +232,12 @@ abstract class AppLocalizations {
   /// **'Monthly times'**
   String get monthlyTimes;
 
+  /// Prayer tab, the untitled card under today's times: the row that opens the prayer reminders sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer notifications'**
+  String get prayerNotificationsRow;
+
   /// Friday's row in the monthly table. Short: it shares a narrow column with the date.
   ///
   /// In en, this message translates to:

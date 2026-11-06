@@ -33,10 +33,13 @@ String remindersSummary(AppLocalizations l, ReminderSettings s) =>
 /// The settings row for prayer notifications: a summary that opens the
 /// sheet. The same on Prayer, Profile and Settings.
 class RemindersRow extends ConsumerWidget {
-  const RemindersRow({super.key, this.divided = false, this.background});
+  const RemindersRow({super.key, this.divided = false, this.background, this.title});
 
   final bool divided;
   final Color? background;
+
+  /// Instead of "Prayer reminders" (Prayer's links card).
+  final String? title;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,7 +50,7 @@ class RemindersRow extends ConsumerWidget {
       divided: divided,
       background: background,
       icon: settings.active ? AppIcons.bell : AppIcons.bellOff,
-      title: l.prayerReminders,
+      title: title ?? l.prayerReminders,
       subtitle: remindersSummary(l, settings),
       trailing: const RowChevron(),
       onTap: () => showRemindersSheet(context),

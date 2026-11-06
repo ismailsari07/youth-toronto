@@ -21,6 +21,7 @@
   "iqamahAt": "Cemaat {time}",
   "prayerNow": "{prayer} · şimdi",
   "monthlyTimes": "Aylık vakitler",
+  "prayerNotificationsRow": "Namaz bildirimleri",
   "monthlyJumuahAt": "Cuma {time}",
   "monthlyMissingDay": "Bu gün için vakit yok",
   "monthlyLastDay": "Yayınlanan son gün: {date}",

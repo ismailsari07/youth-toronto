@@ -184,11 +184,12 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
   prayer_refresh that rescheduled is recorded locally and shown in Profil → Uygulama hakkında as "Son arka plan
   yenileme" (`BackgroundRefreshLog`), to check delivery on TestFlight.
 - No bell on the Prayer hero: next to the Donate pill it cut the mosque line on an iPhone SE. Reminders open from the
-  row under the prayer times, Profile and Settings.
+  links card under the prayer times ("Namaz bildirimleri"), Profile and Settings.
 
 ## Monthly times (since 1.4.0)
 
-`/prayer/monthly` (`monthly_times_screen.dart`), from the row under the times on Prayer: every date from today to the last
+`/prayer/monthly` (`monthly_times_screen.dart`), from Prayer's untitled links card under today's times (1.4.0: "Aylık
+vakitler" and "Namaz bildirimleri", which opens the reminders sheet; the times card holds only the times): every date from today to the last
 `prayer_cache` row, athan over iqamah, Toronto dates. `monthDays` uses `scheduleDays`' rule, so a date without its own valid
 row is listed as missing and nothing is filled or listed past the last row; an unreadable time is a dash, never its raw text.
 Today is green, Fridays gold with the Jumu'ah time in the date column, which stays in view while the prayers scroll sideways.

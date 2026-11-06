@@ -92,6 +92,10 @@
     }
   },
   "monthlyTimes": "Monthly times",
+  "prayerNotificationsRow": "Prayer notifications",
+  "@prayerNotificationsRow": {
+    "description": "Prayer tab, the untitled card under today's times: the row that opens the prayer reminders sheet."
+  },
   "monthlyJumuahAt": "Jumu'ah {time}",
   "@monthlyJumuahAt": {
     "description": "Friday's row in the monthly table. Short: it shares a narrow column with the date.",

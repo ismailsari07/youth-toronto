@@ -132,24 +132,20 @@ class DonatePill extends StatelessWidget {
   }
 }
 
-/// The app icon's mosque, cream on the icon's green, as a small tile.
+/// The app icon's emblem (1.4.0), as a small tile: the artwork fills it,
+/// the leaf flush left, like the icon and the website.
 class _BrandTile extends StatelessWidget {
   const _BrandTile();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: context.colors.brandTile,
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
       child: Image.asset(
-        'assets/brand/mosque-mark.png',
-        width: 24,
-        height: 24,
+        'assets/brand/emblem-tile.png',
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
         excludeFromSemantics: true,
       ),
     );

@@ -4,7 +4,7 @@
 # back. The release build runs in Workflow Editor mode, which ignores this file.
 workflows:
   siri-check:
-    name: Siri check (simulator build + Swift tests, no signing)
+    name: Siri check (simulator build + Swift tests, no team signing)
     instance_type: mac_mini_m2
     max_build_duration: 45
     environment:
@@ -35,7 +35,11 @@ workflows:
         script: python3 tool/check_scene_manifest.py build/ios/iphonesimulator/Runner.app
       - name: The app starts through its scene on a simulator
         script: bash tool/check_simulator_launch.sh build/ios/iphonesimulator/Runner.app
-      - name: Swift tests (RunnerTests)
+      # RunnerTests runs the shortcuts' perform() in the app process, so the app
+      # must carry its entitlements: an ad-hoc signature (no team, no profile)
+      # embeds them on a simulator. CODE_SIGNING_ALLOWED=NO would leave them out,
+      # and INPreferences aborts without com.apple.developer.siri (build 26).
+      - name: Swift tests (RunnerTests, ad-hoc signed)
         script: |
           set -e
           device=$(xcrun simctl list devices available -j | python3 -c "
@@ -52,4 +56,10 @@ workflows:
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -destination "id=$device" \
-            CODE_SIGNING_ALLOWED=NO
+            -derivedDataPath build/xctest \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY=- \
+            DEVELOPMENT_TEAM= \
+            PROVISIONING_PROFILE_SPECIFIER=
+      - name: The tested app carried the Siri entitlement
+        script: bash tool/check_siri_entitlement.sh build/xctest/Build/Products/Debug-iphonesimulator/Runner.app

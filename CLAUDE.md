@@ -214,6 +214,10 @@ Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.
   network. Flutter writes every time as an instant and as text with the reminders' code; Swift compares instants and
   repeats the text. Prayers: with the widget sync, same rows. Events: after a successful fetch (launch, resume, pull,
   silent push); refused after 7 days. Mosque: after a content refresh and at launch.
+- `INPreferences` needs `com.apple.developer.siri` in `Runner.entitlements` and SiriKit on the App ID: without it iOS throws an
+  exception Swift can't catch, and build 26 of 1.4.0 crashed on every question ("Something went wrong"). Not the UIScene
+  migration: the Siri launch had a running engine. `test/siri/siri_entitlement_test.dart` keeps the call and the entitlement
+  together; `siri-check` signs RunnerTests ad hoc, runs the intents' `perform()` in the app and checks the entitlement.
 - Spoken answers and cards follow Siri's language (`INPreferences.siriLanguageCode()`), then the device's, then English;
   never the app's setting. They are said in Siri's voice, and `Bundle.main.preferredLocalizations` only knows the device. Events
   are written in all three. iOS itself picks the titles in the Shortcuts app and Spotlight (`Localizable.strings`), from the

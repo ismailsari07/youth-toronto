@@ -13,6 +13,11 @@ enum SiriLanguage: String {
   /// The language Siri speaks, because the answer is said in Siri's voice. It
   /// can differ from the device's, which is all Bundle.main.preferredLocalizations
   /// knows: that gave English sentences in a Turkish voice.
+  ///
+  /// siriLanguageCode() needs `com.apple.developer.siri` in Runner.entitlements
+  /// (and SiriKit on the App ID). Without it iOS throws an Objective-C exception
+  /// that Swift can't catch, so every intent crashed (TestFlight 1.4.0 build 26).
+  /// test/siri/siri_entitlement_test.dart keeps the two together.
   static var current: SiriLanguage {
     #if canImport(Intents)
     let siri: String? = INPreferences.siriLanguageCode()

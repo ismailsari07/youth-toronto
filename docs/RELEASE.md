@@ -44,6 +44,7 @@ This lives in the **Workflow Editor** app, not in `codemagic.yaml`.
 - **Flutter:** 3.38.5.
 - **Xcode:** pinned to 26.6, the version of the last successful builds. Change it on purpose, as its own step, followed by a full TestFlight round.
 - **Publishing:** upload to App Store Connect for **TestFlight only**. Don't submit to App Store review automatically.
+- **Siri:** the App ID `ca.papemosque.app` must have the **SiriKit** capability (Apple Developer → Identifiers), so the profile carries `com.apple.developer.siri`. Without it the archive fails at signing; with it missing from the app, every shortcut crashes. After turning it on, delete the old profile so a new one is created.
 - **Push:** the signed app must have `aps-environment = production`. If push is missing, the provisioning profile predates it: delete the old profile so a new one is created.
 
 ## 6. TestFlight
@@ -108,6 +109,7 @@ Nothing is wrong with the code. The Account Holder accepts the new agreement at 
 
 **TestFlight**
 - [ ] Release build uses the pinned Xcode (26.6) and uploads to TestFlight only
+- [ ] SiriKit on the App ID; a Siri question answered on the TestFlight build without a crash
 - [ ] Internal round passed on a real phone
 - [ ] External round and Beta App Review, if needed
 

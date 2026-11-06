@@ -72,22 +72,11 @@ void main() {
       buildReminders(days, settings, l ?? en,
           now: now, sound: sound, budget: budget);
 
-  const atAthan = ReminderSettings(timing: ReminderTiming.atAthan);
-
   group('schedule', () {
-    test('defaults: all five prayers, 5 minutes before the iqamah', () {
-      final today = build(const ReminderSettings()).take(5).toList();
+    test('defaults: all five prayers, each at its athan, in the chosen sound', () {
+      final today = build(const ReminderSettings(), sound: ReminderSound.silent).take(5).toList();
       expect(today.map((r) => r.title), ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']);
-      // Stored 12-hour times read as 24-hour: Dhuhr 1:45 → 13:45.
-      expect(
-        today.map((r) => '${r.at.hour}:${r.at.minute}'),
-        ['6:40', '13:40', '16:40', '18:57', '20:25'],
-      );
-      expect(today.every((r) => r.sound == ReminderSound.standard), isTrue);
-    });
-
-    test('at athan time uses the athan times and the chosen sound', () {
-      final today = build(atAthan, sound: ReminderSound.silent).take(5);
+      // Stored 12-hour times read as 24-hour: Dhuhr 1:11 → 13:11.
       expect(
         today.map((r) => '${r.at.hour}:${r.at.minute}'),
         ['5:43', '13:11', '16:23', '19:2', '20:19'],
@@ -119,14 +108,28 @@ void main() {
       expect(first.at.day, 4);
     });
 
-    test('no iqamah: skipped before the iqamah, kept at athan time', () {
+    test('no iqamah: still fires at the athan, without an iqamah time', () {
       days = [(date: '2026-10-04', payload: _payload(dhuhrIqamah: null))];
-      expect(
-        build(const ReminderSettings()).take(4).map((r) => r.title),
-        isNot(contains('Dhuhr')),
-      );
-      final dhuhr = build(atAthan).firstWhere((r) => r.title == 'Dhuhr');
+      final dhuhr = build(const ReminderSettings()).firstWhere((r) => r.title == 'Dhuhr');
+      expect((dhuhr.at.hour, dhuhr.at.minute), (13, 11));
       expect(dhuhr.body, "It's time for Dhuhr prayer");
+    });
+
+    test('an athan that cannot be read gets no reminder, never a guess', () {
+      days = [
+        (
+          date: '2026-10-04',
+          payload: PrayerCachePayload(
+            dailyPrayerTimes: const [
+              DailyPrayerItem(name: 'Dhuhr', time: 'soon', iqamah: '1:45'),
+              DailyPrayerItem(name: 'Asr', time: '4:23', iqamah: '4:45'),
+            ],
+            hijriDate: '',
+            gregorianDate: '04.10.2026',
+          ),
+        ),
+      ];
+      expect(build(const ReminderSettings()).map((r) => r.title), ['Asr']);
     });
   });
 
@@ -145,7 +148,6 @@ void main() {
       final all = build(const ReminderSettings());
       expect(all, hasLength(60));
       expect(daysOf(all), range(4, 15));
-      expect(build(atAthan), hasLength(60));
     });
 
     test('three prayers: 21 days, exactly 63', () {
@@ -177,20 +179,11 @@ void main() {
       expect(daysOf(all), {4, 5});
     });
 
-    test("Friday swap: Jumu'ah takes Dhuhr's slot, never one more", () {
+    test("Friday costs the same five slots, Jumu'ah time or not", () {
       final friday = build(const ReminderSettings()).where((r) => r.at.day == 9);
-      expect(friday.map((r) => r.title),
-          ['Fajr', "Jumu'ah", 'Asr', 'Maghrib', 'Isha']);
-    });
-
-    test("a Friday without Jumu'ah costs one slot less, so a day may fit", () {
-      // Dhuhr, Asr, Isha: 3 a day, 2 on Fridays (9, 16, 23 Oct) without a
-      // Jumu'ah time. 18 × 3 + 3 × 2 = 60, so Sun 25 Oct fits too: 63.
+      expect(friday.map((r) => r.title), ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']);
       days = _rows(DateTime(2026, 10, 4), 30, jumuah: null);
-      final all = build(const ReminderSettings(prayers: {'Dhuhr', 'Asr', 'Isha'}));
-      expect(all, hasLength(63));
-      expect(daysOf(all), range(4, 25));
-      expect(all.where((r) => r.at.day == 9).map((r) => r.title), ['Asr', 'Isha']);
+      expect(build(const ReminderSettings()), hasLength(60));
     });
 
     test('the rows run out before the budget: they stop there, nothing filled', () {
@@ -337,7 +330,6 @@ void main() {
     test("yesterday's row never stands in for today", () {
       days = [_row(DateTime(2026, 10, 3))];
       expect(build(const ReminderSettings()), isEmpty);
-      expect(build(atAthan), isEmpty);
     });
 
     test("a row whose Diyanet date isn't its own is skipped", () {
@@ -355,9 +347,9 @@ void main() {
     });
   });
 
-  group('Friday: Jumu\'ah instead of Dhuhr', () {
+  group("Friday: the Dhuhr athan, and the text gives Jumu'ah", () {
     // The first Friday ahead (30 Oct).
-    Reminder friday(ReminderSettings s, {AppLocalizations? l}) => build(s, l: l)
+    Reminder friday({AppLocalizations? l}) => build(const ReminderSettings(), l: l)
         .firstWhere((r) => r.at.weekday == DateTime.friday && r.id % 10 == 1);
 
     setUp(() {
@@ -366,116 +358,122 @@ void main() {
       days = _rows(DateTime(2026, 10, 28), 10);
     });
 
-    test("at athan time: at the row's jumaaPrayerTime, not Dhuhr's athan", () {
-      final r = friday(atAthan);
-      expect((r.at.hour, r.at.minute), (14, 0));
-      expect(r.title, "Jumu'ah");
-      expect(r.body, "It's time for Jumu'ah prayer");
+    test("fires at Dhuhr's athan, not at the Jumu'ah time", () {
+      final r = friday();
+      expect((r.at.hour, r.at.minute), (13, 11));
+      expect(r.title, 'Dhuhr');
+      expect(r.body, "Dhuhr athan · Jumu'ah at 2:00 PM");
       expect(r.id, 21);
     });
 
-    test('5 minutes before: 5 minutes before the Jumu\'ah time', () {
-      final r = friday(const ReminderSettings());
-      expect((r.at.hour, r.at.minute), (13, 55));
-      expect(r.body, "Jumu'ah in 5 minutes");
-      expect(r.sound, ReminderSound.standard);
+    test('the three languages, each with its own clock', () {
+      expect(friday(l: tr).title, 'Öğle');
+      expect(friday(l: tr).body, "Öğle ezanı · Cuma namazı 14:00'te");
+      expect(friday(l: fr).title, 'Dhohr');
+      expect(friday(l: fr).body, 'Adhan du Dhohr · Prière du vendredi à 14\u00A0h');
     });
 
-    test('Turkish and French', () {
-      expect(friday(atAthan, l: tr).title, 'Cuma namazı');
-      expect(friday(atAthan, l: tr).body, 'Cuma namazı vakti');
-      expect(friday(const ReminderSettings(), l: tr).body, 'Cuma namazına 5 dakika kaldı');
-      expect(friday(atAthan, l: fr).title, 'Prière du vendredi');
-      expect(friday(atAthan, l: fr).body, "C'est l'heure de la prière du vendredi");
-      expect(friday(const ReminderSettings(), l: fr).body, 'Prière du vendredi dans 5 minutes');
+    test("the owner's example: 13:00'te, and the suffix follows what is said", () {
+      days = [_row(DateTime(2026, 10, 30), jumuah: '1:00')];
+      expect(friday(l: tr).body, "Öğle ezanı · Cuma namazı 13:00'te");
+      days = [_row(DateTime(2026, 10, 30), jumuah: '1:30')];
+      expect(friday(l: tr).body, "Öğle ezanı · Cuma namazı 13:30'da");
+      expect(friday(l: fr).body, 'Adhan du Dhohr · Prière du vendredi à 13\u00A0h\u00A030');
+      expect(friday().body, "Dhuhr athan · Jumu'ah at 1:30 PM");
     });
 
-    test('across the DST change: Fri 30 Oct 2:00 PM EDT, Fri 6 Nov 1:00 PM EST', () {
-      expect(friday(atAthan).at.toUtc(), DateTime.utc(2026, 10, 30, 18));
+    test("across the clock change: Dhuhr's athan on either side, Jumu'ah in the text", () {
+      expect(friday().at.toUtc(), DateTime.utc(2026, 10, 30, 17, 11)); // EDT
       now = tz.TZDateTime(mosqueTz, 2026, 11, 4, 3);
       days = [
         ..._rows(DateTime(2026, 11, 4), 2),
         _row(DateTime(2026, 11, 6), jumuah: '1:00'),
         ..._rows(DateTime(2026, 11, 7), 2),
       ];
-      final r = friday(atAthan);
-      expect((r.at.hour, r.at.minute), (13, 0));
+      final r = friday();
+      expect((r.at.hour, r.at.minute), (13, 11));
       expect(r.at.timeZoneOffset, const Duration(hours: -5));
-      expect(r.at.toUtc(), DateTime.utc(2026, 11, 6, 18));
+      expect(r.at.toUtc(), DateTime.utc(2026, 11, 6, 18, 11));
+      expect(r.body, "Dhuhr athan · Jumu'ah at 1:00 PM");
     });
 
-    test('a Friday without a Jumu\'ah time: no Dhuhr reminder, never Dhuhr\'s time', () {
-      days = [
-        ..._rows(DateTime(2026, 10, 28), 2),
-        _row(DateTime(2026, 10, 30), jumuah: null),
-        ..._rows(DateTime(2026, 10, 31), 2),
-      ];
-      final all = build(atAthan);
-      expect(all.where((r) => r.at.day == 30).map((r) => r.title), ['Fajr', 'Asr', 'Maghrib', 'Isha']);
-      days = [_row(DateTime(2026, 10, 30), jumuah: 'soon')];
-      expect(build(atAthan).map((r) => r.title), isNot(contains("Jumu'ah")));
+    test("no readable Jumu'ah time: the athan still fires, and no time is invented", () {
+      for (final jumuah in [null, 'soon']) {
+        days = [_row(DateTime(2026, 10, 30), jumuah: jumuah)];
+        final r = friday();
+        expect((r.at.hour, r.at.minute), (13, 11));
+        expect(r.body, "It's time for Dhuhr prayer");
+        expect(friday(l: tr).body, 'Öğle namazı vakti girdi');
+      }
     });
 
     test('follows the Dhuhr switch', () {
       final noDhuhr = build(const ReminderSettings(prayers: {'Fajr', 'Asr', 'Maghrib', 'Isha'}));
-      expect(noDhuhr.map((r) => r.title), isNot(contains("Jumu'ah")));
+      expect(noDhuhr.where((r) => r.at.weekday == DateTime.friday).map((r) => r.title),
+          contains('Fajr'));
+      expect(noDhuhr.map((r) => r.title), isNot(contains('Dhuhr')));
     });
 
-    test('other days keep Dhuhr', () {
-      final thursday = build(atAthan).firstWhere((r) => r.at.day == 29 && r.id % 10 == 1);
-      expect(thursday.title, 'Dhuhr');
-      expect((thursday.at.hour, thursday.at.minute), (13, 11));
+    test('other days keep the iqamah in the text', () {
+      final thursday = build(const ReminderSettings()).firstWhere((r) => r.at.day == 29 && r.id % 10 == 1);
+      expect(thursday.body, "It's time for Dhuhr prayer · Iqamah at 1:45 PM");
     });
   });
 
+  // Toronto: 14 March 2027 starts daylight time, 1 November 2026 ends it.
+  group('every reminder at the athan, on the days the clock changes', () {
+    for (final (day, offsetAfter) in [
+      (DateTime(2026, 10, 31), -4),
+      (DateTime(2026, 11, 1), -5),
+      (DateTime(2026, 11, 2), -5),
+      (DateTime(2027, 3, 13), -5),
+      (DateTime(2027, 3, 14), -4),
+      (DateTime(2027, 3, 15), -4),
+    ]) {
+      test('${mosqueDateKey(day)}: same wall clock, UTC follows the change', () {
+        now = tz.TZDateTime(mosqueTz, day.year, day.month, day.day, 0, 30);
+        days = [_row(day)];
+        final all = build(const ReminderSettings());
+        expect(all.map((r) => '${r.at.hour}:${r.at.minute}'),
+            ['5:43', '13:11', '16:23', '19:2', '20:19']);
+        expect(all.every((r) => r.at.timeZoneOffset == Duration(hours: offsetAfter)), isTrue);
+        expect(all[1].at.toUtc().hour, 13 - offsetAfter);
+      });
+    }
+  });
+
   group('notification text names the prayer', () {
-    Reminder dhuhr(ReminderSettings s, AppLocalizations l) =>
-        build(s, l: l).firstWhere((r) => r.id == 1);
-    Reminder fajr(ReminderSettings s, AppLocalizations l) =>
-        build(s, l: l).firstWhere((r) => r.id == 0);
+    Reminder dhuhr(AppLocalizations l) =>
+        build(const ReminderSettings(), l: l).firstWhere((r) => r.id == 1);
+    Reminder fajr(AppLocalizations l) =>
+        build(const ReminderSettings(), l: l).firstWhere((r) => r.id == 0);
 
     test('English', () {
-      expect(dhuhr(atAthan, en).title, 'Dhuhr');
-      expect(dhuhr(atAthan, en).body,
-          "It's time for Dhuhr prayer · Iqamah at 1:45 PM");
-      expect(dhuhr(const ReminderSettings(), en).body,
-          'Dhuhr iqamah in 5 minutes');
-      expect(fajr(atAthan, en).body,
-          "It's time for Fajr prayer · Iqamah at 6:45 AM");
-      expect(fajr(const ReminderSettings(), en).body,
-          'Fajr iqamah in 5 minutes');
+      expect(dhuhr(en).title, 'Dhuhr');
+      expect(dhuhr(en).body, "It's time for Dhuhr prayer · Iqamah at 1:45 PM");
+      expect(fajr(en).body, "It's time for Fajr prayer · Iqamah at 6:45 AM");
     });
 
     test('French', () {
-      expect(dhuhr(atAthan, fr).title, 'Dhohr');
-      expect(dhuhr(atAthan, fr).body,
-          "C'est l'heure de la prière du Dhohr · Iqama à 1:45 PM");
-      expect(dhuhr(const ReminderSettings(), fr).body,
-          'Iqama du Dhohr dans 5 minutes');
-      final asr = build(const ReminderSettings(), l: fr)
-          .firstWhere((r) => r.id == 2);
-      expect(asr.body, "Iqama de l'Asr dans 5 minutes");
+      expect(dhuhr(fr).title, 'Dhohr');
+      expect(dhuhr(fr).body,
+          "C'est l'heure de la prière du Dhohr · Iqama à 13\u00A0h\u00A045");
     });
 
     test('Turkish: İmsak as the title, Sabah namazı in the body', () {
-      expect(dhuhr(atAthan, tr).title, 'Öğle');
-      expect(dhuhr(atAthan, tr).body, 'Öğle namazı vakti girdi · Cemaat 1:45 PM');
-      expect(dhuhr(const ReminderSettings(), tr).body,
-          'Öğle cemaatine 5 dakika kaldı');
-      expect(fajr(atAthan, tr).title, 'İmsak');
-      expect(fajr(atAthan, tr).body, 'Sabah namazı vakti girdi · Cemaat 6:45 AM');
-      expect(fajr(const ReminderSettings(), tr).body,
-          'Sabah namazı cemaatine 5 dakika kaldı');
+      expect(dhuhr(tr).title, 'Öğle');
+      expect(dhuhr(tr).body, 'Öğle namazı vakti girdi · Cemaat 13:45');
+      expect(fajr(tr).title, 'İmsak');
+      expect(fajr(tr).body, 'Sabah namazı vakti girdi · Cemaat 06:45');
     });
   });
 
   group('settings', () {
-    test('a device from before these options keeps what it had', () async {
+    test('a device from before these options gets all five prayers', () async {
       SharedPreferences.setMockInitialValues({'prayer_reminders_enabled': true});
       final s = await ReminderSync.loadSettings();
       expect(s.enabled, isTrue);
       expect(s.prayers, ReminderSettings.allPrayers);
-      expect(s.timing, ReminderTiming.beforeIqamah);
     });
 
     test('no saved choice: on only if iOS already allows notifications', () async {
@@ -500,12 +498,10 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       await ReminderSync.saveSettings(const ReminderSettings(
         prayers: {'Asr'},
-        timing: ReminderTiming.atAthan,
         sound: ReminderSound.silent,
       ));
       final s = await ReminderSync.loadSettings();
       expect(s.prayers, {'Asr'});
-      expect(s.timing, ReminderTiming.atAthan);
       expect(s.sound, ReminderSound.silent);
     });
 

@@ -119,6 +119,27 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String reminderFridayBody(String time) {
+    return 'Öğle ezanı · Cuma namazı $time';
+  }
+
+  @override
+  String get monthlyTimes => 'Aylık vakitler';
+
+  @override
+  String monthlyJumuahAt(String time) {
+    return 'Cuma $time';
+  }
+
+  @override
+  String get monthlyMissingDay => 'Bu gün için vakit yok';
+
+  @override
+  String monthlyLastDay(String date) {
+    return 'Yayınlanan son gün: $date';
+  }
+
+  @override
   String get fajrWindowCloses => 'Sabah namazının vakti çıkar';
 
   @override
@@ -129,15 +150,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get remindersPrayers => 'Vakitler';
-
-  @override
-  String get remindersNotifyMe => 'Bildirim zamanı';
-
-  @override
-  String get notifyAtAthan => 'Ezan vaktinde';
-
-  @override
-  String get notifyBeforeIqamah => 'Cemaatten 5 dakika önce';
 
   @override
   String get notificationSound => 'Bildirim sesi';
@@ -164,9 +176,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get remindersSummaryAthan => 'Açık · Ezan vaktinde';
 
   @override
-  String get remindersSummaryIqamah => 'Açık · Cemaatten 5 dk önce';
-
-  @override
   String reminderAthanBody(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'Sabah namazı vakti girdi',
@@ -182,19 +191,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String reminderIqamahAt(String time) {
     return 'Cemaat $time';
-  }
-
-  @override
-  String reminderIqamahSoon(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Sabah namazı cemaatine 5 dakika kaldı',
-      'dhuhr': 'Öğle cemaatine 5 dakika kaldı',
-      'asr': 'İkindi cemaatine 5 dakika kaldı',
-      'maghrib': 'Akşam cemaatine 5 dakika kaldı',
-      'isha': 'Yatsı cemaatine 5 dakika kaldı',
-      'other': '$prayer cemaatine 5 dakika kaldı',
-    });
-    return '$_temp0';
   }
 
   @override
@@ -531,6 +527,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get callTheOffice => 'Cami ofisini arayın';
 
   @override
+  String get tapToCall => 'Aramak için dokunun';
+
+  @override
   String get mosqueOffice => 'Cami ofisi';
 
   @override
@@ -589,7 +588,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settings => 'Ayarlar';
 
   @override
-  String get settingsRowSubtitle => 'Hatırlatıcılar, dil, hesap';
+  String get settingsRowSubtitle => 'Bildirimler, dil, hesap';
 
   @override
   String get yourDetails => 'Bilgileriniz';
@@ -1337,6 +1336,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get regSubmit => 'Kaydı gönder';
 
   @override
+  String get regNoCancelNote =>
+      'Kayıt uygulamadan iptal edilemez. Değiştirmen gerekirse camiyle iletişime geç.';
+
+  @override
   String get regNoCancel => 'Kayıt uygulamadan iptal edilemez.';
 
   @override
@@ -1441,15 +1444,144 @@ class AppLocalizationsTr extends AppLocalizations {
   String get keyboardNext => 'Sonraki alan';
 
   @override
-  String get reminderJumuahNow => 'Cuma namazı vakti';
-
-  @override
-  String get reminderJumuahSoon => 'Cuma namazına 5 dakika kaldı';
-
-  @override
   String get remindersEndingNotice =>
       'Namaz hatırlatmalarınız yarın duracak. Doğru saatte gelmeye devam etmeleri için Pape Mosque\'u bir kez açmanız yeterli.';
 
   @override
   String get lastBackgroundRefresh => 'Son arka plan yenileme';
+
+  @override
+  String get lastVoiceAnswerLanguage => 'Son sesli yanıtın dili';
+
+  @override
+  String get newsSection => 'Camimizden Haberler';
+
+  @override
+  String get newsSegment => 'Haberler';
+
+  @override
+  String get newsFeatured => 'Öne çıkan';
+
+  @override
+  String newsPhotoCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotoğraf',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsGone => 'Bu haber artık yayında değil';
+
+  @override
+  String get newsShare => 'Paylaş';
+
+  @override
+  String newsOpenPhoto(String index, String total) {
+    return 'Fotoğraf $index / $total, tam ekran aç';
+  }
+
+  @override
+  String get newsViewerHint => 'İki parmakla yakınlaştırın, kaydırarak geçin';
+
+  @override
+  String get newsViewerHintOne => 'İki parmakla yakınlaştırın';
+
+  @override
+  String get forgotPassword => 'Şifremi unuttum';
+
+  @override
+  String get confirmEmailTitle => 'E-postanızı onaylayın';
+
+  @override
+  String confirmEmailSubtitle(String email) {
+    return '$email adresine 6 haneli bir kod gönderdik.';
+  }
+
+  @override
+  String get emailCodeLabel => '6 haneli kod';
+
+  @override
+  String get enterEmailCode => 'E-postadaki 6 haneli kodu girin.';
+
+  @override
+  String get confirmEmailButton => 'Onayla';
+
+  @override
+  String get confirmingEmail => 'Onaylanıyor…';
+
+  @override
+  String get resendCode => 'Kodu tekrar gönder';
+
+  @override
+  String resendCodeIn(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Kodu tekrar gönder ($seconds sn)',
+      one: 'Kodu tekrar gönder (1 sn)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get codeSentAgain => 'Yeni bir kod gönderildi.';
+
+  @override
+  String get confirmLaterNote =>
+      'E-postayı göremiyor musunuz? Gereksiz (spam) klasörüne bakın. Hesabınız kaydedildi; dilerseniz daha sonra, giriş yaptığınızda da onaylayabilirsiniz.';
+
+  @override
+  String get errorInvalidCode =>
+      'Kod yanlış ya da süresi dolmuş. Kontrol edin veya yeni bir kod isteyin.';
+
+  @override
+  String get errorSamePassword => 'Yeni şifre eskisinden farklı olmalı.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'Bu e-posta adresiyle zaten bir hesap var. Giriş yapın ya da şifrenizi unuttuysanız sıfırlayın.';
+
+  @override
+  String get resetPasswordTitle => 'Şifrenizi sıfırlayın';
+
+  @override
+  String get resetEmailSubtitle =>
+      'Hesabınızın e-posta adresini girin, size 6 haneli bir kod gönderelim.';
+
+  @override
+  String get sendCode => 'Kod gönder';
+
+  @override
+  String get sendingCode => 'Gönderiliyor…';
+
+  @override
+  String resetCodeSubtitle(String email) {
+    return '$email bir hesaba bağlıysa bu adrese 6 haneli bir kod gönderdik.';
+  }
+
+  @override
+  String get continueButton => 'Devam';
+
+  @override
+  String get checkingCode => 'Kontrol ediliyor…';
+
+  @override
+  String get resetCodeNote =>
+      'Birkaç dakikada e-posta gelmezse gereksiz klasörüne ve adrese bakın. Apple ile açılan hesapların şifresi yoktur: Apple ile giriş yapın.';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Yeni şifrenizi seçin. Bu telefonda giriş yapmış olarak kalırsınız.';
+
+  @override
+  String get newPassword => 'Yeni şifre';
+
+  @override
+  String get savePassword => 'Şifreyi kaydet';
+
+  @override
+  String get passwordChanged => 'Şifreniz değiştirildi.';
 }

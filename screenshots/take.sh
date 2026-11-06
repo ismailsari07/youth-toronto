@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# App Store screenshots, 6.9" iPhone (1320×2868), English and Turkish.
+# App Store screenshots, 6.9" iPhone (1320×2868), English, Turkish and French.
 # Runs on macOS after:
 #   flutter build ios --simulator --debug -t screenshots/main.dart
 # Writes screenshots/out/{en,tr}/NN_<shot>.png. See screenshots/main.dart.
@@ -9,8 +9,8 @@ cd "$(dirname "$0")/.."
 APP=build/ios/iphonesimulator/Runner.app
 BUNDLE=ca.papemosque.app
 OUT=screenshots/out
-SHOTS=(prayer_light prayer_dark community event mosque reminders times marriage donate language)
-LANGS=(en tr)
+SHOTS=(prayer_light notifications times monthly news community event donate marriage language prayer_dark)
+LANGS=(en tr fr)
 DEVICE_TYPE=com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro-Max
 
 [ -d "$APP" ] || { echo "No $APP: build it first"; exit 1; }

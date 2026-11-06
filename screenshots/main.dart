@@ -17,6 +17,7 @@ import 'package:myt_flutter/l10n/l10n.dart';
 import 'package:myt_flutter/main.dart';
 import 'package:myt_flutter/shared/providers/donations_provider.dart';
 import 'package:myt_flutter/shared/providers/events_news_provider.dart';
+import 'package:myt_flutter/shared/providers/mosque_news_provider.dart';
 import 'package:myt_flutter/shared/providers/prayer_provider.dart';
 import 'package:myt_flutter/shared/providers/push_provider.dart';
 import 'package:myt_flutter/shared/providers/registration_provider.dart';
@@ -35,18 +36,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 // screen can't be opened. Nothing is written to the database: no device
 // registration, no event view.
 
-/// The screens, in App Store order.
+/// The raw screens (1.4.0). The App Store slides are composed from these
+/// (screenshots/compose.py): 01 prayer_light, 02 notifications, 03 the
+/// widgets (drawn, no screen), 04 times, 05 monthly, 06 news, 07 community +
+/// event, 08 donate, 09 marriage, 10 language + prayer_dark.
 const shots = [
   'prayer_light',
-  'prayer_dark',
+  'notifications',
+  'times',
+  'monthly',
+  'news',
   'community',
   'event',
-  'mosque',
-  'reminders',
-  'times',
-  'marriage',
   'donate',
+  'marriage',
   'language',
+  'prayer_dark',
 ];
 
 /// The event the `event` shot opens, matched by title.
@@ -123,28 +128,44 @@ Future<void> _open(String shot, String lang) async {
       router.go('/community');
       await Future<void>.delayed(const Duration(milliseconds: 500));
       router.push('/community/event/${pick.event.id}');
-    case 'mosque':
-      router.go('/profile');
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-      router.push('/profile/mosque');
-    case 'reminders':
+    case 'notifications':
+      // Over Profile, so the Prayer home appears only once in slides 1-9.
       router.go('/profile');
       await Future<void>.delayed(const Duration(seconds: 1));
       final profile = rootNavigatorKey.currentContext!;
       if (profile.mounted) unawaited(showRemindersSheet(profile));
     case 'times':
       await loaded(container.read(prayerProvider.future));
-      // Let the times card and the Jumu'ah card ease in before measuring.
+      // Let the times card and the links card ease in before measuring.
       await Future<void>.delayed(const Duration(seconds: 2));
       final failure = await _scrollToTimes();
       if (failure != null) return _ready('failed: $failure');
+    case 'monthly':
+      await loaded(container.read(prayerProvider.future));
+      router.push('/prayer/monthly');
+    case 'news':
+      // Real news only: a missing item fails the run, nothing stands in.
+      final news = await container
+          .read(mosqueNewsProvider.future)
+          .timeout(const Duration(seconds: 30), onTimeout: () => const []);
+      final pick = news.where((n) => n.photos.length > 1).firstOrNull ??
+          news.where((n) => n.photos.isNotEmpty).firstOrNull;
+      if (pick == null) {
+        return _ready(
+          'failed: no published mosque news with photos (${news.length} published)',
+        );
+      }
+      router.go('/community');
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      router.push('/community/news', extra: pick);
     case 'marriage':
       // Signed out, the service opens on its gate (MarriageRoutes.entryFor).
       router.go('/profile');
       await Future<void>.delayed(const Duration(milliseconds: 500));
       router.push(MarriageRoutes.gate);
     case 'donate':
-      await loaded(container.read(prayerProvider.future));
+      // Over Profile, not Prayer: the home screen appears only once.
+      router.go('/profile');
       // The sheet must show the funds, not only "All donation options".
       for (
         var i = 0;
@@ -156,8 +177,9 @@ Future<void> _open(String shot, String lang) async {
       if (container.read(donationFundsProvider).isEmpty) {
         return _ready('failed: no donation funds loaded');
       }
-      final prayer = rootNavigatorKey.currentContext!;
-      if (prayer.mounted) unawaited(showDonateSheet(prayer));
+      await Future<void>.delayed(const Duration(seconds: 1));
+      final profile = rootNavigatorKey.currentContext!;
+      if (profile.mounted) unawaited(showDonateSheet(profile));
     case 'language':
       router.go('/profile');
       await Future<void>.delayed(const Duration(seconds: 1));
@@ -188,8 +210,8 @@ Future<void> _open(String shot, String lang) async {
 }
 
 /// Scrolls Prayer so "Today at the mosque" sits just under the status bar,
-/// then checks that the whole times card and the Jumu'ah card are above the
-/// tab bar. Returns why not, or null.
+/// then checks that the whole times card and the links card under it are
+/// above the tab bar. Returns why not, or null.
 Future<String?> _scrollToTimes() async {
   final l = rootNavigatorKey.currentContext!.l10n;
   final home = _elements()
@@ -228,13 +250,12 @@ Future<String?> _scrollToTimes() async {
   header = findHeader();
   if (header == null) return 'the "${l.todayAtTheMosque}" section went away';
 
-  // Gold card: Jumu'ah, unless an Eid is near and takes its place.
-  final jumuah = _elements(scrollable.context as Element).where((e) {
-    final w = e.widget;
-    return w is Text && w.data == l.jumuah;
-  }).lastOrNull; // last: on a Friday the Dhuhr row says Jumu'ah too
-  if (jumuah == null) return 'no Jumu\'ah card on Prayer (an Eid card?)';
-  final card = _ancestorElement<AppCard>(jumuah) ?? jumuah;
+  // The links card under the times (1.4.0): "Aylık vakitler" and
+  // "Namaz bildirimleri" must both be above the tab bar.
+  final links = _elements(scrollable.context as Element)
+      .where((e) => e.widget.key == const ValueKey('prayer-links'))
+      .firstOrNull;
+  if (links == null) return 'no links card under the times';
   final island = _elements()
       .where((e) => e.widget is IslandTabBar)
       .map(_rect)
@@ -243,8 +264,8 @@ Future<String?> _scrollToTimes() async {
   if (_rect(header).top < top - 1) {
     return '"${l.todayAtTheMosque}" is under the status bar';
   }
-  if (_rect(card).bottom > bottom) {
-    return 'the Jumu\'ah card is under the tab bar';
+  if (_rect(links).bottom > bottom) {
+    return 'the links card is under the tab bar';
   }
   return null;
 }
@@ -259,18 +280,6 @@ Iterable<Element> _elements([Element? root]) sync* {
     element.visitChildElements(children.add);
     stack.addAll(children.reversed);
   }
-}
-
-Element? _ancestorElement<T extends Widget>(Element element) {
-  Element? found;
-  element.visitAncestorElements((e) {
-    if (e.widget is T) {
-      found = e;
-      return false;
-    }
-    return true;
-  });
-  return found;
 }
 
 Rect _rect(Element element) {

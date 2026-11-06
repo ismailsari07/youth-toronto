@@ -106,13 +106,22 @@ class AppSegmented extends StatelessWidget {
                         onTap: () => onChanged(i),
                         behavior: HitTestBehavior.opaque,
                         child: Center(
-                          child: Text(
-                            labels[i],
-                            style: i == index
-                                ? AppText.segment.c(context.colors.ink)
-                                : AppText.segment
-                                    .copyWith(fontWeight: FontWeight.w500)
-                                    .c(context.colors.ink2),
+                          // One line always: a long label or large text
+                          // shrinks to fit rather than wrapping out of the bar.
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                labels[i],
+                                maxLines: 1,
+                                style: i == index
+                                    ? AppText.segment.c(context.colors.ink)
+                                    : AppText.segment
+                                        .copyWith(fontWeight: FontWeight.w500)
+                                        .c(context.colors.ink2),
+                              ),
+                            ),
                           ),
                         ),
                       ),

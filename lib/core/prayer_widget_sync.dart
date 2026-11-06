@@ -8,6 +8,7 @@ import '../shared/formatters.dart';
 import 'mosque_time.dart';
 import 'prayer_days.dart';
 import 'prayer_service.dart';
+import 'siri_data_sync.dart';
 
 /// Feeds the iOS home-screen and lock-screen widgets (ios/PrayerWidget).
 ///
@@ -78,6 +79,13 @@ class PrayerWidgetSync {
       final l = await currentAppLocalizations();
       final data = buildPrayerWidgetData(days, l, mosqueNow());
       await _channel.invokeMethod<void>('update', jsonEncode(data));
+      // The same rows feed the Siri shortcuts: no second request.
+      await SiriDataSync.writePrayers(
+        days,
+        mosqueNow(),
+        firstDay: _firstDay,
+        dayCount: _dayCount,
+      );
     } catch (e) {
       debugPrint('PrayerWidgetSync: update failed: $e');
     }
@@ -93,8 +101,8 @@ class PrayerWidgetSync {
 ///   "strings": {"nextPrayer": "SIRADAKİ NAMAZ"},
 ///   "prayers": [
 ///     {"key": "Fajr", "name": "İmsak", "at": 1759570980,
-///      "time": "5:43 AM", "athan": "Ezan 5:43 AM",
-///      "iqamah": "Cemaat 6:45 AM", "day": "2026-10-04"}
+///      "time": "05:43", "athan": "Ezan 05:43",
+///      "iqamah": "Cemaat 06:45", "day": "2026-10-04"}
 ///   ]
 /// }
 /// ```
@@ -118,7 +126,7 @@ Map<String, Object?> buildPrayerWidgetData(
     for (final item in payload.dailyPrayerTimes) {
       final moment = prayerMoment(day, item.name, item.time);
       if (moment == null) continue;
-      final time = prayerClock12(item.name, item.time);
+      final time = prayerClockText(l, item.name, item.time);
       final iqamah = item.iqamah;
       prayers.add({
         'key': item.name,
@@ -127,7 +135,7 @@ Map<String, Object?> buildPrayerWidgetData(
         'time': time,
         'athan': l.athanAt(time),
         if (iqamah != null)
-          'iqamah': l.iqamahAt(prayerClock12(item.name, iqamah)),
+          'iqamah': l.iqamahAt(prayerClockText(l, item.name, iqamah)),
         'day': mosqueDateKey(day),
       });
     }

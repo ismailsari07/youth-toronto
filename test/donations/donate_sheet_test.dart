@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:myt_flutter/core/content/content_bundle.dart';
 import 'package:myt_flutter/core/donations/donation_funds.dart';
 import 'package:myt_flutter/features/donations/donate_sheet.dart';
 import 'package:myt_flutter/l10n/l10n.dart';
@@ -74,6 +75,45 @@ void main() {
     expect(find.text('Faire un don'), findsOneWidget);
     expect(find.text('Zekât'), findsOneWidget);
     expect(find.text('Toutes les options de don'), findsOneWidget);
+  });
+
+  testWidgets('shows the translated title in the app language', (tester) async {
+    final translated = [
+      DonationFund(
+        slug: 'zekat',
+        title: 'Zekât',
+        titles: I18n.parse({'tr': 'Zekât', 'en': 'Zakat', 'fr': 'La zakat'}),
+      ),
+      DonationFund(
+        slug: 'sadaka',
+        title: 'Sadaka',
+        titles: I18n.parse({'tr': 'Sadaka', 'en': 'Sadaqah'}),
+      ),
+    ];
+    await open(tester, translated, locale: const Locale('fr'));
+    expect(find.text('La zakat'), findsOneWidget);
+    expect(find.text('Sadaqah'), findsOneWidget);
+    expect(find.text('Zekât'), findsNothing);
+  });
+
+  testWidgets('a 60 character French title fits at 390 pt', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final long = 'Fonds pour les services funéraires et la vie de la communauté';
+    await open(
+      tester,
+      [
+        DonationFund(
+          slug: 'long',
+          title: 'Uzun',
+          titles: I18n.parse({'tr': 'Uzun', 'fr': long.substring(0, 60)}),
+        ),
+      ],
+      locale: const Locale('fr'),
+    );
+    expect(find.text(long.substring(0, 60)), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('tapping a row closes the sheet', (tester) async {

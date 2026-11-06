@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/eid.dart';
 import '../../../core/feature_flags.dart';
 import '../../../core/models.dart';
 import '../../../core/mosque_time.dart';
@@ -12,6 +13,7 @@ import '../../../core/prayer_refresh.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
 import '../../../shared/providers/content_provider.dart';
+import '../../../shared/providers/mosque_news_provider.dart';
 import '../../../shared/providers/prayer_provider.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -25,12 +27,14 @@ import '../../../ui/components/moon_countdown_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
+import 'monthly_times_screen.dart';
 import '../widgets/community_section.dart';
+import '../widgets/news_rail.dart';
 import '../widgets/hero_identity_row.dart';
 import '../widgets/reminders_sheet.dart';
 
-/// Spec §7.1 — the Prayer tab root. The whole daily list lives here; there is
-/// deliberately no separate "all times" screen (§7.2).
+/// Spec §7.1 — the Prayer tab root: today's whole list. Other days are in
+/// [MonthlyTimesScreen], from the row under the times.
 class PrayerHomeScreen extends ConsumerStatefulWidget {
   const PrayerHomeScreen({super.key});
 
@@ -57,6 +61,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
     return RefreshableList(
       onRefresh: () async {
         ref.invalidate(prayerProvider);
+        ref.invalidate(mosqueNewsProvider);
         // The panel's content too, so a new banner shows on a pull.
         ref.read(contentProvider.notifier).refresh(force: true);
         await ref.read(prayerProvider.future);
@@ -70,7 +75,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
         AppSpace.scrollBottomInset,
       ),
       // The tab's entrance cascade, top to bottom: the hero (who we are,
-      // the date and the moon), the emergency banner, the Community
+      // the date and the moon), the emergency banner, the news, the Community
       // section, the times, the occasion card, the mosque card.
       // The hero runs under the status bar, which keeps light icons over it
       // in both modes.
@@ -88,6 +93,8 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       ),
       children: [
         const StaggerItem(index: 0, child: EmergencyBanner()),
+        // Hides when there's no news; brings its own top gap, as below.
+        const StaggerItem(index: 1, child: NewsRail()),
         // Next event and latest announcement; brings its own top gap and
         // hides entirely when there is nothing to show.
         const StaggerItem(index: 1, child: CommunitySection()),
@@ -113,6 +120,10 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
                   child: _timesCard(payload, loading),
                 ),
               ),
+              const SizedBox(height: AppSpace.cardGap),
+              // No title: the monthly table and the reminders, in every
+              // state, so they stay reachable when today's times fail.
+              _linksCard(),
             ],
           ),
         ),
@@ -218,8 +229,6 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               leading: const Shimmer(width: 38, height: 38, radius: 19),
               trailing: const Shimmer(width: 64, height: 18),
             ),
-          if (kPrayerRemindersEnabled)
-            RemindersRow(divided: true, background: context.colors.cardMuted),
         ],
       );
     }
@@ -255,7 +264,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               : AppText.prayerName.c(past ? context.colors.ink2 : context.colors.ink),
           subtitle: isSunrise
               ? l.fajrWindowCloses
-              : l.athanAt(prayerClock12(p.name, p.time)),
+              : l.athanAt(prayerClockText(l, p.name, p.time)),
           subtitleStyle: AppText.caption.c(
             isCurrent ? context.colors.selectedCaption : context.colors.ink3,
           ),
@@ -264,19 +273,30 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       );
     }
 
-    if (kPrayerRemindersEnabled) {
-      rows.add(
-        RemindersRow(divided: true, background: context.colors.cardMuted),
-      );
-    }
     return GroupedRows(rows: rows);
   }
+
+  /// Under the times: the monthly table (its own screen) and the reminders
+  /// (the same sheet as everywhere else).
+  Widget _linksCard() => GroupedRows(
+        key: const ValueKey('prayer-links'),
+        rows: [
+          AppListRow(
+            icon: AppIcons.calendar,
+            title: context.l10n.monthlyTimes,
+            trailing: const RowChevron(),
+            onTap: () => context.push('/prayer/monthly'),
+          ),
+          if (kPrayerRemindersEnabled)
+            const RemindersRow(divided: true),
+        ],
+      );
 
   Widget _trailing(DailyPrayerItem p, bool isCurrent) {
     final iqamah = p.iqamah;
     if (iqamah == null) {
       return Text(
-        prayerClock12(p.name, p.time),
+        prayerClockText(context.l10n, p.name, p.time),
         style: isCurrent
             ? AppText.iqamahValue
                 .copyWith(fontWeight: FontWeight.w700)
@@ -294,7 +314,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
               .c(isCurrent ? context.colors.selectedLabel : context.colors.ink4),
         ),
         Text(
-          prayerClock12(p.name, iqamah),
+          prayerClockText(context.l10n, p.name, iqamah),
           style: isCurrent
               ? AppText.iqamahValue
                   .copyWith(fontWeight: FontWeight.w700)
@@ -331,7 +351,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       // prayer_cache, so none is shown.
       subtitle: jumaa == null
           ? l.jumuahEveryFriday
-          : l.salahAt(prayerClock12('Dhuhr', jumaa)),
+          : l.salahAt(prayerClockText(l, 'Dhuhr', jumaa)),
     );
   }
 
@@ -387,7 +407,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
   ) {
     if (eid == null) return null;
     for (final entry in [(true, eid.eidFitr), (false, eid.eidAdha)]) {
-      final date = _parseTurkishDate(entry.$2.date);
+      final date = parseEidDate(entry.$2.date);
       if (date == null) continue;
       final now = mosqueNow();
       final days = date.difference(DateTime(now.year, now.month, now.day)).inDays;
@@ -401,23 +421,6 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
       }
     }
     return null;
-  }
-
-  static const _turkishMonths = {
-    'ocak': 1, 'şubat': 2, 'subat': 2, 'mart': 3, 'nisan': 4, 'mayıs': 5,
-    'mayis': 5, 'haziran': 6, 'temmuz': 7, 'ağustos': 8, 'agustos': 8,
-    'eylül': 9, 'eylul': 9, 'ekim': 10, 'kasım': 11, 'kasim': 11, 'aralık': 12,
-    'aralik': 12,
-  };
-
-  DateTime? _parseTurkishDate(String raw) {
-    final parts = raw.trim().split(RegExp(r'\s+'));
-    if (parts.length < 3) return null;
-    final day = int.tryParse(parts[0]);
-    final month = _turkishMonths[parts[1].toLowerCase()];
-    final year = int.tryParse(parts[2]);
-    if (day == null || month == null || year == null) return null;
-    return DateTime(year, month, day);
   }
 
   /// Spec §7.1 step 8.

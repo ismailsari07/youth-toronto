@@ -98,19 +98,24 @@ void main() {
     expect(yesterday['time'], '5:42 AM');
   });
 
-  test('times are normalised to 12-hour with AM/PM in every language', () {
-    for (final lang in ['en', 'fr', 'tr']) {
+  test('times follow the language: 12-hour in English, 24-hour otherwise', () {
+    final expected = {
+      'en': ['5:43 AM', '7:11 AM', '1:11 PM', '4:23 PM', '7:02 PM', '8:19 PM'],
+      'tr': ['05:43', '07:11', '13:11', '16:23', '19:02', '20:19'],
+      'fr': [
+        '5\u00A0h\u00A043',
+        '7\u00A0h\u00A011',
+        '13\u00A0h\u00A011',
+        '16\u00A0h\u00A023',
+        '19\u00A0h\u00A002',
+        '20\u00A0h\u00A019',
+      ],
+    };
+    for (final MapEntry(key: lang, value: times) in expected.entries) {
       final today = prayers(
         build(lang),
       ).where((p) => p['day'] == '2026-10-04').map((p) => p['time']).toList();
-      expect(today, [
-        '5:43 AM',
-        '7:11 AM',
-        '1:11 PM',
-        '4:23 PM',
-        '7:02 PM',
-        '8:19 PM',
-      ]);
+      expect(today, times, reason: lang);
     }
   });
 
@@ -127,8 +132,8 @@ void main() {
     expect(tr['locale'], 'tr');
     expect((tr['strings']! as Map)['nextPrayer'], 'SIRADAKİ NAMAZ');
     final asr = prayers(tr).firstWhere((p) => p['key'] == 'Asr');
-    expect(asr['athan'], 'Ezan 4:23 PM');
-    expect(asr['iqamah'], 'Cemaat 4:45 PM');
+    expect(asr['athan'], 'Ezan 16:23');
+    expect(asr['iqamah'], 'Cemaat 16:45');
   });
 
   test('Sunrise carries no iqamah line', () {

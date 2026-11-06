@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/content/content_bundle.dart';
 import '../../../core/event_schedule.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/formatters.dart';
@@ -20,6 +21,7 @@ import '../../../ui/components/motion.dart';
 import '../../../shared/providers/registration_provider.dart';
 import '../../push/push_widgets.dart';
 import '../../registration/event_registration_section.dart';
+import '../widgets/event_contribution_card.dart';
 
 /// Spec §7.6. Pushed onto the root navigator, so the island is not shown and
 /// the sticky bar owns the bottom of the screen.
@@ -32,6 +34,11 @@ class EventDetailScreen extends ConsumerWidget {
   const EventDetailScreen({super.key, required this.upcoming});
 
   final UpcomingEvent upcoming;
+
+  static String? _blankToNull(String? s) {
+    final v = s?.trim();
+    return v == null || v.isEmpty ? null : v;
+  }
 
   Future<void> _open(String url) async {
     try {
@@ -79,7 +86,7 @@ class EventDetailScreen extends ConsumerWidget {
             ? l.beginsAfterJamaah
             : l.beginsAboutOn(
                 l.beginsAfterJamaah,
-                eventTime(estimate),
+                eventTime(l, estimate),
                 dayMonthLong(l, start),
               ),
       );
@@ -93,7 +100,7 @@ class EventDetailScreen extends ConsumerWidget {
             AppListRow(
               divided: true,
               icon: AppIcons.clock,
-              title: eventTime(start),
+              title: eventTime(l, start),
               subtitle: l.startTime,
             ),
         AppListRow(
@@ -109,7 +116,7 @@ class EventDetailScreen extends ConsumerWidget {
         AppListRow(
           icon: AppIcons.clock,
           title: longDate(l, start),
-          subtitle: eventTime(start),
+          subtitle: eventTime(l, start),
         )
       else ...[
         AppListRow(
@@ -228,6 +235,16 @@ class EventDetailScreen extends ConsumerWidget {
                       description,
                       style: AppText.body.c(context.colors.ink2),
                     ),
+                  ),
+                ],
+                if (event.hasContribution) ...[
+                  const SizedBox(height: AppSpace.cardGapWide),
+                  EventContributionCard(
+                    heading: event.contributionHeading!.trim(),
+                    text: _blankToNull(event.contributionText),
+                    phone: event.contributionPhone!.trim(),
+                    name: _blankToNull(event.contributionName),
+                    onCall: () => _open(telUri(event.contributionPhone!)),
                   ),
                 ],
                 const SizedBox(height: AppSpace.cardGapWide),

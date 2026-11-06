@@ -1,0 +1,6 @@
+/* Texts of iOS's permission prompts come from Info.plist in English. */
+
+/* Other names Siri accepts for the app (INAlternativeAppNames in Info.plist). */
+"APP_NAME_SYNONYM_1" = "Pape Camii";
+"APP_NAME_SYNONYM_2" = "Mosquée Pape";
+"APP_NAME_SYNONYM_3" = "Pape Cami";

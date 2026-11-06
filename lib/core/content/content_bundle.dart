@@ -236,12 +236,16 @@ class AppFeatures {
     this.burialService = true,
     this.events = true,
     this.announcements = true,
+    this.news = true,
   });
 
   final bool marriageService;
   final bool burialService;
   final bool events;
   final bool announcements;
+
+  /// Camimizden Haberler; a missing flag means on.
+  final bool news;
 
   factory AppFeatures.parse(Object? raw, AppFeatures fallback) {
     if (raw is! Map) return fallback;
@@ -255,6 +259,7 @@ class AppFeatures {
       burialService: flag('burial_service', fallback.burialService),
       events: flag('events', fallback.events),
       announcements: flag('announcements', fallback.announcements),
+      news: flag('news', fallback.news),
     );
   }
 }

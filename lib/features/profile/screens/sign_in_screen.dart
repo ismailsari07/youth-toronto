@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
+import '../../../core/email_auth.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../theme/app_icon.dart';
@@ -42,16 +43,28 @@ class _SignInScreenState extends State<SignInScreen> {
       _busy = true;
       _error = null;
     });
-    final error = await AuthService.signInWithEmail(
-      _email.text.trim(),
-      _password.text,
-    );
+    final email = _email.text.trim();
+    final error = await EmailAuth.instance.signIn(email, _password.text);
     if (!mounted) return;
+    final unconfirmed = error?.kind == AuthFailure.emailNotConfirmed;
     setState(() {
       _busy = false;
-      _error = error;
+      _error = unconfirmed ? null : error;
     });
-    if (error == null) context.pop();
+    if (error == null) return context.pop();
+    // The account waits for its code: send a new one and ask for it.
+    if (unconfirmed) {
+      await _then(context.push<bool>(
+        '/profile/confirm-email',
+        extra: (email: email, sendOnOpen: true),
+      ));
+    }
+  }
+
+  /// Closes this screen too once the pushed one signed in.
+  Future<void> _then(Future<bool?> pushed) async {
+    final signedIn = await pushed;
+    if (signedIn == true && mounted) context.pop();
   }
 
   /// Apple or Google. A closed sheet shows nothing.
@@ -113,6 +126,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       controller: _email,
                       hint: l.emailHint,
                       keyboardType: TextInputType.emailAddress,
+                      autofillHints: const [AutofillHints.email],
                     ),
                     AppField(
                       label: l.password,
@@ -125,8 +139,30 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ],
                 ),
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: Pressable(
+                    key: const ValueKey('forgot-password'),
+                    onTap: _busy
+                        ? null
+                        : () => _then(context.push<bool>(
+                              '/profile/reset-password',
+                              extra: _email.text.trim(),
+                            )),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 12, 4, 4),
+                      child: Text(
+                        l.forgotPassword,
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                        ).c(context.colors.green),
+                      ),
+                    ),
+                  ),
+                ),
                 if (error != null) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Text(
                     authErrorText(l, error),
                     style: const TextStyle(fontSize: 13.5).c(context.colors.danger),

@@ -3,8 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'mosque_time.dart';
+import 'prayer_month.dart';
 import 'prayer_widget_sync.dart';
 import 'reminder_sync.dart';
+import 'siri_data_sync.dart';
 
 /// The silent push pape-admin sends after any change to a prayer_cache row
 /// dated today or later (debounced on the server): data
@@ -20,12 +22,16 @@ const prayerRefreshType = 'prayer_refresh';
 
 bool isPrayerRefresh(Map<String, dynamic> data) => data['type'] == prayerRefreshType;
 
-/// Reminders and widget, together. Never throws. Completes with whether the
+/// Reminders, widget and Siri's data, together. Never throws. Completes with whether the
 /// reminders were rescheduled from fresh rows.
 Future<bool> refreshPrayerSchedules() async {
   initMosqueTime();
-  final (rescheduled, _) =
-      await (ReminderSync.sync(), PrayerWidgetSync.sync()).wait;
+  PrayerRows.forget();
+  final (rescheduled, _, _) = await (
+    ReminderSync.sync(),
+    PrayerWidgetSync.sync(),
+    SiriDataSync.syncEvents(),
+  ).wait;
   return rescheduled;
 }
 
@@ -74,9 +80,10 @@ abstract final class BackgroundRefreshLog {
 }
 
 /// FirebaseMessaging.onBackgroundMessage's handler. On iOS FlutterFire calls
-/// it on the app's own engine (the app is woken, or launched, in the
-/// background and main() has run), so the widget's platform channel in
-/// AppDelegate is there too. iOS gives it about 25 seconds.
+/// it on the app's own engine, so the widget's platform channel in AppDelegate
+/// is there too. iOS gives it about 25 seconds. That engine exists once a scene
+/// has connected: a launch with no scene runs no Dart, so this doesn't run. The
+/// owner accepted that (see "UIScene lifecycle" in CLAUDE.md).
 @pragma('vm:entry-point')
 Future<void> onBackgroundPush(RemoteMessage message) =>
     handlePushData(message.data, background: true);

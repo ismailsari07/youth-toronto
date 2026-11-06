@@ -63,7 +63,11 @@ class SectionHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(title, style: AppText.sectionHeader.c(context.colors.ink)),
+        // Wraps rather than running into the trailing text at large sizes.
+        Flexible(
+          child: Text(title, style: AppText.sectionHeader.c(context.colors.ink)),
+        ),
+        if (trailing != null) const SizedBox(width: 12),
         if (trailing != null)
           if (onTrailingTap != null)
             Pressable(

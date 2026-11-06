@@ -74,6 +74,15 @@ void main() {
       expect(find.text('Phone *', findRichText: true), findsOneWidget);
       expect(find.text('Saved to your profile'), findsOneWidget);
       expect(find.text("A registration can't be cancelled in the app."), findsOneWidget);
+      // The note comes first, above everything the member fills in.
+      final note = find.text(
+        "A registration can't be cancelled in the app. If you need to change it, please contact the mosque.",
+      );
+      expect(note, findsOneWidget);
+      expect(
+        tester.getBottomLeft(note).dy,
+        lessThan(tester.getTopLeft(find.text('Zeynep Aksoy')).dy),
+      );
       // Every question, required ones starred.
       expect(find.byType(QuestionField), findsNWidgets(8));
       expect(find.text('School *', findRichText: true), findsOneWidget);

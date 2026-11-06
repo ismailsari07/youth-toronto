@@ -1,3 +1,4 @@
+import '../../../shared/birth_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,13 +39,7 @@ class _MarriageDobViewState extends ConsumerState<MarriageDobView> {
   }
 
   Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _date ?? DateTime(now.year - 25),
-      firstDate: DateTime(now.year - 100),
-      lastDate: now,
-    );
+    final picked = await showBirthDatePicker(context, initial: _date);
     if (picked == null) return;
     setState(() {
       _date = picked;

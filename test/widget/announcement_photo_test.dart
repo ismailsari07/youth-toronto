@@ -81,4 +81,14 @@ void main() {
     expect(find.byIcon(Icons.broken_image), findsNothing);
     expect(tester.getSize(find.byType(AnnouncementPhoto)).height, 0);
   });
+
+  testWidgets('a card photo that fails collapses too', (tester) async {
+    await pump(
+      tester,
+      const Column(children: [AnnouncementPhoto.cover(url: 'https://example.test/missing.jpg')]),
+    );
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(AnnouncementPhoto)).height, 0);
+  });
 }

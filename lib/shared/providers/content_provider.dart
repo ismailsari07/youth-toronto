@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/content/content_bundle.dart';
 import '../../core/content/content_repository.dart';
+import '../../core/siri_data_sync.dart';
 
 /// The cached or bundled content, read in main() before the first frame so
 /// no screen is ever empty. Tests get [ContentBundle.empty].
@@ -42,6 +43,7 @@ class ContentNotifier extends Notifier<ContentBundle> {
       if (bundle != null) {
         state = bundle;
         _fetchedAt = DateTime.now();
+        await SiriDataSync.writeMosque(bundle);
       }
     } catch (_) {
       debugPrint('Content fetch failed');

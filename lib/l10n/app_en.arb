@@ -82,13 +82,41 @@
       }
     }
   },
+  "reminderFridayBody": "Dhuhr athan · Jumu'ah at {time}",
+  "@reminderFridayBody": {
+    "description": "Body of Friday's Dhuhr notification, at the Dhuhr athan. [time] is the Jumu'ah time; Turkish already carries its suffix (13:00'te).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyTimes": "Monthly times",
+  "monthlyJumuahAt": "Jumu'ah {time}",
+  "@monthlyJumuahAt": {
+    "description": "Friday's row in the monthly table. Short: it shares a narrow column with the date.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyMissingDay": "No times for this day",
+  "monthlyLastDay": "Last published day: {date}",
+  "@monthlyLastDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "fajrWindowCloses": "Fajr window closes",
   "prayerReminders": "Prayer reminders",
+  "@prayerReminders": {
+    "description": "Only inside the notifications themselves (the notice's title, the channel name). Every screen label says prayerNotifications."
+  },
   "prayerNotifications": "Prayer notifications",
   "remindersPrayers": "Prayers",
-  "remindersNotifyMe": "Notify me",
-  "notifyAtAthan": "At athan time",
-  "notifyBeforeIqamah": "5 minutes before iqamah",
   "notificationSound": "Notification sound",
   "soundAthan": "Athan",
   "@soundAthan": {
@@ -100,7 +128,6 @@
   "stopSound": "Stop",
   "remindersSummaryOff": "Off",
   "remindersSummaryAthan": "On · At athan time",
-  "remindersSummaryIqamah": "On · 5 min before iqamah",
   "reminderAthanBody": "{prayer, select, fajr{It's time for Fajr prayer} dhuhr{It's time for Dhuhr prayer} asr{It's time for Asr prayer} maghrib{It's time for Maghrib prayer} isha{It's time for Isha prayer} other{It's time for {prayer} prayer}}",
   "@reminderAthanBody": {
     "description": "Body of the notification at athan time. [prayer] is the lower-case English key. Turkish uses the namaz form (Fajr: Sabah namazı).",
@@ -112,18 +139,9 @@
   },
   "reminderIqamahAt": "Iqamah at {time}",
   "@reminderIqamahAt": {
-    "description": "Appended to the athan-time body after ' · '. [time] is 12-hour in every language, e.g. 1:45 PM.",
+    "description": "Appended to the athan-time body after ' · '. [time] follows the language: 1:45 PM, 13:45, 13 h 45.",
     "placeholders": {
       "time": {
-        "type": "String"
-      }
-    }
-  },
-  "reminderIqamahSoon": "{prayer, select, fajr{Fajr iqamah in 5 minutes} dhuhr{Dhuhr iqamah in 5 minutes} asr{Asr iqamah in 5 minutes} maghrib{Maghrib iqamah in 5 minutes} isha{Isha iqamah in 5 minutes} other{{prayer} iqamah in 5 minutes}}",
-  "@reminderIqamahSoon": {
-    "description": "Body of the notification 5 minutes before the iqamah. [prayer] is the lower-case English key.",
-    "placeholders": {
-      "prayer": {
         "type": "String"
       }
     }
@@ -360,6 +378,10 @@
   "shareThisAnnouncement": "Share this announcement",
   "questions": "Questions?",
   "callTheOffice": "Call the mosque office",
+  "tapToCall": "Tap to call",
+  "@tapToCall": {
+    "description": "Event page, contribution box: under the phone number when the event names no contact person."
+  },
   "mosqueOffice": "Mosque office",
   "everyoneWelcome": "Everyone is welcome",
   "freeToAttend": "Free to attend",
@@ -379,7 +401,7 @@
   "creatingAccount": "Creating…",
   "signOut": "Sign out",
   "settings": "Settings",
-  "settingsRowSubtitle": "Reminders, language, account",
+  "settingsRowSubtitle": "Notifications, language, account",
   "yourDetails": "Your details",
   "notifications": "Notifications",
   "app": "App",
@@ -677,7 +699,7 @@
       }
     }
   },
-  "regViews": "{count} people viewed",
+  "regViews": "{count, plural, =1{1 person viewed} other{{count} people viewed}}",
   "@regViews": {
     "description": "Under the registration card; only from 25 views.",
     "placeholders": {
@@ -784,6 +806,10 @@
   "regSubmit": "Send registration",
   "@regSubmit": {
     "description": "Registration screen button."
+  },
+  "regNoCancelNote": "A registration can't be cancelled in the app. If you need to change it, please contact the mosque.",
+  "@regNoCancelNote": {
+    "description": "At the top of the registration form, before the member sends it."
   },
   "regNoCancel": "A registration can't be cancelled in the app.",
   "@regNoCancel": {
@@ -931,14 +957,6 @@
   "@keyboardNext": {
     "description": "VoiceOver label of an arrow on the keyboard accessory bar."
   },
-  "reminderJumuahNow": "It's time for Jumu'ah prayer",
-  "@reminderJumuahNow": {
-    "description": "Friday's Dhuhr reminder, at the Jumu'ah time (title: jumuah)."
-  },
-  "reminderJumuahSoon": "Jumu'ah in 5 minutes",
-  "@reminderJumuahSoon": {
-    "description": "Friday's reminder 5 minutes before the Jumu'ah time (title: jumuah)."
-  },
   "remindersEndingNotice": "Your prayer reminders will stop tomorrow. Open Pape Mosque once to keep them coming at the right times.",
   "@remindersEndingNotice": {
     "description": "Local notification on the last day with scheduled prayer reminders (title: prayerReminders). Moved forward every time the app syncs."
@@ -946,5 +964,50 @@
   "lastBackgroundRefresh": "Last background refresh",
   "@lastBackgroundRefresh": {
     "description": "About this app: when a prayer_refresh silent push last rescheduled the reminders in the background; the value is a date and time, or a dash if never."
-  }
+  },
+  "lastVoiceAnswerLanguage": "Last voice answer language",
+  "@lastVoiceAnswerLanguage": {
+    "description": "About this app: how the last voice-assistant shortcut answer chose its language, shown as raw codes for TestFlight checks, or a dash if none yet."
+  },
+  "newsSection": "Mosque News",
+  "newsSegment": "News",
+  "newsFeatured": "Featured",
+  "newsPhotoCount": "{count, plural, =1{1 photo} other{{count} photos}}",
+  "newsGone": "This news item is no longer available",
+  "newsShare": "Share",
+  "newsOpenPhoto": "Photo {index} of {total}, open full screen",
+  "newsViewerHint": "Pinch to zoom, swipe for more",
+  "newsViewerHintOne": "Pinch to zoom",
+  "@newsPhotoCount": {"placeholders": {"count": {"type": "int"}}},
+  "@newsOpenPhoto": {"placeholders": {"index": {"type": "String"}, "total": {"type": "String"}}},
+  "forgotPassword": "Forgot password?",
+  "confirmEmailTitle": "Confirm your email",
+  "confirmEmailSubtitle": "We sent a 6-digit code to {email}.",
+  "@confirmEmailSubtitle": {"placeholders": {"email": {"type": "String"}}},
+  "emailCodeLabel": "6-digit code",
+  "@emailCodeLabel": {"description": "Label above the code field."},
+  "enterEmailCode": "Enter the 6-digit code from the email.",
+  "confirmEmailButton": "Confirm",
+  "confirmingEmail": "Confirming…",
+  "resendCode": "Send the code again",
+  "resendCodeIn": "{seconds, plural, one{Send the code again (1 s)} other{Send the code again ({seconds} s)}}",
+  "@resendCodeIn": {"placeholders": {"seconds": {"type": "int"}}},
+  "codeSentAgain": "A new code is on its way.",
+  "confirmLaterNote": "Can't find the email? Check your junk folder. Your account is saved: you can also confirm later, the next time you sign in.",
+  "errorInvalidCode": "That code is wrong or has expired. Check it, or ask for a new one.",
+  "errorSamePassword": "Choose a password different from your old one.",
+  "emailAlreadyRegistered": "This email already has an account. Sign in, or reset the password if you've forgotten it.",
+  "resetPasswordTitle": "Reset your password",
+  "resetEmailSubtitle": "Enter your account's email and we'll send you a 6-digit code.",
+  "sendCode": "Send code",
+  "sendingCode": "Sending…",
+  "resetCodeSubtitle": "If {email} has an account, we've sent it a 6-digit code.",
+  "@resetCodeSubtitle": {"placeholders": {"email": {"type": "String"}}},
+  "continueButton": "Continue",
+  "checkingCode": "Checking…",
+  "resetCodeNote": "No email after a few minutes? Check your junk folder and the address. Accounts made with Apple have no password: use Sign in with Apple.",
+  "newPasswordSubtitle": "Choose a new password. You'll stay signed in on this phone.",
+  "newPassword": "New password",
+  "savePassword": "Save password",
+  "passwordChanged": "Your password has been changed."
 }

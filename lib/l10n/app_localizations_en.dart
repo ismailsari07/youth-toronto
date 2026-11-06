@@ -119,6 +119,27 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String reminderFridayBody(String time) {
+    return 'Dhuhr athan · Jumu\'ah at $time';
+  }
+
+  @override
+  String get monthlyTimes => 'Monthly times';
+
+  @override
+  String monthlyJumuahAt(String time) {
+    return 'Jumu\'ah $time';
+  }
+
+  @override
+  String get monthlyMissingDay => 'No times for this day';
+
+  @override
+  String monthlyLastDay(String date) {
+    return 'Last published day: $date';
+  }
+
+  @override
   String get fajrWindowCloses => 'Fajr window closes';
 
   @override
@@ -129,15 +150,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remindersPrayers => 'Prayers';
-
-  @override
-  String get remindersNotifyMe => 'Notify me';
-
-  @override
-  String get notifyAtAthan => 'At athan time';
-
-  @override
-  String get notifyBeforeIqamah => '5 minutes before iqamah';
 
   @override
   String get notificationSound => 'Notification sound';
@@ -164,9 +176,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remindersSummaryAthan => 'On · At athan time';
 
   @override
-  String get remindersSummaryIqamah => 'On · 5 min before iqamah';
-
-  @override
   String reminderAthanBody(String prayer) {
     String _temp0 = intl.Intl.selectLogic(prayer, {
       'fajr': 'It\'s time for Fajr prayer',
@@ -182,19 +191,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String reminderIqamahAt(String time) {
     return 'Iqamah at $time';
-  }
-
-  @override
-  String reminderIqamahSoon(String prayer) {
-    String _temp0 = intl.Intl.selectLogic(prayer, {
-      'fajr': 'Fajr iqamah in 5 minutes',
-      'dhuhr': 'Dhuhr iqamah in 5 minutes',
-      'asr': 'Asr iqamah in 5 minutes',
-      'maghrib': 'Maghrib iqamah in 5 minutes',
-      'isha': 'Isha iqamah in 5 minutes',
-      'other': '$prayer iqamah in 5 minutes',
-    });
-    return '$_temp0';
   }
 
   @override
@@ -533,6 +529,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get callTheOffice => 'Call the mosque office';
 
   @override
+  String get tapToCall => 'Tap to call';
+
+  @override
   String get mosqueOffice => 'Mosque office';
 
   @override
@@ -591,7 +590,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
-  String get settingsRowSubtitle => 'Reminders, language, account';
+  String get settingsRowSubtitle => 'Notifications, language, account';
 
   @override
   String get yourDetails => 'Your details';
@@ -1270,7 +1269,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String regViews(int count) {
-    return '$count people viewed';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people viewed',
+      one: '1 person viewed',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1342,6 +1347,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regSubmit => 'Send registration';
+
+  @override
+  String get regNoCancelNote =>
+      'A registration can\'t be cancelled in the app. If you need to change it, please contact the mosque.';
 
   @override
   String get regNoCancel => 'A registration can\'t be cancelled in the app.';
@@ -1447,15 +1456,146 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keyboardNext => 'Next field';
 
   @override
-  String get reminderJumuahNow => 'It\'s time for Jumu\'ah prayer';
-
-  @override
-  String get reminderJumuahSoon => 'Jumu\'ah in 5 minutes';
-
-  @override
   String get remindersEndingNotice =>
       'Your prayer reminders will stop tomorrow. Open Pape Mosque once to keep them coming at the right times.';
 
   @override
   String get lastBackgroundRefresh => 'Last background refresh';
+
+  @override
+  String get lastVoiceAnswerLanguage => 'Last voice answer language';
+
+  @override
+  String get newsSection => 'Mosque News';
+
+  @override
+  String get newsSegment => 'News';
+
+  @override
+  String get newsFeatured => 'Featured';
+
+  @override
+  String newsPhotoCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos',
+      one: '1 photo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsGone => 'This news item is no longer available';
+
+  @override
+  String get newsShare => 'Share';
+
+  @override
+  String newsOpenPhoto(String index, String total) {
+    return 'Photo $index of $total, open full screen';
+  }
+
+  @override
+  String get newsViewerHint => 'Pinch to zoom, swipe for more';
+
+  @override
+  String get newsViewerHintOne => 'Pinch to zoom';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get confirmEmailTitle => 'Confirm your email';
+
+  @override
+  String confirmEmailSubtitle(String email) {
+    return 'We sent a 6-digit code to $email.';
+  }
+
+  @override
+  String get emailCodeLabel => '6-digit code';
+
+  @override
+  String get enterEmailCode => 'Enter the 6-digit code from the email.';
+
+  @override
+  String get confirmEmailButton => 'Confirm';
+
+  @override
+  String get confirmingEmail => 'Confirming…';
+
+  @override
+  String get resendCode => 'Send the code again';
+
+  @override
+  String resendCodeIn(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Send the code again ($seconds s)',
+      one: 'Send the code again (1 s)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get codeSentAgain => 'A new code is on its way.';
+
+  @override
+  String get confirmLaterNote =>
+      'Can\'t find the email? Check your junk folder. Your account is saved: you can also confirm later, the next time you sign in.';
+
+  @override
+  String get errorInvalidCode =>
+      'That code is wrong or has expired. Check it, or ask for a new one.';
+
+  @override
+  String get errorSamePassword =>
+      'Choose a password different from your old one.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'This email already has an account. Sign in, or reset the password if you\'ve forgotten it.';
+
+  @override
+  String get resetPasswordTitle => 'Reset your password';
+
+  @override
+  String get resetEmailSubtitle =>
+      'Enter your account\'s email and we\'ll send you a 6-digit code.';
+
+  @override
+  String get sendCode => 'Send code';
+
+  @override
+  String get sendingCode => 'Sending…';
+
+  @override
+  String resetCodeSubtitle(String email) {
+    return 'If $email has an account, we\'ve sent it a 6-digit code.';
+  }
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get checkingCode => 'Checking…';
+
+  @override
+  String get resetCodeNote =>
+      'No email after a few minutes? Check your junk folder and the address. Accounts made with Apple have no password: use Sign in with Apple.';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Choose a new password. You\'ll stay signed in on this phone.';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get savePassword => 'Save password';
+
+  @override
+  String get passwordChanged => 'Your password has been changed.';
 }

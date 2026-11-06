@@ -1,15 +1,78 @@
-# Only for the yaml-configured Codemagic app used for App Store screenshots.
-# The release build stays in the Workflow Editor app, which ignores this file.
+# Only read while the Codemagic app is switched to YAML configuration. There is one
+# app, because Codemagic doesn't allow adding the same repo twice: switch it to YAML,
+# run this workflow (or `screenshots`, from the screenshots branch), then switch it
+# back. The release build runs in Workflow Editor mode, which ignores this file.
 workflows:
-  screenshots:
-    name: App Store screenshots (6.9", en + tr)
+  siri-check:
+    name: Siri check (simulator build + Swift tests, no team signing)
     instance_type: mac_mini_m2
-    max_build_duration: 60
+    max_build_duration: 45
     environment:
       flutter: 3.38.5
       xcode: latest
       cocoapods: default
     # No triggering section: it runs only when started by hand.
+    scripts:
+      - name: Get packages
+        script: flutter pub get
+      - name: Flutter tests
+        script: flutter test
+      - name: Build for the simulator (no signing)
+        script: flutter build ios --simulator --debug
+      - name: The shortcuts made it into the app
+        script: |
+          set -e
+          app=build/ios/iphonesimulator/Runner.app
+          test -d "$app/Metadata.appintents" || { echo "No App Intents metadata in the app"; exit 1; }
+          # Debug builds keep the code in Runner.debug.dylib on recent Xcodes.
+          bin="$app/Runner"
+          test -f "$app/Runner.debug.dylib" && bin="$app/Runner.debug.dylib"
+          otool -l "$bin" | grep -A2 LC_LOAD_WEAK_DYLIB | grep -q AppIntents \
+            || { echo "AppIntents is not weak-linked: the app would crash on iOS 15"; exit 1; }
+      - name: The translations made it into the app
+        script: python3 tool/check_siri_bundle.py build/ios/iphonesimulator/Runner.app
+      - name: The scene manifest made it into the app
+        script: python3 tool/check_scene_manifest.py build/ios/iphonesimulator/Runner.app
+      - name: The app starts through its scene on a simulator
+        script: bash tool/check_simulator_launch.sh build/ios/iphonesimulator/Runner.app
+      # RunnerTests runs the shortcuts' perform() in the app process, so the app
+      # must carry its entitlements: an ad-hoc signature (no team, no profile)
+      # embeds them on a simulator. CODE_SIGNING_ALLOWED=NO would leave them out,
+      # and INPreferences aborts without com.apple.developer.siri (build 26).
+      - name: Swift tests (RunnerTests, ad-hoc signed)
+        script: |
+          set -e
+          device=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          runtimes = json.load(sys.stdin)['devices']
+          for runtime in sorted(runtimes, reverse=True):
+              for d in runtimes[runtime]:
+                  if d['name'].startswith('iPhone'):
+                      print(d['udid'])
+                      raise SystemExit
+          ")
+          echo "Testing on $device"
+          xcodebuild test \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -destination "id=$device" \
+            -derivedDataPath build/xctest \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY=- \
+            DEVELOPMENT_TEAM= \
+            PROVISIONING_PROFILE_SPECIFIER=
+      - name: The tested app carried the Siri entitlement
+        script: bash tool/check_siri_entitlement.sh build/xctest/Build/Products/Debug-iphonesimulator/Runner.app
+  screenshots:
+    name: App Store screenshots (6.9", en + tr + fr)
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      flutter: 3.38.5
+      xcode: latest
+      cocoapods: default
+    # No triggering section: it runs only when started by hand, from the
+    # screenshots branch.
     scripts:
       - name: Get packages
         script: flutter pub get

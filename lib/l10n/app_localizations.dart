@@ -220,13 +220,43 @@ abstract class AppLocalizations {
   /// **'{prayer} · now'**
   String prayerNow(String prayer);
 
+  /// Body of Friday's Dhuhr notification, at the Dhuhr athan. [time] is the Jumu'ah time; Turkish already carries its suffix (13:00'te).
+  ///
+  /// In en, this message translates to:
+  /// **'Dhuhr athan · Jumu\'ah at {time}'**
+  String reminderFridayBody(String time);
+
+  /// No description provided for @monthlyTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly times'**
+  String get monthlyTimes;
+
+  /// Friday's row in the monthly table. Short: it shares a narrow column with the date.
+  ///
+  /// In en, this message translates to:
+  /// **'Jumu\'ah {time}'**
+  String monthlyJumuahAt(String time);
+
+  /// No description provided for @monthlyMissingDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No times for this day'**
+  String get monthlyMissingDay;
+
+  /// No description provided for @monthlyLastDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Last published day: {date}'**
+  String monthlyLastDay(String date);
+
   /// No description provided for @fajrWindowCloses.
   ///
   /// In en, this message translates to:
   /// **'Fajr window closes'**
   String get fajrWindowCloses;
 
-  /// No description provided for @prayerReminders.
+  /// Only inside the notifications themselves (the notice's title, the channel name). Every screen label says prayerNotifications.
   ///
   /// In en, this message translates to:
   /// **'Prayer reminders'**
@@ -243,24 +273,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Prayers'**
   String get remindersPrayers;
-
-  /// No description provided for @remindersNotifyMe.
-  ///
-  /// In en, this message translates to:
-  /// **'Notify me'**
-  String get remindersNotifyMe;
-
-  /// No description provided for @notifyAtAthan.
-  ///
-  /// In en, this message translates to:
-  /// **'At athan time'**
-  String get notifyAtAthan;
-
-  /// No description provided for @notifyBeforeIqamah.
-  ///
-  /// In en, this message translates to:
-  /// **'5 minutes before iqamah'**
-  String get notifyBeforeIqamah;
 
   /// No description provided for @notificationSound.
   ///
@@ -310,29 +322,17 @@ abstract class AppLocalizations {
   /// **'On · At athan time'**
   String get remindersSummaryAthan;
 
-  /// No description provided for @remindersSummaryIqamah.
-  ///
-  /// In en, this message translates to:
-  /// **'On · 5 min before iqamah'**
-  String get remindersSummaryIqamah;
-
   /// Body of the notification at athan time. [prayer] is the lower-case English key. Turkish uses the namaz form (Fajr: Sabah namazı).
   ///
   /// In en, this message translates to:
   /// **'{prayer, select, fajr{It\'s time for Fajr prayer} dhuhr{It\'s time for Dhuhr prayer} asr{It\'s time for Asr prayer} maghrib{It\'s time for Maghrib prayer} isha{It\'s time for Isha prayer} other{It\'s time for {prayer} prayer}}'**
   String reminderAthanBody(String prayer);
 
-  /// Appended to the athan-time body after ' · '. [time] is 12-hour in every language, e.g. 1:45 PM.
+  /// Appended to the athan-time body after ' · '. [time] follows the language: 1:45 PM, 13:45, 13 h 45.
   ///
   /// In en, this message translates to:
   /// **'Iqamah at {time}'**
   String reminderIqamahAt(String time);
-
-  /// Body of the notification 5 minutes before the iqamah. [prayer] is the lower-case English key.
-  ///
-  /// In en, this message translates to:
-  /// **'{prayer, select, fajr{Fajr iqamah in 5 minutes} dhuhr{Dhuhr iqamah in 5 minutes} asr{Asr iqamah in 5 minutes} maghrib{Maghrib iqamah in 5 minutes} isha{Isha iqamah in 5 minutes} other{{prayer} iqamah in 5 minutes}}'**
-  String reminderIqamahSoon(String prayer);
 
   /// No description provided for @remindersDeniedNote.
   ///
@@ -814,6 +814,12 @@ abstract class AppLocalizations {
   /// **'Call the mosque office'**
   String get callTheOffice;
 
+  /// Event page, contribution box: under the phone number when the event names no contact person.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to call'**
+  String get tapToCall;
+
   /// No description provided for @mosqueOffice.
   ///
   /// In en, this message translates to:
@@ -931,7 +937,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsRowSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Reminders, language, account'**
+  /// **'Notifications, language, account'**
   String get settingsRowSubtitle;
 
   /// No description provided for @yourDetails.
@@ -2161,7 +2167,7 @@ abstract class AppLocalizations {
   /// Under the registration card; only from 25 views.
   ///
   /// In en, this message translates to:
-  /// **'{count} people viewed'**
+  /// **'{count, plural, =1{1 person viewed} other{{count} people viewed}}'**
   String regViews(int count);
 
   /// Registration state and disabled button: no places left.
@@ -2289,6 +2295,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send registration'**
   String get regSubmit;
+
+  /// At the top of the registration form, before the member sends it.
+  ///
+  /// In en, this message translates to:
+  /// **'A registration can\'t be cancelled in the app. If you need to change it, please contact the mosque.'**
+  String get regNoCancelNote;
 
   /// Under the send button.
   ///
@@ -2482,18 +2494,6 @@ abstract class AppLocalizations {
   /// **'Next field'**
   String get keyboardNext;
 
-  /// Friday's Dhuhr reminder, at the Jumu'ah time (title: jumuah).
-  ///
-  /// In en, this message translates to:
-  /// **'It\'s time for Jumu\'ah prayer'**
-  String get reminderJumuahNow;
-
-  /// Friday's reminder 5 minutes before the Jumu'ah time (title: jumuah).
-  ///
-  /// In en, this message translates to:
-  /// **'Jumu\'ah in 5 minutes'**
-  String get reminderJumuahSoon;
-
   /// Local notification on the last day with scheduled prayer reminders (title: prayerReminders). Moved forward every time the app syncs.
   ///
   /// In en, this message translates to:
@@ -2505,6 +2505,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last background refresh'**
   String get lastBackgroundRefresh;
+
+  /// About this app: how the last voice-assistant shortcut answer chose its language, shown as raw codes for TestFlight checks, or a dash if none yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Last voice answer language'**
+  String get lastVoiceAnswerLanguage;
+
+  /// No description provided for @newsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Mosque News'**
+  String get newsSection;
+
+  /// No description provided for @newsSegment.
+  ///
+  /// In en, this message translates to:
+  /// **'News'**
+  String get newsSegment;
+
+  /// No description provided for @newsFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get newsFeatured;
+
+  /// No description provided for @newsPhotoCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo} other{{count} photos}}'**
+  String newsPhotoCount(int count);
+
+  /// No description provided for @newsGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This news item is no longer available'**
+  String get newsGone;
+
+  /// No description provided for @newsShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get newsShare;
+
+  /// No description provided for @newsOpenPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {index} of {total}, open full screen'**
+  String newsOpenPhoto(String index, String total);
+
+  /// No description provided for @newsViewerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom, swipe for more'**
+  String get newsViewerHint;
+
+  /// No description provided for @newsViewerHintOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom'**
+  String get newsViewerHintOne;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @confirmEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email'**
+  String get confirmEmailTitle;
+
+  /// No description provided for @confirmEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to {email}.'**
+  String confirmEmailSubtitle(String email);
+
+  /// Label above the code field.
+  ///
+  /// In en, this message translates to:
+  /// **'6-digit code'**
+  String get emailCodeLabel;
+
+  /// No description provided for @enterEmailCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code from the email.'**
+  String get enterEmailCode;
+
+  /// No description provided for @confirmEmailButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmEmailButton;
+
+  /// No description provided for @confirmingEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirming…'**
+  String get confirmingEmail;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the code again'**
+  String get resendCode;
+
+  /// No description provided for @resendCodeIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds, plural, one{Send the code again (1 s)} other{Send the code again ({seconds} s)}}'**
+  String resendCodeIn(int seconds);
+
+  /// No description provided for @codeSentAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'A new code is on its way.'**
+  String get codeSentAgain;
+
+  /// No description provided for @confirmLaterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find the email? Check your junk folder. Your account is saved: you can also confirm later, the next time you sign in.'**
+  String get confirmLaterNote;
+
+  /// No description provided for @errorInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That code is wrong or has expired. Check it, or ask for a new one.'**
+  String get errorInvalidCode;
+
+  /// No description provided for @errorSamePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a password different from your old one.'**
+  String get errorSamePassword;
+
+  /// No description provided for @emailAlreadyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'This email already has an account. Sign in, or reset the password if you\'ve forgotten it.'**
+  String get emailAlreadyRegistered;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your password'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @resetEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your account\'s email and we\'ll send you a 6-digit code.'**
+  String get resetEmailSubtitle;
+
+  /// No description provided for @sendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code'**
+  String get sendCode;
+
+  /// No description provided for @sendingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get sendingCode;
+
+  /// No description provided for @resetCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If {email} has an account, we\'ve sent it a 6-digit code.'**
+  String resetCodeSubtitle(String email);
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
+
+  /// No description provided for @checkingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get checkingCode;
+
+  /// No description provided for @resetCodeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'No email after a few minutes? Check your junk folder and the address. Accounts made with Apple have no password: use Sign in with Apple.'**
+  String get resetCodeNote;
+
+  /// No description provided for @newPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new password. You\'ll stay signed in on this phone.'**
+  String get newPasswordSubtitle;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// No description provided for @savePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Save password'**
+  String get savePassword;
+
+  /// No description provided for @passwordChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed.'**
+  String get passwordChanged;
 }
 
 class _AppLocalizationsDelegate

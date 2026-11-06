@@ -1,0 +1,191 @@
+import Foundation
+
+// What the Siri shortcuts read: three JSON documents the Flutter app writes
+// into the App Group (lib/core/siri_data_sync.dart). No network here, ever.
+//
+// Flutter writes each time as an instant AND as display text in each language,
+// using the same code as the reminders. This side compares instants and repeats
+// the text; it never parses or calculates a clock time.
+
+enum SiriStoreKey {
+  static let appGroup = "group.ca.papemosque.app"
+  static let prayers = "siri_prayers"
+  static let events = "siri_events"
+  static let mosque = "siri_mosque"
+  /// What the last answer's language was decided from (About this app).
+  static let lastLanguage = "siri_last_language"
+  /// The widget's document, written by lib/core/prayer_widget_sync.dart; its
+  /// `locale` is the language the app shows.
+  static let widgetData = "prayer_widget_data"
+  static let version = 2
+}
+
+/// The order of a complete day, as prayer_cache names them.
+enum PrayerKey: String, Codable, CaseIterable {
+  case fajr = "Fajr"
+  case sunrise = "Sunrise"
+  case dhuhr = "Dhuhr"
+  case asr = "Asr"
+  case maghrib = "Maghrib"
+  case isha = "Isha"
+}
+
+/// One time's text in each language: "4:55 PM", "16:55", "16 h 55". All three
+/// are required, so a document missing one is refused rather than guessed from.
+struct SiriClock: Codable, Equatable {
+  let en: String
+  let tr: String
+  let fr: String
+
+  func text(_ language: SiriLanguage) -> String {
+    switch language {
+    case .en: return en
+    case .tr: return tr
+    case .fr: return fr
+    }
+  }
+}
+
+struct SiriPrayer: Codable, Equatable {
+  let key: PrayerKey
+  let at: Double
+  let time: SiriClock
+  let iqamahAt: Double?
+  let iqamah: SiriClock?
+
+  var date: Date { Date(timeIntervalSince1970: at) }
+}
+
+struct SiriJumuah: Codable, Equatable {
+  let at: Double
+  let time: SiriClock
+
+  var date: Date { Date(timeIntervalSince1970: at) }
+}
+
+struct SiriDay: Codable, Equatable {
+  let date: String // yyyy-MM-dd, Toronto
+  let prayers: [SiriPrayer]
+  let jumuah: SiriJumuah? // only on a Friday, from that Friday's own row
+
+  /// All six times, in order and strictly increasing. Anything less counts
+  /// as no data: a partial day is never answered from.
+  var isComplete: Bool {
+    guard prayers.map(\.key) == PrayerKey.allCases else { return false }
+    return zip(prayers, prayers.dropFirst()).allSatisfy { $0.at < $1.at }
+  }
+
+  func prayer(_ key: PrayerKey) -> SiriPrayer? {
+    prayers.first { $0.key == key }
+  }
+}
+
+struct SiriEid: Codable, Equatable {
+  let which: String // fitr or adha
+  let date: String // yyyy-MM-dd, Toronto
+  let firstAt: Double
+  let first: SiriClock
+  let secondAt: Double?
+  let second: SiriClock?
+
+  /// When it stops being "upcoming": after the last prayer of the day.
+  var endsAt: Date { Date(timeIntervalSince1970: secondAt ?? firstAt) }
+}
+
+struct SiriPrayersDoc: Codable, Equatable {
+  let version: Int
+  let writtenAt: Double
+  let days: [SiriDay]
+  let eid: [SiriEid]
+}
+
+struct SiriEvent: Codable, Equatable {
+  let id: String
+  let title: String
+  let day: String // yyyy-MM-dd, Toronto
+  let startsAt: Double
+  let when: [String: String] // language -> the app's schedule line
+  let next: [String: String]? // language -> "next: ...", recurring events only
+}
+
+struct SiriEventsDoc: Codable, Equatable {
+  let version: Int
+  let fetchedAt: Double // the last successful fetch
+  let items: [SiriEvent]
+}
+
+struct SiriMosqueDoc: Codable, Equatable {
+  let version: Int
+  let name: String
+  let phone: String?
+  let tel: String?
+  let address: String?
+  let lat: Double?
+  let lng: Double?
+  let eventsEnabled: Bool
+}
+
+enum SiriStore {
+  private static func decode<T: Decodable>(_ type: T.Type, key: String, version: (T) -> Int) -> T? {
+    guard let json = UserDefaults(suiteName: SiriStoreKey.appGroup)?.string(forKey: key) else {
+      return nil
+    }
+    return decode(type, json: json, version: version)
+  }
+
+  /// A document of an unknown version, or one that can't be read, is missing.
+  static func decode<T: Decodable>(_ type: T.Type, json: String, version: (T) -> Int) -> T? {
+    guard let bytes = json.data(using: .utf8),
+          let doc = try? JSONDecoder().decode(type, from: bytes),
+          version(doc) == SiriStoreKey.version
+    else { return nil }
+    return doc
+  }
+
+  static var prayers: SiriPrayersDoc? {
+    decode(SiriPrayersDoc.self, key: SiriStoreKey.prayers) { $0.version }
+  }
+
+  static var events: SiriEventsDoc? {
+    decode(SiriEventsDoc.self, key: SiriStoreKey.events) { $0.version }
+  }
+
+  static var mosque: SiriMosqueDoc? {
+    decode(SiriMosqueDoc.self, key: SiriStoreKey.mosque) { $0.version }
+  }
+
+  /// The language the app shows, from the widget's document: "tr", "en", "fr".
+  static var appLanguage: String? {
+    guard let json = UserDefaults(suiteName: SiriStoreKey.appGroup)?.string(forKey: SiriStoreKey.widgetData)
+    else { return nil }
+    return widgetLocale(json: json)
+  }
+
+  static func widgetLocale(json: String) -> String? {
+    guard let bytes = json.data(using: .utf8),
+          let object = try? JSONSerialization.jsonObject(with: bytes) as? [String: Any],
+          let locale = object["locale"] as? String, !locale.isEmpty
+    else { return nil }
+    return locale
+  }
+
+  static func recordLanguage(_ note: SiriLanguageNote) {
+    UserDefaults(suiteName: SiriStoreKey.appGroup)?.set(note.text, forKey: SiriStoreKey.lastLanguage)
+  }
+}
+
+/// How an answer's language was chosen, for About this app on TestFlight:
+/// "tr · assistant en-US (notDetermined) · app tr · device en". Codes only,
+/// nothing personal.
+struct SiriLanguageNote: Equatable {
+  let language: SiriLanguage
+  let assistant: String?
+  let status: String
+  let app: String?
+  let device: String?
+
+  var text: String {
+    let assistantCode = (assistant?.isEmpty ?? true) ? "-" : assistant!
+    return "\(language.rawValue) · assistant \(assistantCode) (\(status)) · app \(app ?? "-") · device \(device ?? "-")"
+  }
+}

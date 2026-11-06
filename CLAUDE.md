@@ -49,7 +49,8 @@ the website in Safari (`LaunchMode.externalApplication`); never add a form or a 
   options" shows.
 - URL: `links.donation` from the bundle, else `https://papemosque.ca/donation`; a fund adds `?fund=<slug>`,
   which the website turns into that fund's open form.
-- Fund titles are Turkish only (one `title` column); translations wait for the panel's fund module.
+- Fund titles (since 1.4.0): `title_i18n` from the panel's Fonlar, in the app language, then EN, then TR. The plain
+  `title` column is a copy of Turkish and the fallback, also for lists cached before 1.4.0.
 
 ## Push notifications (since 1.0.8)
 
@@ -122,6 +123,32 @@ Contract: pape-admin CLAUDE.md §10 (the server enforces everything; the app's c
   mute); `set_event_notifications` answering `P0001 registered` is `PushError.registered` (toggle stays on). The
   event's notification row is on and locked only while push can arrive (D5).
 
+## Contribution box (next version after 1.3.1)
+
+Optional "call this number to contribute" card on the event page, after "About this event"
+(`lib/features/community/widgets/event_contribution_card.dart`). Information only, no payment. Columns
+`youth_events.contribution_phone/_heading/_text/_name`: no phone means no card. The phone is always
+`416 555 0142` (Canada/US, set by the panel), so `telUri` dials it. The heading and text are single-language, like
+the event title; only "Tap to call" is translated. **When this version is on the App Store:** set
+`APP_SHOWS_CONTRIBUTION = true` in pape-admin `src/lib/event-contribution.ts`.
+
+## Email codes and password reset (1.4.0)
+
+Supabase sends auth email through Resend SMTP (`noreply@papemosque.ca`). The member types a 6-digit code (`{{ .Token }}`)
+into the app, so nothing depends on a link opening the app. Code: `lib/core/email_auth.dart` (`EmailAuth.instance`,
+replaceable in tests), `confirm_email_screen.dart`, `reset_password_screen.dart`, `widgets/email_code.dart`; tests
+`test/auth/email_auth_test.dart`. Templates, dashboard settings and rollout order: `docs/email-templates/README.md`.
+
+- Sign-up with no session opens "E-postanızı onaylayın" (`verifyOTP` signup signs in). A sign-in refused with
+  `email_not_confirmed` sends a new code and opens the same screen. "Kodu tekrar gönder" waits 60 s, Supabase's interval.
+- With "Confirm email" on, Supabase answers a sign-up for a registered address like a success, with no identities and no
+  email. The app says the address has an account and offers sign-in and "Şifremi unuttum". Before 1.4.0 the app already
+  said "email taken", so this reveals nothing new.
+- "Şifremi unuttum": email, then code (`verifyOTP` recovery signs in), then new password (`updateUser`). The code step
+  reads the same for any address; only a rate limit or a network failure shows (`resetRequestError`).
+- Every request passes `kAuthEmailRedirect` (`https://papemosque.ca/hesap/onaylandi`). The Reset password template
+  shows the code when `.RedirectTo` equals it and the panel's link otherwise, so that URL must be in Supabase's Redirect URLs.
+
 ## Keyboard (since 1.2.1)
 
 The keyboard always has a way out (TestFlight 1.2.0: number, phone and multi-line fields had none). Code:
@@ -139,7 +166,7 @@ The keyboard always has a way out (TestFlight 1.2.0: number, phone and multi-lin
   that slot). The registration form does this and hides its "can't be cancelled" line while the keyboard is up: on an
   iPhone SE that leaves about 150 pt of form between the nav bar and Send.
 
-## Prayer reminders (back since 1.3.0; budget and notice since 1.3.1)
+## Prayer reminders (back since 1.3.0; budget and notice since 1.3.1; athan only since 1.4.0)
 
 Owner's hard rule: a prayer notification must NEVER fire at a wrong time. If real data runs out, reminders stop; no
 estimates, no filling, no carrying a day forward (pape-admin `docs/prayer-range-migrations.md`). `prayer_cache` holds a
@@ -151,36 +178,162 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
 - Reminders fill iOS's 64 pending slots (1.3.1, decided with the owner): 63 for reminders (`reminderBudget`), 1 for the
   notice, `otherLocalNotifications = 0` (event/announcement pushes are remote; count any new local notification there).
   Whole days only, in date order from today, until the next day doesn't fit or the rows run out: 12 days with all five
-  prayers, 21 with three; a Friday's Jumu'ah takes Dhuhr's slot.
+  prayers, 21 with three.
 - The notice (`buildNotice`, id 9999, payload `open_prayer` → Prayer): "your reminders stop tomorrow, open the app" at
   10:00 Toronto on the last scheduled day; if that has passed, the middle of the next prayer gap still ahead, never in
   21:30–08:00, else none. Rebuilt with every sync, so a regular user never sees it; none when reminders are off.
-- Friday's Dhuhr is Jumu'ah: title `jumuah`, at that Friday row's `jumaaPrayerTime` (as both athan and iqamah, so "5 min
-  before" = 5 min before it); no readable Jumu'ah time → no Dhuhr reminder that day. Follows the Dhuhr switch.
+- Every reminder fires at the athan; the owner removed "5 minutes before the iqamah" in 1.4.0. `loadSettings` deletes the old
+  `prayer_reminders_timing` key, and the launch's sync replaces what was pending. Offline, or until the updated app first
+  runs, the old iqamah-time reminders stay pending; the next successful sync replaces them.
+- Friday's Dhuhr fires at the Dhuhr athan; its body gives that row's `jumaaPrayerTime` ("Öğle ezanı · Cuma namazı 13:00'te",
+  `reminderFridayBody`, `clockInSentence` adds the Turkish suffix). No readable Jumu'ah time: the plain athan text, never an
+  invented time. Follows the Dhuhr switch. The notice's gaps still go around Jumu'ah.
 - Default: a saved on/off wins; with none, on only if iOS already allows notifications (e.g. after the push pre-prompt).
   The iOS prompt never appears on its own: only `sync(ask: true)` from the reminders sheet asks. The owner rejected a
   "reminders stop" notice on 2026-10-10 and decided the local one above for 1.3.1.
 - Rescheduled on launch, resume, pull-to-refresh on Prayer, settings/language changes, and the `prayer_refresh` silent
   push (pape-admin sends it after any change to a row dated today or later, debounced; FCM data
   `{"type":"prayer_refresh"}`, `content-available`). Foreground: `PushPlatform.received`; background:
-  `onBackgroundPush`, which FlutterFire runs on iOS on the app's own engine, so the widget bridge is there too. iOS
-  may not deliver it (app swiped away, Low Power Mode, Background App Refresh off); the notice asks the member to open the app before
-  the schedule runs out.
+  `onBackgroundPush`, on the app's own engine, so the widget bridge is there too. It needs a running engine (see "UIScene lifecycle").
+  iOS may not deliver it (app swiped away, Low Power Mode, Background App Refresh off); the notice asks the member to open the app
+  before the schedule runs out.
   A failed fetch keeps what's scheduled (it came from real rows); an empty answer clears it. A background
   prayer_refresh that rescheduled is recorded locally and shown in Profil → Uygulama hakkında as "Son arka plan
   yenileme" (`BackgroundRefreshLog`), to check delivery on TestFlight.
 - No bell on the Prayer hero: next to the Donate pill it cut the mosque line on an iPhone SE. Reminders open from the
-  row under the prayer times, Profile and Settings.
+  links card under the prayer times ("Namaz bildirimleri"), Profile and Settings.
+- Screens name them "Namaz bildirimleri" / "Prayer notifications" / "Notifications de prière" everywhere (`prayerNotifications`:
+  rows, sheet title, delete-account list); `prayerReminders` is only the notifications' own wording (notice title, channel)
+  (owner, 1.4.0; `test/l10n/prayer_notifications_label_test.dart`).
+
+## Monthly times (since 1.4.0)
+
+`/prayer/monthly` (`monthly_times_screen.dart`), from Prayer's untitled links card under today's times (1.4.0: "Aylık
+vakitler" and "Namaz bildirimleri", which opens the reminders sheet; the times card holds only the times): every date from today to the last
+`prayer_cache` row, athan over iqamah, Toronto dates. `monthDays` uses `scheduleDays`' rule, so a date without its own valid
+row is listed as missing and nothing is filled or listed past the last row; an unreadable time is a dash, never its raw text.
+Today is green, Fridays gold with the Jumu'ah time in the date column, which stays in view while the prayers scroll sideways.
+Rows: `PrayerRows` (`prayer_month.dart`) keeps the reminders' fetch in memory for 15 minutes, so opening it usually makes no
+call; `refreshPrayerSchedules` (pull, `prayer_refresh`) drops them. With reminders off or after 15 minutes it fetches once.
+
+## French (audited 2026-11-02)
+
+Canadian French, `vous`, gender-neutral wording. Terms: prière, adhan, iqama, Fajr/Dhohr/Asr/Maghrib/Icha, "Prière du
+vendredi (Joumou'a)", mosquée, don, courriel. Typography: no space before `?`, `!`, `;`; no-break space before `:`; "2e".
+`test/l10n/french_strings_test.dart` enforces keys, placeholders and typography; `test/l10n/french_layout_test.dart`
+renders every main screen and sheet at 390 pt and fails on an overflow or cut text (`SHOT_DIR=<dir>` also saves PNGs).
+Native: permission prompts in `ios/Runner/{fr,tr}.lproj/InfoPlist.strings`; the widget's own texts in `WidgetText`
+(`PrayerWidget.swift`). The app name stays "Pape Mosque" on the home screen, as iOS Settings shows it.
+
+## Siri and Shortcuts (since 1.4.0)
+
+iOS 16+, ten App Shortcuts (Apple's limit) in EN/TR/FR. Same hard rule as the reminders: never a wrong or estimated time.
+Code: `ios/Runner/Siri/`, `lib/core/siri_data_sync.dart`, `lib/core/siri_bridge.dart`, `lib/core/launch_gate.dart`.
+
+- Data: three versioned JSON documents in the App Group (`siri_prayers`, `siri_events`, `siri_mosque`; shapes in
+  `siri_data_sync.dart`), each written separately so one failed fetch can't touch another. Intents read only these, no
+  network. Flutter writes every time as an instant and as text with the reminders' code; Swift compares instants and
+  repeats the text. Prayers: with the widget sync, same rows. Events: after a successful fetch (launch, resume, pull,
+  silent push); refused after 7 days. Mosque: after a content refresh and at launch.
+- `INPreferences` needs `com.apple.developer.siri` in `Runner.entitlements` and SiriKit on the App ID: without it iOS throws an
+  exception Swift can't catch, and build 26 of 1.4.0 crashed on every question ("Something went wrong"). Not the UIScene
+  migration: the Siri launch had a running engine. `test/siri/siri_entitlement_test.dart` keeps the call and the entitlement
+  together; `siri-check` signs RunnerTests ad hoc, runs the intents' `perform()` in the app and checks the entitlement.
+- Spoken answers and cards follow Siri's language (`INPreferences.siriLanguageCode()`) only when `siriAuthorizationStatus()` is
+  `.authorized`; then the language the app shows (`locale` in the widget's `prayer_widget_data`: the in-app choice or iOS's
+  per-app language), then the bundle's, then English. Never the device's first. TestFlight 1.4.0 (Turkish Siri, English
+  iPhone, app in Turkish, authorization never asked) got an English code from `siriLanguageCode()` and answered in English.
+  We don't ask for Siri authorization (no prompt, no `NSSiriUsageDescription`): asking is the owner's call. Each answer
+  records how its language was chosen, in every build; Profil → Uygulama hakkında shows it ("Son sesli yanıtın dili",
+  e.g. `tr · assistant en-US (notDetermined) · app tr · device en`) only on TestFlight or a debug build, never in the App
+  Store release. The App Store ships the TestFlight binary, so `AppDelegate.isTestBuild` reads the receipt
+  (`sandboxReceipt`), not a build flag; `showsTestLines` in `reminders_provider.dart`. Option A for 1.4.0 (owner, 2026-11-06). Tests: `SiriLogicTests`, `test/siri/siri_language_test.dart`.
+  Events are written in all three. iOS itself picks the titles in the Shortcuts app and Spotlight (`Localizable.strings`), from the
+  device's language or the app's language in iOS Settings, not Siri's: Apple documents Siri's language as able to differ. So
+  test those with the device in that language; `tool/check_siri_bundle.py` (in `siri-check`) proves the translations shipped. `test/siri/siri_terms_test.dart` keeps Swift's terms and phrases in step with the ARB files.
+- Intents are in the Runner target (Apple's rule for App Shortcuts), so a question launches the app in the background, with
+  Flutter only if iOS connects a scene (see "UIScene lifecycle"). They read only the App Group, so they answer either way.
+  `LaunchGate` keeps a Flutter launch invisible: no launch counted, no pre-prompt, no `register_device`, no reminder reschedule, no
+  sync of the panel's content, until the app really comes forward, then all of it once. (The unseen first frame can still
+  run the home screen's read-only loads, like prayer times and events; they write nothing.)
+  (`test/siri/launch_gate_test.dart` pumps the real `MytApp`). Silent pushes get the same gate and still reschedule through
+  `onBackgroundPush`. The pre-prompt also never fires over a shortcut that brought the app forward.
+- Directions and Call: Siri confirms, then `HandoffIntent` brings the app forward for a moment to open Maps or `tel:`; a
+  background intent can't open another app. iOS adds its own `tel:` alert. Donate opens `showDonateSheet`.
+- `AppIntents` is weak-linked (`-weak_framework`) because the app still runs on iOS 15.
+- App names: `INAlternativeAppNames` with per-language values in `InfoPlist.strings`, limit three per language. Turkish's
+  third is "Pape Camii'nde" so "Pape Camii'nde sıradaki namaz" matches. Apple's docs ask for an Intents extension; an Apple
+  engineer wrote (June 2026) that it keeps working for App Shortcuts. If a phone ignores them, that extension is next.
+- Prayer parameter: Siri matches the name in the phrase's language (Turkish İmsak, Öğle, İkindi, Akşam, Yatsı). No synonyms like
+  "Sabah": that initializer needs iOS 17 and the table is read at build time, so it can't vary by iOS version.
+- Turkish sentences say "13:07'de", "16:30'da" (`TurkishTime`: the suffix follows the last number said; on the hour, the
+  hour: "16:00'da"); cards keep "13:07". Each time in `siri_prayers` is `{en, tr, fr}` (document version 2): Siri's language can
+  differ from the app's, and a document missing a language is refused.
+- No Apple names in any intent text: title, description, parameter, phrase, short title, spoken or snippet text, in any language.
+  App Store Connect rejects the upload otherwise (ITMS-90626, build 23 of 1.4.0, "cannot contain 'siri'"), and only at upload.
+  `test/siri/siri_trademark_test.dart` scans the code's string literals and every `.strings` file for these names.
+- Tests: `tool/siri_swift_test.sh` runs the Foundation-only logic in Docker; workflow `siri-check` in `codemagic.yaml`
+  compiles everything (the only compile of `AppIntents` and SwiftUI code; this machine has no Xcode) and runs RunnerTests.
+
+## UIScene lifecycle (since 1.4.0)
+
+Apple requires it from Xcode 27: an app built with that SDK without UIScene fails at launch. Flutter's official migration, on
+3.38.5: `UIApplicationSceneManifest` in `Info.plist` with the stock `FlutterSceneDelegate` and no `SceneDelegate` of our own.
+`AppDelegate` is a `FlutterImplicitEngineDelegate`: plugins and the three channels are registered in
+`didInitializeImplicitFlutterEngine`; only the notification delegate is set in `didFinishLaunching`. Launch options are nil
+now, and `UIApplication.delegate.window` is nil: never use them (`test/ios/ui_scene_test.dart`).
+
+- The engine starts when the scene loads the storyboard. A launch with no scene runs no Dart. **Decided by the owner on 2026-11-05:**
+  if a `prayer_refresh` push on a cold background launch does nothing because of this, accept it and document it here; don't add
+  a custom engine or `SceneDelegate`. Reminders then update at the next launch or resume. The 12-day window and the notice cover
+  running out; a corrected time reaches a phone like that only when the app next runs. Pushes to a suspended app with a live engine are not affected.
+- iOS can drop a suspended app's scene and connect a new one, which starts a new engine, so registration must be repeatable.
+- `siri-check`: `tool/check_scene_manifest.py` reads the built `Info.plist`; `tool/check_simulator_launch.sh` launches the app
+  on a simulator and looks for the Debug-only "PapeScene" log line, which only the scene's engine can write (in the app's stderr or the
+  simulator's log). Only the Runner target's Debug config defines `DEBUG`; without it the line is compiled out and the step fails
+  with a working app, as on its first run (0103d81).
+
+## Camimizden Haberler (since 1.4.0)
+
+`lib/core/news/mosque_news.dart` reads `mosque_news` (published only; admins can read drafts), keeps the last good list in
+shared_preferences. Named apart from `newsProvider`, which means announcements. Home: `NewsRail` under the emergency banner,
+featured first, 188 pt cards so the times stay near; hidden with no news. Community: third segment, shown once something is
+published; the segment lives in `communitySegmentProvider` so the rail's "See all" can open it. Detail: `NewsDetailScreen`
+(4:5 `PageView`, dots, tap for `NewsViewer`, pinch to zoom). `NewsPhotoFrame`: a crop fills it; `fit: contain` shows the whole
+photo over `PosterBackdrop`, and the viewer shows it clean. Push: `news_id` → `/community/news/:id`. Kill switch
+`features.news`. With Events and Announcements both off there's no Community tab, so the rail has no "See all".
+
+## Announcement photos on cards (since 1.4.0)
+
+`PosterFrame` (`announcement_photo.dart`), the website's rule: the card keeps its 16:9 frame and the whole image shows
+(contain), over a blurred, darkened copy of itself. Within 2% of 16:9 it just fills the frame, so photos look as before. The
+detail page keeps the natural size. Event photos (`PhotoBand`) still crop.
+
+## Clock times (since 1.4.0)
+
+English "4:55 PM", Turkish "16:55" (morning "05:43"), French "16 h 55" (no-break spaces; on the hour "16 h"). One function,
+`clockText` in `lib/shared/formatters.dart`, behind `prayerClockText` and `eventTime`; the widget and Siri get its text from
+Flutter. Display only: instants and scheduling never read it (`test/l10n/clock_format_test.dart`, DST days included).
+`french_layout_test.dart` fails on a 12-hour or colon time on any French screen. Free text from the panel isn't converted.
 
 ## App Store screenshots (branch `screenshots`)
 
-6.9" (1320×2868), en + tr, made on Codemagic's macOS machines by a second, yaml-configured Codemagic app (workflow
-`screenshots` in `codemagic.yaml`; the release app stays in the Workflow Editor and ignores that file). It builds
-`screenshots/main.dart` for the simulator (no signing) and `screenshots/take.sh` launches it once per shot on an iPhone 16
-Pro Max with a 9:41 status bar. The entry point runs the real app through `startApp()` (`lib/main.dart`) on live data,
-signed out, and never writes to the database (no `register_device`, no `record_event_view`). PNGs are build artifacts.
+6.9" (1320×2868), en + tr + fr, made on Codemagic's macOS machines by the yaml-configured Codemagic app (workflow
+`screenshots` in `codemagic.yaml`, started by hand from this branch; switch the app back to the Workflow Editor
+afterwards). It builds `screenshots/main.dart` for the simulator (no signing) and `screenshots/take.sh` launches it once
+per raw shot on an iPhone 16 Pro Max with a 9:41 status bar. The entry point runs the real app through `startApp()`
+(`lib/main.dart`) on live data, signed out, and never writes to the database (no `register_device`, no
+`record_event_view`). Raw PNGs are build artifacts; a missing screen (no "Gençlik Buluşması" event, no published mosque
+news with photos, no donation funds) fails the run instead of showing something else.
+
+`screenshots/compose.py` turns the raw shots into the ten App Store slides (1.4.0 order: Diyanet, athan notifications,
+widgets, iqamah/Jumu'ah, monthly, news, community + event, donate, marriage/funeral, languages + dark). The design is the
+1.0.x set's, measured from its PNGs; Inter stands in for SF Pro; the widget slide is drawn, not captured. Images never go
+into git.
 
 ## Release checklist
+
+Full guide: `docs/RELEASE.md`.
 
 1. `dart run tool/gen_content_defaults.dart` (refreshes `assets/content_defaults.json` from the live bundle;
    the banner is never bundled). Commit the result if it changed.

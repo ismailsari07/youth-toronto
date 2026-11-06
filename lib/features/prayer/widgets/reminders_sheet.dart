@@ -26,12 +26,9 @@ import '../../../ui/components/motion.dart';
 Future<void> showRemindersSheet(BuildContext context) =>
     showAppSheet<void>(context: context, builder: (_) => const _RemindersSheet());
 
-/// "Off", "On · At athan time" or "On · 5 min before iqamah".
-String remindersSummary(AppLocalizations l, ReminderSettings s) => !s.active
-    ? l.remindersSummaryOff
-    : s.timing == ReminderTiming.atAthan
-        ? l.remindersSummaryAthan
-        : l.remindersSummaryIqamah;
+/// "Off" or "On · At athan time".
+String remindersSummary(AppLocalizations l, ReminderSettings s) =>
+    s.active ? l.remindersSummaryAthan : l.remindersSummaryOff;
 
 /// The settings row for prayer notifications: a summary that opens the
 /// sheet. The same on Prayer, Profile and Settings.
@@ -50,7 +47,7 @@ class RemindersRow extends ConsumerWidget {
       divided: divided,
       background: background,
       icon: settings.active ? AppIcons.bell : AppIcons.bellOff,
-      title: l.prayerReminders,
+      title: l.prayerNotifications,
       subtitle: remindersSummary(l, settings),
       trailing: const RowChevron(),
       onTap: () => showRemindersSheet(context),
@@ -141,7 +138,6 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
     final blocked = settings.active && _allowed == false;
     final athanBundled = ref.watch(athanBundledProvider).valueOrNull ?? false;
     final sound = settings.soundWith(athanBundled: athanBundled);
-    final atAthan = settings.timing == ReminderTiming.atAthan;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -171,7 +167,7 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
               ),
               const SizedBox(height: 20),
               Text(
-                l.prayerReminders,
+                l.prayerNotifications,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)
                     .c(context.colors.ink),
@@ -232,61 +228,27 @@ class _RemindersSheetState extends ConsumerState<_RemindersSheet> {
                       ),
                       const SizedBox(height: AppSpace.cardGapWide),
                       _Section(
-                        title: l.remindersNotifyMe,
+                        title: l.notificationSound,
                         off: off,
                         rows: [
-                          _ChoiceRow(
-                            title: l.notifyAtAthan,
-                            selected: atAthan,
-                            onTap: () =>
-                                _settings.setTiming(ReminderTiming.atAthan),
-                          ),
-                          _ChoiceRow(
-                            divided: true,
-                            title: l.notifyBeforeIqamah,
-                            selected: !atAthan,
-                            onTap: () => _settings
-                                .setTiming(ReminderTiming.beforeIqamah),
-                          ),
+                          for (final (i, s) in [
+                            if (athanBundled) ReminderSound.athan,
+                            ReminderSound.standard,
+                            ReminderSound.silent,
+                          ].indexed)
+                            _ChoiceRow(
+                              divided: i > 0,
+                              title: _soundName(l, s),
+                              selected: s == sound,
+                              onTap: () => _settings.setSound(s),
+                              preview: s == ReminderSound.silent
+                                  ? null
+                                  : _PreviewButton(
+                                      playing: _playing == s,
+                                      onTap: () => _togglePreview(s),
+                                    ),
+                            ),
                         ],
-                      ),
-                      // The sound only applies at athan time.
-                      FadeSwitch(
-                        animateSize: true,
-                        child: atAthan
-                            ? Padding(
-                                key: const ValueKey('sound'),
-                                padding: const EdgeInsets.only(
-                                  top: AppSpace.cardGapWide,
-                                ),
-                                child: _Section(
-                                  title: l.notificationSound,
-                                  off: off,
-                                  rows: [
-                                    for (final (i, s) in [
-                                      if (athanBundled) ReminderSound.athan,
-                                      ReminderSound.standard,
-                                      ReminderSound.silent,
-                                    ].indexed)
-                                      _ChoiceRow(
-                                        divided: i > 0,
-                                        title: _soundName(l, s),
-                                        selected: s == sound,
-                                        onTap: () => _settings.setSound(s),
-                                        preview: s == ReminderSound.silent
-                                            ? null
-                                            : _PreviewButton(
-                                                playing: _playing == s,
-                                                onTap: () => _togglePreview(s),
-                                              ),
-                                      ),
-                                  ],
-                                ),
-                              )
-                            : const SizedBox(
-                                key: ValueKey('no-sound'),
-                                width: double.infinity,
-                              ),
                       ),
                     ],
                   ),

@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,7 +16,7 @@ import '../../theme/app_tokens.dart';
 /// fails, the photo collapses to nothing (never a broken-image icon), so the
 /// card looks as it would without a photo.
 class AnnouncementPhoto extends StatefulWidget {
-  /// Cropped to 16:9 (cover, top-weighted), for the cards.
+  /// A 16:9 frame that never crops, for the cards: see [PosterFrame].
   const AnnouncementPhoto.cover({
     super.key,
     required this.url,
@@ -64,29 +66,28 @@ class _AnnouncementPhotoState extends State<AnnouncementPhoto> {
       child: ColoredBox(color: context.colors.shimmerFrom),
     );
 
-    final image = Image(
-      image: NetworkImage(widget.url),
-      width: double.infinity,
-      fit: widget.natural ? BoxFit.fitWidth : BoxFit.cover,
-      // Top-weighted crop, so faces and poster headers survive in portrait
-      // photos.
-      alignment: widget.natural ? Alignment.center : const Alignment(0, -0.4),
-      // Labelled below, so the placeholder carries the alt text too.
-      excludeFromSemantics: true,
-      frameBuilder: (context, child, frame, sync) {
-        if (frame == null) return placeholder;
-        return widget.natural
-            ? child
-            : AspectRatio(aspectRatio: 16 / 9, child: child);
-      },
-      errorBuilder: (_, _, _) {
-        // Collapse after this frame; returning an empty box meanwhile.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && !_failed) setState(() => _failed = true);
-        });
-        return const SizedBox.shrink();
-      },
-    );
+    void collapse() {
+      // After this frame; an empty box meanwhile.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_failed) setState(() => _failed = true);
+      });
+    }
+
+    final Widget image = widget.natural
+        ? Image(
+            image: NetworkImage(widget.url),
+            width: double.infinity,
+            fit: BoxFit.fitWidth,
+            // Labelled below, so the placeholder carries the alt text too.
+            excludeFromSemantics: true,
+            frameBuilder: (context, child, frame, sync) =>
+                frame == null ? placeholder : child,
+            errorBuilder: (_, _, _) {
+              collapse();
+              return const SizedBox.shrink();
+            },
+          )
+        : PosterFrame(image: NetworkImage(widget.url), onFailed: collapse);
 
     final onTap = widget.onTap;
     final labelled = alt == null || alt.isEmpty
@@ -99,6 +100,150 @@ class _AnnouncementPhotoState extends State<AnnouncementPhoto> {
             child: GestureDetector(onTap: onTap, child: labelled),
           );
     return widget.wrap?.call(photo) ?? photo;
+  }
+}
+
+/// How far from the frame's shape an image may be and still fill it: a 16:9
+/// photo whose pixel size rounds to 1.77 or 1.78 shouldn't grow side bars.
+const _sameShapeTolerance = 0.02;
+
+/// The card's 16:9 frame around an image of any shape, the website's rule: the
+/// whole image always shows (contain), and a blurred, darkened copy of it fills
+/// what's left. A 16:9 photo fills the frame and looks as it always did.
+class PosterFrame extends StatefulWidget {
+  const PosterFrame({super.key, required this.image, this.onFailed});
+
+  static const aspectRatio = 16 / 9;
+
+  final ImageProvider image;
+
+  /// The image can't be loaded; the caller decides what's left.
+  final VoidCallback? onFailed;
+
+  /// Whether an image of this shape leaves part of the frame empty.
+  static bool leavesRoom(double imageAspect) =>
+      (imageAspect / aspectRatio - 1).abs() > _sameShapeTolerance;
+
+  @override
+  State<PosterFrame> createState() => _PosterFrameState();
+}
+
+class _PosterFrameState extends State<PosterFrame> {
+  ImageStream? _stream;
+  ImageStreamListener? _listener;
+  double? _aspect;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _listen();
+  }
+
+  @override
+  void didUpdateWidget(PosterFrame old) {
+    super.didUpdateWidget(old);
+    if (old.image != widget.image) {
+      _aspect = null;
+      _listen();
+    }
+  }
+
+  /// Only the size is wanted here; the visible [Image]s read the same
+  /// provider, so this adds no download.
+  void _listen() {
+    final stream = widget.image.resolve(createLocalImageConfiguration(context));
+    if (stream.key == _stream?.key) return;
+    _stopListening();
+    final listener = ImageStreamListener(
+      (info, _) {
+        final aspect = info.image.width / info.image.height;
+        info.dispose();
+        if (mounted) setState(() => _aspect = aspect);
+      },
+      // The visible Image reports the failure.
+      onError: (_, _) {},
+    );
+    _stream = stream..addListener(listener);
+    _listener = listener;
+  }
+
+  void _stopListening() {
+    final listener = _listener;
+    if (listener != null) _stream?.removeListener(listener);
+    _stream = null;
+    _listener = null;
+  }
+
+  @override
+  void dispose() {
+    _stopListening();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final aspect = _aspect;
+    final backdrop = aspect != null && PosterFrame.leavesRoom(aspect);
+    return AspectRatio(
+      aspectRatio: PosterFrame.aspectRatio,
+      child: ClipRect(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (backdrop) PosterBackdrop(image: widget.image),
+            Image(
+              image: widget.image,
+              // Fills exactly when the shapes match; otherwise never crops.
+              fit: aspect == null || backdrop ? BoxFit.contain : BoxFit.cover,
+              // Labelled by AnnouncementPhoto, placeholder included.
+              excludeFromSemantics: true,
+              frameBuilder: (context, child, frame, sync) => frame == null
+                  ? ColoredBox(color: context.colors.shimmerFrom)
+                  : child,
+              errorBuilder: (_, _, _) {
+                widget.onFailed?.call();
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A small decode of the same image, stretched and blurred: at this size it
+/// costs almost nothing to draw while a list of cards scrolls.
+class PosterBackdrop extends StatelessWidget {
+  const PosterBackdrop({super.key, required this.image});
+
+  final ImageProvider image;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      key: const Key('poster-backdrop'),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ImageFiltered(
+            imageFilter: ui.ImageFilter.blur(
+              sigmaX: 18,
+              sigmaY: 18,
+              tileMode: TileMode.clamp,
+            ),
+            child: Image(
+              image: ResizeImage(image, width: 96),
+              fit: BoxFit.cover,
+              excludeFromSemantics: true,
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            ),
+          ),
+          // The same in light and dark: it sits under a photo, not on the page.
+          const ColoredBox(color: Color(0x59000000)),
+        ],
+      ),
+    );
   }
 }
 

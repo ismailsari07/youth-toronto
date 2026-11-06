@@ -6,12 +6,14 @@ import '../app/tab_branch_container.dart';
 import '../features/community/screens/announcement_detail_screen.dart';
 import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
+import '../features/community/screens/news_detail_screen.dart';
 import '../features/marriage/data/marriage_application.dart';
 import '../features/marriage/screens/marriage_gate_screen.dart';
 import '../features/marriage/screens/marriage_received_screen.dart';
 import '../features/marriage/screens/marriage_status_screen.dart';
 import '../features/marriage/screens/marriage_upload_screen.dart';
 import '../features/marriage/screens/marriage_viewer_screen.dart';
+import '../features/prayer/screens/monthly_times_screen.dart';
 import '../features/prayer/screens/prayer_home_screen.dart';
 import '../features/profile/screens/burial_services_screen.dart';
 import '../features/profile/screens/delete_account_screen.dart';
@@ -20,12 +22,15 @@ import '../features/profile/screens/profile_root_screen.dart';
 import '../features/profile/screens/service_detail_screen.dart';
 import '../features/profile/screens/settings_screen.dart';
 import '../features/profile/screens/sign_in_screen.dart';
+import '../features/profile/screens/confirm_email_screen.dart';
+import '../features/profile/screens/reset_password_screen.dart';
 import '../features/profile/screens/sign_up_screen.dart';
 import '../features/push/item_loader_screens.dart';
 import '../features/registration/registration_screen.dart';
 import 'content/content_bundle.dart';
 import 'event_schedule.dart';
 import 'models.dart';
+import 'news/mosque_news.dart';
 
 final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -60,6 +65,13 @@ final router = GoRouter(
               path: '/prayer',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: PrayerHomeScreen()),
+              routes: [
+                GoRoute(
+                  path: 'monthly',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MonthlyTimesScreen(),
+                ),
+              ],
             ),
           ],
         ),
@@ -92,6 +104,13 @@ final router = GoRouter(
                     item: state.extra! as Announcement,
                   ),
                 ),
+                GoRoute(
+                  path: 'news',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => NewsDetailScreen(
+                    item: state.extra! as MosqueNews,
+                  ),
+                ),
                 // Tapped notifications: loaded by id (lib/core/push/push_route.dart).
                 GoRoute(
                   path: 'event/:id',
@@ -105,6 +124,13 @@ final router = GoRouter(
                   path: 'announcement/:id',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => AnnouncementByIdScreen(
+                    id: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'news/:id',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => NewsByIdScreen(
                     id: state.pathParameters['id']!,
                   ),
                 ),
@@ -129,6 +155,24 @@ final router = GoRouter(
                   path: 'sign-up',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const SignUpScreen(),
+                ),
+                GoRoute(
+                  path: 'confirm-email',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) {
+                    final extra = state.extra;
+                    return ConfirmEmailScreen(
+                      email: extra is ConfirmEmailArgs ? extra.email : '',
+                      sendOnOpen: extra is ConfirmEmailArgs && extra.sendOnOpen,
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'reset-password',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => ResetPasswordScreen(
+                    email: state.extra is String ? state.extra! as String : '',
+                  ),
                 ),
                 GoRoute(
                   path: 'settings',

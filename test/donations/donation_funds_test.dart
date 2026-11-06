@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:myt_flutter/core/content/content_bundle.dart';
 import 'package:myt_flutter/core/donations/donation_funds.dart';
 
 /// The live `donation_funds` rows (2026-10-14), plus the hidden holding
@@ -73,6 +74,61 @@ void main() {
         {'slug': 'good', 'title': '  Trimmed  ', 'is_active': true},
       ]);
       expect(funds, [const DonationFund(slug: 'good', title: 'Trimmed')]);
+    });
+
+    test('picks the title in the language, then English, then Turkish', () {
+      final funds = DonationFunds.parse([
+        {
+          'slug': 'all',
+          'title': 'Zekât',
+          'title_i18n': {'tr': 'Zekât', 'en': 'Zakat', 'fr': 'Zakât FR'},
+          'is_active': true,
+        },
+        {
+          'slug': 'en',
+          'title': 'Sadaka',
+          'title_i18n': {'tr': 'Sadaka', 'en': 'Charity'},
+          'is_active': true,
+        },
+        {
+          'slug': 'tr',
+          'title': 'Fitre',
+          'title_i18n': {'tr': 'Fitre'},
+          'is_active': true,
+        },
+      ]);
+      expect(funds[0].titleIn('fr'), 'Zakât FR');
+      expect(funds[0].titleIn('en'), 'Zakat');
+      expect(funds[0].titleIn('tr'), 'Zekât');
+      expect(funds[1].titleIn('fr'), 'Charity');
+      expect(funds[2].titleIn('fr'), 'Fitre');
+      expect(funds[2].titleIn('en'), 'Fitre');
+    });
+
+    test('a list cached without title_i18n falls back to title', () {
+      final funds = DonationFunds.parse(liveRows());
+      expect(funds.first.titleIn('fr'), 'Zekât');
+      expect(funds.first.titleIn('en'), 'Zekât');
+    });
+
+    test('unusable title_i18n falls back to title', () {
+      for (final bad in [null, 'Zakat', 5, <String, dynamic>{}, {'en': ''}]) {
+        final funds = DonationFunds.parse([
+          {'slug': 'z', 'title': 'Zekât', 'title_i18n': bad, 'is_active': true},
+        ]);
+        expect(funds.single.titleIn('en'), 'Zekât');
+      }
+    });
+
+    test('a changed translation is a changed fund', () {
+      const a = DonationFund(slug: 'z', title: 'Z');
+      final b = DonationFund(
+        slug: 'z',
+        title: 'Z',
+        titles: I18n.parse({'tr': 'Z', 'en': 'Zakat'}),
+      );
+      expect(a, isNot(b));
+      expect(a, const DonationFund(slug: 'z', title: 'Z'));
     });
 
     test('anything but a list is no funds', () {

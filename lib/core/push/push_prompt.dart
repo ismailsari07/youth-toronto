@@ -37,6 +37,17 @@ abstract final class PushPromptStore {
   static const _dismissals = 'push_prompt_dismissals';
   static const _lastDismissed = 'push_prompt_last_dismissed_ms';
 
+  /// What [countLaunch] would return, without counting: a background launch
+  /// isn't a launch until the app comes forward.
+  static Future<int> nextLaunch() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return (prefs.getInt(_launches) ?? 0) + 1;
+    } catch (_) {
+      return 1;
+    }
+  }
+
   /// Counts this launch and returns the total (1 on the first launch).
   static Future<int> countLaunch() async {
     try {

@@ -5,6 +5,7 @@ import '../../core/event_schedule.dart';
 import '../../core/events_news_service.dart';
 import '../../core/models.dart';
 import '../../core/mosque_time.dart';
+import '../../core/news/mosque_news.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/app_icon.dart';
 import '../../theme/app_theme.dart';
@@ -14,6 +15,7 @@ import '../../ui/components/app_card.dart';
 import '../../ui/components/app_scaffolding.dart';
 import '../community/screens/announcement_detail_screen.dart';
 import '../community/screens/event_detail_screen.dart';
+import '../community/screens/news_detail_screen.dart';
 
 /// A tapped notification's event, loaded by id: it may not be in the list
 /// the app has (or has loaded yet). With [occurrence] (yyyy-mm-dd), a
@@ -119,6 +121,52 @@ class _AnnouncementByIdScreenState extends State<AnnouncementByIdScreen> {
           );
         }
         return AnnouncementDetailScreen(item: item);
+      },
+    );
+  }
+}
+
+class NewsByIdScreen extends StatefulWidget {
+  const NewsByIdScreen({super.key, required this.id});
+
+  final String id;
+
+  @override
+  State<NewsByIdScreen> createState() => _NewsByIdScreenState();
+}
+
+class _NewsByIdScreenState extends State<NewsByIdScreen> {
+  late Future<MosqueNews?> _future = MosqueNewsService.fetchOne(widget.id);
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return FutureBuilder<MosqueNews?>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return _LoadingPage(eyebrow: l.newsSection);
+        }
+        if (snap.hasError) {
+          return _MessagePage(
+            eyebrow: l.newsSection,
+            icon: AppIcons.photo,
+            title: l.errorNetwork,
+            onRetry: () => setState(
+              () => _future = MosqueNewsService.fetchOne(widget.id),
+            ),
+          );
+        }
+        final item = snap.data;
+        if (item == null) {
+          return _MessagePage(
+            eyebrow: l.newsSection,
+            icon: AppIcons.photo,
+            title: l.newsGone,
+            body: l.goneBody,
+          );
+        }
+        return NewsDetailScreen(item: item);
       },
     );
   }

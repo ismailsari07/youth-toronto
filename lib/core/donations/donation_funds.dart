@@ -4,21 +4,41 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// One fund from the website's `donation_funds` table. The title is a single
-/// text in Turkish, shown as written in every language.
+import '../content/content_bundle.dart';
+
+/// One fund from the `donation_funds` table. [titles] is the panel's
+/// `title_i18n`; [title] is the plain column (a copy of the Turkish title),
+/// which also serves lists cached before translations existed.
 @immutable
 class DonationFund {
-  const DonationFund({required this.slug, required this.title});
+  const DonationFund({
+    required this.slug,
+    required this.title,
+    this.titles = I18n.empty,
+  });
 
   final String slug;
   final String title;
+  final I18n titles;
+
+  /// The title in [lang], then English, then Turkish.
+  String titleIn(String lang) {
+    final text = titles.resolve(lang);
+    return text.isEmpty ? title : text;
+  }
 
   @override
   bool operator ==(Object other) =>
-      other is DonationFund && other.slug == slug && other.title == title;
+      other is DonationFund &&
+      other.slug == slug &&
+      other.title == title &&
+      other.titleIn('tr') == titleIn('tr') &&
+      other.titleIn('en') == titleIn('en') &&
+      other.titleIn('fr') == titleIn('fr');
 
   @override
-  int get hashCode => Object.hash(slug, title);
+  int get hashCode =>
+      Object.hash(slug, title, titleIn('tr'), titleIn('en'), titleIn('fr'));
 }
 
 /// The donation funds the app offers. Donations themselves happen on the
@@ -49,11 +69,12 @@ abstract final class DonationFunds {
         continue;
       }
       if (title is! String || title.trim().isEmpty) continue;
+      final titles = I18n.parse(row['title_i18n']);
       final order = row['display_order'];
       rows.add((
         order is num ? order.toInt() : 1 << 30,
         i,
-        DonationFund(slug: slug, title: title.trim()),
+        DonationFund(slug: slug, title: title.trim(), titles: titles),
       ));
     }
     rows.sort((a, b) => a.$1 != b.$1 ? a.$1 - b.$1 : a.$2 - b.$2);
@@ -77,7 +98,7 @@ abstract final class DonationFunds {
   static Future<List<DonationFund>> fetch() async {
     final raw = await Supabase.instance.client
         .from('donation_funds')
-        .select('slug, title, display_order, is_active')
+        .select('slug, title, title_i18n, display_order, is_active')
         .eq('is_active', true)
         .order('display_order');
     try {

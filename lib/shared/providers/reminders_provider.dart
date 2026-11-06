@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/notification_sounds.dart';
 import '../../core/prayer_refresh.dart';
 import '../../core/reminder_settings.dart';
 import '../../core/reminder_sync.dart';
+import '../../core/siri_bridge.dart';
 
 /// The device's prayer-notification settings: the one source for the bell,
 /// its sheet and the summary rows on Prayer, Profile and Settings, so every
@@ -22,6 +24,24 @@ final athanBundledProvider =
 /// background (null: never). Read again each time the About sheet opens.
 final lastBackgroundRefreshProvider =
     FutureProvider.autoDispose<DateTime?>((ref) => BackgroundRefreshLog.load());
+
+/// Test lines in About this app (the voice answer language) show only in a
+/// debug build or a TestFlight install, never in the App Store release.
+bool showsTestLines({required bool debug, required bool testFlight}) =>
+    debug || testFlight;
+
+final testLinesVisibleProvider = FutureProvider<bool>(
+  (ref) async => showsTestLines(
+    debug: kDebugMode,
+    testFlight: await SiriBridge.isTestBuild(),
+  ),
+);
+
+/// How the last shortcut answer's language was chosen (null: none yet).
+/// Recorded on every answer, App Store builds included; only shown in tests.
+/// Read again each time the About sheet opens.
+final voiceAnswerLanguageProvider =
+    FutureProvider.autoDispose<String?>((ref) => SiriBridge.languageNote());
 
 class ReminderSettingsNotifier extends AsyncNotifier<ReminderSettings> {
   @override
@@ -51,9 +71,6 @@ class ReminderSettingsNotifier extends AsyncNotifier<ReminderSettings> {
       ),
     );
   }
-
-  Future<void> setTiming(ReminderTiming timing) =>
-      _save(_current.copyWith(timing: timing));
 
   Future<void> setSound(ReminderSound sound) =>
       _save(_current.copyWith(sound: sound));

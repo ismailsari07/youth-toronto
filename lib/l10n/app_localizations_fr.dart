@@ -1521,4 +1521,101 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get newsViewerHintOne => 'Pincez pour zoomer';
+
+  @override
+  String get forgotPassword => 'Mot de passe oublié?';
+
+  @override
+  String get confirmEmailTitle => 'Confirmez votre courriel';
+
+  @override
+  String confirmEmailSubtitle(String email) {
+    return 'Nous avons envoyé un code à 6 chiffres à $email.';
+  }
+
+  @override
+  String get emailCodeLabel => 'Code à 6 chiffres';
+
+  @override
+  String get enterEmailCode => 'Entrez le code à 6 chiffres du courriel.';
+
+  @override
+  String get confirmEmailButton => 'Confirmer';
+
+  @override
+  String get confirmingEmail => 'Confirmation…';
+
+  @override
+  String get resendCode => 'Renvoyer le code';
+
+  @override
+  String resendCodeIn(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Renvoyer le code ($seconds s)',
+      one: 'Renvoyer le code (1 s)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get codeSentAgain => 'Un nouveau code a été envoyé.';
+
+  @override
+  String get confirmLaterNote =>
+      'Vous ne trouvez pas le courriel? Vérifiez vos courriels indésirables. Votre compte est enregistré : vous pourrez aussi le confirmer plus tard, à votre prochaine connexion.';
+
+  @override
+  String get errorInvalidCode =>
+      'Ce code est erroné ou a expiré. Vérifiez-le ou demandez-en un nouveau.';
+
+  @override
+  String get errorSamePassword =>
+      'Choisissez un mot de passe différent de l\'ancien.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'Un compte existe déjà avec ce courriel. Connectez-vous ou réinitialisez le mot de passe si vous l\'avez oublié.';
+
+  @override
+  String get resetPasswordTitle => 'Réinitialiser le mot de passe';
+
+  @override
+  String get resetEmailSubtitle =>
+      'Entrez le courriel de votre compte et nous vous enverrons un code à 6 chiffres.';
+
+  @override
+  String get sendCode => 'Envoyer le code';
+
+  @override
+  String get sendingCode => 'Envoi…';
+
+  @override
+  String resetCodeSubtitle(String email) {
+    return 'Si $email est associé à un compte, nous y avons envoyé un code à 6 chiffres.';
+  }
+
+  @override
+  String get continueButton => 'Continuer';
+
+  @override
+  String get checkingCode => 'Vérification…';
+
+  @override
+  String get resetCodeNote =>
+      'Aucun courriel après quelques minutes? Vérifiez vos courriels indésirables et l\'adresse. Les comptes créés avec Apple n\'ont pas de mot de passe : utilisez « Se connecter avec Apple ».';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Choisissez un nouveau mot de passe. Votre session reste ouverte sur ce téléphone.';
+
+  @override
+  String get newPassword => 'Nouveau mot de passe';
+
+  @override
+  String get savePassword => 'Enregistrer le mot de passe';
+
+  @override
+  String get passwordChanged => 'Votre mot de passe a été modifié.';
 }

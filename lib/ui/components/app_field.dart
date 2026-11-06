@@ -21,6 +21,7 @@ class AppField extends StatelessWidget {
     this.onTap,
     this.last = false,
     this.onSubmit,
+    this.autofillHints,
   });
 
   final String label;
@@ -36,6 +37,7 @@ class AppField extends StatelessWidget {
   /// See [AppTextInput.last] and [AppTextInput.onSubmit].
   final bool last;
   final VoidCallback? onSubmit;
+  final Iterable<String>? autofillHints;
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +81,7 @@ class AppField extends StatelessWidget {
                   keyboardType: keyboardType,
                   readOnly: readOnly,
                   onTap: onTap,
+                  autofillHints: autofillHints,
                   cursorColor: context.colors.green,
                   style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w500)
                       .c(context.colors.ink),

@@ -37,6 +37,9 @@ class AppTextInput extends StatefulWidget {
     this.last = false,
     this.onSubmit,
     this.cursorColor,
+    this.textAlign = TextAlign.start,
+    this.autofillHints,
+    this.autofocus = false,
   });
 
   final TextEditingController controller;
@@ -53,6 +56,9 @@ class AppTextInput extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
   final Color? cursorColor;
+  final TextAlign textAlign;
+  final Iterable<String>? autofillHints;
+  final bool autofocus;
 
   /// The screen's last field: return says "Done" instead of "Next".
   final bool last;
@@ -153,6 +159,9 @@ class _AppTextInputState extends State<AppTextInput> {
       inputFormatters: widget.inputFormatters,
       onChanged: widget.onChanged,
       cursorColor: widget.cursorColor,
+      textAlign: widget.textAlign,
+      autofillHints: widget.autofillHints,
+      autofocus: widget.autofocus,
       textInputAction: _multiline
           ? TextInputAction.newline
           : widget.last

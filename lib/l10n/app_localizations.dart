@@ -2565,6 +2565,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pinch to zoom'**
   String get newsViewerHintOne;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @confirmEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email'**
+  String get confirmEmailTitle;
+
+  /// No description provided for @confirmEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to {email}.'**
+  String confirmEmailSubtitle(String email);
+
+  /// Label above the code field.
+  ///
+  /// In en, this message translates to:
+  /// **'6-digit code'**
+  String get emailCodeLabel;
+
+  /// No description provided for @enterEmailCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code from the email.'**
+  String get enterEmailCode;
+
+  /// No description provided for @confirmEmailButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmEmailButton;
+
+  /// No description provided for @confirmingEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirming…'**
+  String get confirmingEmail;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the code again'**
+  String get resendCode;
+
+  /// No description provided for @resendCodeIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds, plural, one{Send the code again (1 s)} other{Send the code again ({seconds} s)}}'**
+  String resendCodeIn(int seconds);
+
+  /// No description provided for @codeSentAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'A new code is on its way.'**
+  String get codeSentAgain;
+
+  /// No description provided for @confirmLaterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find the email? Check your junk folder. Your account is saved: you can also confirm later, the next time you sign in.'**
+  String get confirmLaterNote;
+
+  /// No description provided for @errorInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That code is wrong or has expired. Check it, or ask for a new one.'**
+  String get errorInvalidCode;
+
+  /// No description provided for @errorSamePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a password different from your old one.'**
+  String get errorSamePassword;
+
+  /// No description provided for @emailAlreadyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'This email already has an account. Sign in, or reset the password if you\'ve forgotten it.'**
+  String get emailAlreadyRegistered;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your password'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @resetEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your account\'s email and we\'ll send you a 6-digit code.'**
+  String get resetEmailSubtitle;
+
+  /// No description provided for @sendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code'**
+  String get sendCode;
+
+  /// No description provided for @sendingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get sendingCode;
+
+  /// No description provided for @resetCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If {email} has an account, we\'ve sent it a 6-digit code.'**
+  String resetCodeSubtitle(String email);
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
+
+  /// No description provided for @checkingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get checkingCode;
+
+  /// No description provided for @resetCodeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'No email after a few minutes? Check your junk folder and the address. Accounts made with Apple have no password: use Sign in with Apple.'**
+  String get resetCodeNote;
+
+  /// No description provided for @newPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new password. You\'ll stay signed in on this phone.'**
+  String get newPasswordSubtitle;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// No description provided for @savePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Save password'**
+  String get savePassword;
+
+  /// No description provided for @passwordChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed.'**
+  String get passwordChanged;
 }
 
 class _AppLocalizationsDelegate

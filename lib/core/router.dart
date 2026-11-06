@@ -22,6 +22,8 @@ import '../features/profile/screens/profile_root_screen.dart';
 import '../features/profile/screens/service_detail_screen.dart';
 import '../features/profile/screens/settings_screen.dart';
 import '../features/profile/screens/sign_in_screen.dart';
+import '../features/profile/screens/confirm_email_screen.dart';
+import '../features/profile/screens/reset_password_screen.dart';
 import '../features/profile/screens/sign_up_screen.dart';
 import '../features/push/item_loader_screens.dart';
 import '../features/registration/registration_screen.dart';
@@ -153,6 +155,24 @@ final router = GoRouter(
                   path: 'sign-up',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const SignUpScreen(),
+                ),
+                GoRoute(
+                  path: 'confirm-email',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) {
+                    final extra = state.extra;
+                    return ConfirmEmailScreen(
+                      email: extra is ConfirmEmailArgs ? extra.email : '',
+                      sendOnOpen: extra is ConfirmEmailArgs && extra.sendOnOpen,
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'reset-password',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => ResetPasswordScreen(
+                    email: state.extra is String ? state.extra! as String : '',
+                  ),
                 ),
                 GoRoute(
                   path: 'settings',

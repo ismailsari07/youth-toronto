@@ -11,6 +11,10 @@ enum AuthFailure {
   emailTaken,
   weakPassword,
   emailNotConfirmed,
+  /// A 6-digit email code that is wrong or expired.
+  invalidCode,
+  /// A new password equal to the old one.
+  samePassword,
   rateLimited,
   network,
   sessionExpired,
@@ -68,30 +72,7 @@ class AuthService {
       await _client.auth.signInWithPassword(email: email, password: password);
       return null;
     } on AuthException catch (e) {
-      return _fromAuthException(e);
-    } catch (_) {
-      return (kind: AuthFailure.unexpected, serverMessage: null);
-    }
-  }
-
-  static Future<AuthError?> signUpWithEmail(
-    String email,
-    String password,
-    String fullName, {
-    required String phone,
-    required DateTime dateOfBirth,
-  }) async {
-    try {
-      final dob =
-          '${dateOfBirth.year}-${dateOfBirth.month.toString().padLeft(2, '0')}-${dateOfBirth.day.toString().padLeft(2, '0')}';
-      await _client.auth.signUp(
-        email: email,
-        password: password,
-        data: {'full_name': fullName, 'phone': phone, 'date_of_birth': dob},
-      );
-      return null;
-    } on AuthException catch (e) {
-      return _fromAuthException(e);
+      return errorFrom(e);
     } catch (_) {
       return (kind: AuthFailure.unexpected, serverMessage: null);
     }
@@ -128,7 +109,7 @@ class AuthService {
         nonce: rawNonce,
       );
     } on AuthException catch (e) {
-      return _fromAuthException(e);
+      return errorFrom(e);
     } catch (_) {
       return (kind: AuthFailure.network, serverMessage: null);
     }
@@ -168,7 +149,7 @@ class AuthService {
       );
       return null;
     } on AuthException catch (e) {
-      return _fromAuthException(e);
+      return errorFrom(e);
     } catch (_) {
       return (kind: AuthFailure.network, serverMessage: null);
     }
@@ -216,7 +197,7 @@ class AuthService {
     return providers is List && providers.contains('google');
   }
 
-  static AuthError _fromAuthException(AuthException e) {
+  static AuthError errorFrom(AuthException e) {
     if (e is AuthRetryableFetchException) {
       return (kind: AuthFailure.network, serverMessage: null);
     }
@@ -225,6 +206,8 @@ class AuthService {
       'user_already_exists' || 'email_exists' => AuthFailure.emailTaken,
       'weak_password' => AuthFailure.weakPassword,
       'email_not_confirmed' => AuthFailure.emailNotConfirmed,
+      'otp_expired' || 'otp_disabled' => AuthFailure.invalidCode,
+      'same_password' => AuthFailure.samePassword,
       'over_request_rate_limit' ||
       'over_email_send_rate_limit' =>
         AuthFailure.rateLimited,

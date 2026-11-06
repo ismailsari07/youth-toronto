@@ -35,6 +35,8 @@ import 'package:myt_flutter/features/prayer/screens/monthly_times_screen.dart';
 import 'package:myt_flutter/features/prayer/screens/prayer_home_screen.dart';
 import 'package:myt_flutter/features/prayer/widgets/reminders_sheet.dart';
 import 'package:myt_flutter/features/profile/screens/burial_services_screen.dart';
+import 'package:myt_flutter/features/profile/screens/confirm_email_screen.dart';
+import 'package:myt_flutter/features/profile/screens/reset_password_screen.dart';
 import 'package:myt_flutter/features/profile/screens/delete_account_screen.dart';
 import 'package:myt_flutter/features/profile/screens/mosque_info_screen.dart';
 import 'package:myt_flutter/features/profile/screens/profile_root_screen.dart';
@@ -330,6 +332,13 @@ void main() {
     'settings': (_) => const SettingsScreen(),
     'sign_in': (_) => const SignInScreen(),
     'sign_up': (_) => const SignUpScreen(),
+    'confirm_email': (_) => const ConfirmEmailScreen(email: 'ayse.yilmaz@example.com'),
+    'reset_email': (_) => const ResetPasswordScreen(email: 'ayse.yilmaz@example.com'),
+    'reset_code': (_) => const ResetPasswordScreen(
+          email: 'ayse.yilmaz@example.com',
+          initialStep: ResetStep.code,
+        ),
+    'reset_password': (_) => const ResetPasswordScreen(initialStep: ResetStep.password),
     'delete_account': (_) => const DeleteAccountScreen(),
     'mosque_info': (_) => const MosqueInfoScreen(),
     'burial': (_) => const BurialServicesScreen(),
@@ -342,6 +351,26 @@ void main() {
 
   for (final MapEntry(:key, :value) in screens.entries) {
     testWidgets('$key fits', (tester) => check(tester, key, value));
+  }
+
+  // The email code screens, in every language at iPhone size (1.4.1).
+  for (final lang in const ['tr', 'en']) {
+    for (final name in const [
+      'sign_in',
+      'confirm_email',
+      'reset_email',
+      'reset_code',
+      'reset_password',
+    ]) {
+      testWidgets('$name fits ($lang)', (tester) => check(
+            tester,
+            '${name}_$lang',
+            screens[name]!,
+            signedIn: false,
+            height: 852,
+            locale: Locale(lang),
+          ));
+    }
   }
 
   testWidgets('the no-cancel note fits on top of the registration form', (tester) {

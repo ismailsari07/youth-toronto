@@ -1501,4 +1501,101 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newsViewerHintOne => 'Pinch to zoom';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get confirmEmailTitle => 'Confirm your email';
+
+  @override
+  String confirmEmailSubtitle(String email) {
+    return 'We sent a 6-digit code to $email.';
+  }
+
+  @override
+  String get emailCodeLabel => '6-digit code';
+
+  @override
+  String get enterEmailCode => 'Enter the 6-digit code from the email.';
+
+  @override
+  String get confirmEmailButton => 'Confirm';
+
+  @override
+  String get confirmingEmail => 'Confirming…';
+
+  @override
+  String get resendCode => 'Send the code again';
+
+  @override
+  String resendCodeIn(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Send the code again ($seconds s)',
+      one: 'Send the code again (1 s)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get codeSentAgain => 'A new code is on its way.';
+
+  @override
+  String get confirmLaterNote =>
+      'Can\'t find the email? Check your junk folder. Your account is saved: you can also confirm later, the next time you sign in.';
+
+  @override
+  String get errorInvalidCode =>
+      'That code is wrong or has expired. Check it, or ask for a new one.';
+
+  @override
+  String get errorSamePassword =>
+      'Choose a password different from your old one.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'This email already has an account. Sign in, or reset the password if you\'ve forgotten it.';
+
+  @override
+  String get resetPasswordTitle => 'Reset your password';
+
+  @override
+  String get resetEmailSubtitle =>
+      'Enter your account\'s email and we\'ll send you a 6-digit code.';
+
+  @override
+  String get sendCode => 'Send code';
+
+  @override
+  String get sendingCode => 'Sending…';
+
+  @override
+  String resetCodeSubtitle(String email) {
+    return 'If $email has an account, we\'ve sent it a 6-digit code.';
+  }
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get checkingCode => 'Checking…';
+
+  @override
+  String get resetCodeNote =>
+      'No email after a few minutes? Check your junk folder and the address. Accounts made with Apple have no password: use Sign in with Apple.';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Choose a new password. You\'ll stay signed in on this phone.';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get savePassword => 'Save password';
+
+  @override
+  String get passwordChanged => 'Your password has been changed.';
 }

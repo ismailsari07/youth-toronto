@@ -1488,4 +1488,100 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get newsViewerHintOne => 'İki parmakla yakınlaştırın';
+
+  @override
+  String get forgotPassword => 'Şifremi unuttum';
+
+  @override
+  String get confirmEmailTitle => 'E-postanızı onaylayın';
+
+  @override
+  String confirmEmailSubtitle(String email) {
+    return '$email adresine 6 haneli bir kod gönderdik.';
+  }
+
+  @override
+  String get emailCodeLabel => '6 haneli kod';
+
+  @override
+  String get enterEmailCode => 'E-postadaki 6 haneli kodu girin.';
+
+  @override
+  String get confirmEmailButton => 'Onayla';
+
+  @override
+  String get confirmingEmail => 'Onaylanıyor…';
+
+  @override
+  String get resendCode => 'Kodu tekrar gönder';
+
+  @override
+  String resendCodeIn(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Kodu tekrar gönder ($seconds sn)',
+      one: 'Kodu tekrar gönder (1 sn)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get codeSentAgain => 'Yeni bir kod gönderildi.';
+
+  @override
+  String get confirmLaterNote =>
+      'E-postayı göremiyor musunuz? Gereksiz (spam) klasörüne bakın. Hesabınız kaydedildi; dilerseniz daha sonra, giriş yaptığınızda da onaylayabilirsiniz.';
+
+  @override
+  String get errorInvalidCode =>
+      'Kod yanlış ya da süresi dolmuş. Kontrol edin veya yeni bir kod isteyin.';
+
+  @override
+  String get errorSamePassword => 'Yeni şifre eskisinden farklı olmalı.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'Bu e-posta adresiyle zaten bir hesap var. Giriş yapın ya da şifrenizi unuttuysanız sıfırlayın.';
+
+  @override
+  String get resetPasswordTitle => 'Şifrenizi sıfırlayın';
+
+  @override
+  String get resetEmailSubtitle =>
+      'Hesabınızın e-posta adresini girin, size 6 haneli bir kod gönderelim.';
+
+  @override
+  String get sendCode => 'Kod gönder';
+
+  @override
+  String get sendingCode => 'Gönderiliyor…';
+
+  @override
+  String resetCodeSubtitle(String email) {
+    return '$email bir hesaba bağlıysa bu adrese 6 haneli bir kod gönderdik.';
+  }
+
+  @override
+  String get continueButton => 'Devam';
+
+  @override
+  String get checkingCode => 'Kontrol ediliyor…';
+
+  @override
+  String get resetCodeNote =>
+      'Birkaç dakikada e-posta gelmezse gereksiz klasörüne ve adrese bakın. Apple ile açılan hesapların şifresi yoktur: Apple ile giriş yapın.';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Yeni şifrenizi seçin. Bu telefonda giriş yapmış olarak kalırsınız.';
+
+  @override
+  String get newPassword => 'Yeni şifre';
+
+  @override
+  String get savePassword => 'Şifreyi kaydet';
+
+  @override
+  String get passwordChanged => 'Şifreniz değiştirildi.';
 }

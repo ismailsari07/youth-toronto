@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth_service.dart';
+import '../../../core/email_auth.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/providers/auth_provider.dart';
 import '../../../shared/formatters.dart';
@@ -38,6 +39,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   /// Rendered at build time, so it follows a language change.
   String Function(AppLocalizations l)? _error;
 
+  /// The address already has an account: offer sign-in and the reset.
+  bool _registered = false;
+
   @override
   void dispose() {
     _name.dispose();
@@ -47,6 +51,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _password.dispose();
     super.dispose();
   }
+
+  @visibleForTesting
+  void debugSetBirthDate(DateTime date) => setState(() => _birthDate = date);
 
   Future<void> _pickDate() async {
     final picked = await showBirthDatePicker(context, initial: _birthDate);
@@ -74,20 +81,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       _busy = true;
       _error = null;
+      _registered = false;
     });
-    final error = await AuthService.signUpWithEmail(
-      email,
-      _password.text,
-      name,
+    final outcome = await EmailAuth.instance.signUp(
+      email: email,
+      password: _password.text,
+      fullName: name,
       phone: _phone.text.trim(),
       dateOfBirth: _birthDate!,
     );
     if (!mounted) return;
+    final error = outcome.error;
     setState(() {
       _busy = false;
+      _registered = outcome.result == SignUpResult.alreadyRegistered;
       _error = error == null ? null : (l) => authErrorText(l, error);
     });
-    if (error == null) context.pop();
+    switch (outcome.result) {
+      case SignUpResult.signedIn:
+        context.pop();
+      case SignUpResult.confirmEmail:
+        final signedIn = await context.push<bool>(
+          '/profile/confirm-email',
+          extra: (email: email, sendOnOpen: false),
+        );
+        if (signedIn == true && mounted) context.pop();
+      case SignUpResult.alreadyRegistered || null:
+        break;
+    }
   }
 
   /// Apple or Google. A closed sheet shows nothing.
@@ -157,6 +178,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       controller: _email,
                       hint: l.emailHint,
                       keyboardType: TextInputType.emailAddress,
+                      autofillHints: const [AutofillHints.email],
                       divided: true,
                     ),
                     AppField(
@@ -194,6 +216,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     style: const TextStyle(fontSize: 13.5).c(context.colors.danger),
                   ),
                 ],
+                if (_registered) _AlreadyRegistered(email: _email.text.trim()),
                 const SizedBox(height: 14),
                 Text(
                   l.detailsSharedOnlyWithOffice,
@@ -223,6 +246,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// With "Confirm email" on, Supabase sends nothing to an address that
+/// already has an account: say so and offer the two ways in.
+class _AlreadyRegistered extends StatelessWidget {
+  const _AlreadyRegistered({required this.email});
+
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    Widget link(String key, String label, VoidCallback onTap) => Pressable(
+          key: ValueKey(key),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 16, 4),
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600)
+                  .c(context.colors.green),
+            ),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.emailAlreadyRegistered,
+            style: const TextStyle(fontSize: 13.5, height: 1.4)
+                .c(context.colors.danger),
+          ),
+          Wrap(
+            children: [
+              link('registered-sign-in', l.signIn,
+                  () => context.pushReplacement('/profile/sign-in')),
+              link('registered-reset', l.forgotPassword,
+                  () => context.pushReplacement('/profile/reset-password', extra: email)),
+            ],
           ),
         ],
       ),

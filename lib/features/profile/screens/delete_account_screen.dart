@@ -136,7 +136,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   rows: [
                     AppListRow(
                       icon: AppIcons.bell,
-                      title: l.prayerReminders,
+                      title: l.prayerNotifications,
                       subtitle: l.remindersStay,
                     ),
                     AppListRow(

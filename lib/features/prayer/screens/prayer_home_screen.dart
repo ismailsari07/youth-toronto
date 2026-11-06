@@ -288,7 +288,7 @@ class _PrayerHomeScreenState extends ConsumerState<PrayerHomeScreen> {
             onTap: () => context.push('/prayer/monthly'),
           ),
           if (kPrayerRemindersEnabled)
-            RemindersRow(divided: true, title: context.l10n.prayerNotificationsRow),
+            const RemindersRow(divided: true),
         ],
       );
 

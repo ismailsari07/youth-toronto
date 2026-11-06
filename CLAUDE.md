@@ -185,6 +185,9 @@ rolling ~30-day window, one validated row per Toronto date. Code: `lib/core/remi
   yenileme" (`BackgroundRefreshLog`), to check delivery on TestFlight.
 - No bell on the Prayer hero: next to the Donate pill it cut the mosque line on an iPhone SE. Reminders open from the
   links card under the prayer times ("Namaz bildirimleri"), Profile and Settings.
+- Screens name them "Namaz bildirimleri" / "Prayer notifications" / "Notifications de prière" everywhere (`prayerNotifications`:
+  rows, sheet title, delete-account list); `prayerReminders` is only the notifications' own wording (notice title, channel)
+  (owner, 1.4.0; `test/l10n/prayer_notifications_label_test.dart`).
 
 ## Monthly times (since 1.4.0)
 

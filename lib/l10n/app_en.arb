@@ -92,10 +92,6 @@
     }
   },
   "monthlyTimes": "Monthly times",
-  "prayerNotificationsRow": "Prayer notifications",
-  "@prayerNotificationsRow": {
-    "description": "Prayer tab, the untitled card under today's times: the row that opens the prayer reminders sheet."
-  },
   "monthlyJumuahAt": "Jumu'ah {time}",
   "@monthlyJumuahAt": {
     "description": "Friday's row in the monthly table. Short: it shares a narrow column with the date.",
@@ -116,6 +112,9 @@
   },
   "fajrWindowCloses": "Fajr window closes",
   "prayerReminders": "Prayer reminders",
+  "@prayerReminders": {
+    "description": "Only inside the notifications themselves (the notice's title, the channel name). Every screen label says prayerNotifications."
+  },
   "prayerNotifications": "Prayer notifications",
   "remindersPrayers": "Prayers",
   "notificationSound": "Notification sound",
@@ -402,7 +401,7 @@
   "creatingAccount": "Creating…",
   "signOut": "Sign out",
   "settings": "Settings",
-  "settingsRowSubtitle": "Reminders, language, account",
+  "settingsRowSubtitle": "Notifications, language, account",
   "yourDetails": "Your details",
   "notifications": "Notifications",
   "app": "App",

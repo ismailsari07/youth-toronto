@@ -127,9 +127,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monthlyTimes => 'Monthly times';
 
   @override
-  String get prayerNotificationsRow => 'Prayer notifications';
-
-  @override
   String monthlyJumuahAt(String time) {
     return 'Jumu\'ah $time';
   }
@@ -593,7 +590,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
-  String get settingsRowSubtitle => 'Reminders, language, account';
+  String get settingsRowSubtitle => 'Notifications, language, account';
 
   @override
   String get yourDetails => 'Your details';

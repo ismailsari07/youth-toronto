@@ -232,12 +232,6 @@ abstract class AppLocalizations {
   /// **'Monthly times'**
   String get monthlyTimes;
 
-  /// Prayer tab, the untitled card under today's times: the row that opens the prayer reminders sheet.
-  ///
-  /// In en, this message translates to:
-  /// **'Prayer notifications'**
-  String get prayerNotificationsRow;
-
   /// Friday's row in the monthly table. Short: it shares a narrow column with the date.
   ///
   /// In en, this message translates to:
@@ -262,7 +256,7 @@ abstract class AppLocalizations {
   /// **'Fajr window closes'**
   String get fajrWindowCloses;
 
-  /// No description provided for @prayerReminders.
+  /// Only inside the notifications themselves (the notice's title, the channel name). Every screen label says prayerNotifications.
   ///
   /// In en, this message translates to:
   /// **'Prayer reminders'**
@@ -943,7 +937,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsRowSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Reminders, language, account'**
+  /// **'Notifications, language, account'**
   String get settingsRowSubtitle;
 
   /// No description provided for @yourDetails.

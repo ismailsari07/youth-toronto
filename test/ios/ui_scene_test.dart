@@ -67,6 +67,29 @@ void main() {
         contains('PapeScene: Flutter engine ready'),
       );
     });
+
+    // Flutter's template doesn't define DEBUG for Runner, so the line above was
+    // compiled out and siri-check failed with a working app (1.4.0, 0103d81).
+    test('the Runner target defines DEBUG in Debug, and only there', () {
+      final project = File('ios/Runner.xcodeproj/project.pbxproj').readAsStringSync();
+      Map<String, String> runnerConfigs() {
+        final list = RegExp(
+          r'Build configuration list for PBXNativeTarget "Runner" \*/ = \{.*?buildConfigurations = \((.*?)\);',
+          dotAll: true,
+        ).firstMatch(project)![1]!;
+        return {
+          for (final m in RegExp(r'(\w{24}) /\* (\w+) \*/').allMatches(list))
+            m[2]!: RegExp('${m[1]} /\\* ${m[2]} \\*/ = \\{(.*?)name = ${m[2]};', dotAll: true)
+                .firstMatch(project)![1]!,
+        };
+      }
+
+      final configs = runnerConfigs();
+      expect(configs.keys, containsAll(['Debug', 'Release', 'Profile']));
+      expect(configs['Debug'], contains('SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;'));
+      expect(configs['Release'], isNot(contains('SWIFT_ACTIVE_COMPILATION_CONDITIONS')));
+      expect(configs['Profile'], isNot(contains('SWIFT_ACTIVE_COMPILATION_CONDITIONS')));
+    });
   });
 
   test('no native code uses what UIScene takes away', () {

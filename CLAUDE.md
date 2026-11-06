@@ -261,7 +261,9 @@ now, and `UIApplication.delegate.window` is nil: never use them (`test/ios/ui_sc
   running out; a corrected time reaches a phone like that only when the app next runs. Pushes to a suspended app with a live engine are not affected.
 - iOS can drop a suspended app's scene and connect a new one, which starts a new engine, so registration must be repeatable.
 - `siri-check`: `tool/check_scene_manifest.py` reads the built `Info.plist`; `tool/check_simulator_launch.sh` launches the app
-  on a simulator and looks for the Debug-only "PapeScene" log line, which only the scene's engine can write.
+  on a simulator and looks for the Debug-only "PapeScene" log line, which only the scene's engine can write (in the app's stderr or the
+  simulator's log). Only the Runner target's Debug config defines `DEBUG`; without it the line is compiled out and the step fails
+  with a working app, as on its first run (0103d81).
 
 ## Camimizden Haberler (since 1.4.0)
 

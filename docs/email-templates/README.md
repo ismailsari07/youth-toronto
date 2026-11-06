@@ -13,8 +13,7 @@ text that still reads well with styles stripped.
 
 Magic link, Invite user and Reauthentication stay as they are: neither the app nor the panel sends them.
 
-The logo is `https://papemosque.ca/android-chrome-192x192.png`, the website's live app icon. `brand/pape-emblem-256.png`
-is in the website repo but not deployed yet.
+The logo is `https://papemosque.ca/email/logo.png`, kept stable on the website for email.
 
 ## How Reset password serves both the app and the panel
 
@@ -47,7 +46,7 @@ Authentication → URL Configuration:
 - **Site URL:** unchanged (the panel). It is the fallback for anything not on the list.
 - **Redirect URLs:** add exactly `https://papemosque.ca/hesap/onaylandi`, and keep the panel's `https://<panel>.vercel.app/**`.
 
-Website: `https://papemosque.ca/hesap/onaylandi` must exist before "Confirm email" is turned on. It is a static page with
+Website: `https://papemosque.ca/hesap/onaylandi` is live (since 2026-11-06). It is a static page with
 no script: "E-postanız onaylandı. Pape Mosque uygulamasına dönüp giriş yapabilirsiniz." in TR/EN/FR. Supabase confirms
 the address before redirecting, so the page needs no code and can ignore the `?code=` it receives.
 
@@ -57,7 +56,7 @@ requires SPF to pass for the domain, which the Resend domain setup provides.
 
 ## Order
 
-1. Publish the website page.
+1. ~~Publish the website page.~~ Done (2026-11-06, with `/email/logo.png`).
 2. Add the Redirect URL. Set the OTP length and expiry, the 60 s interval and the three templates. All of this is safe
    with "Confirm email" still off: only "Şifremi unuttum" uses it, and that is new in 1.4.1.
 3. Ship 1.4.1. On TestFlight, check "Şifremi unuttum" on a test account (it works without "Confirm email").

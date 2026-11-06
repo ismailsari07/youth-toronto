@@ -164,6 +164,7 @@ void main() {
         }
         expect(html, isNot(contains('<script')), reason: name);
         expect(RegExp(r'<img ').allMatches(html).length, 1, reason: '$name: the logo only');
+        expect(html, contains('src="https://papemosque.ca/email/logo.png"'), reason: name);
       }
     });
 

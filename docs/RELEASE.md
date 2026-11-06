@@ -79,6 +79,18 @@ Do these only once the version is **on the App Store**, not when it's approved.
 | `latest_build` (Uygulama ayarları) | Set to the new version, e.g. `1.4.0`. Informational: the app reads it but doesn't act on it. |
 | `min_supported_version` (Uygulama ayarları) | **Raise only when you want to force an update.** Anyone below it is blocked until they update, so it must never be above the version on the store. |
 
+**Supabase, Authentication** (since 1.4.0, which also carries the email codes: `docs/email-templates/README.md`)
+
+| Setting | What to do |
+|---|---|
+| **Confirm email** (Sign In / Providers → Email) | Turn **on** once 1.4.0 is live. Until then it stays off: older apps close the sign-up screen with no message when it's on. Then check one sign-up and one "Şifremi unuttum" on the store build. |
+
+**`min_supported_version` for 1.4.0 (recommended, owner to confirm): leave it where it is.** Nothing in 1.4.0 needs the
+server to refuse older apps. With "Confirm email" on, a sign-up from an older app still gets the email: its code can't be
+typed there, but its link confirms the account (it opens the panel's address, the Site URL, because older apps send no
+redirect), and signing in then works. Sign-ups are rare and the cost is a confusing moment for those few, so we don't
+block everyone for it. Raise it to `1.4.0` only if sign-ups from old versions turn into support questions.
+
 **Constants in the `pape-admin` repo.** These only change what the panel tells editors. Set to `true`, commit and deploy the panel.
 
 | Constant | File | True when the App Store version has |
@@ -110,6 +122,7 @@ Nothing is wrong with the code. The Account Holder accepts the new agreement at 
 **TestFlight**
 - [ ] Release build uses the pinned Xcode (26.6) and uploads to TestFlight only
 - [ ] SiriKit on the App ID; a Siri question answered on the TestFlight build without a crash
+- [ ] 1.4.0: email templates and Redirect URL set in Supabase, "Confirm email" still **off**
 - [ ] Internal round passed on a real phone
 - [ ] External round and Beta App Review, if needed
 
@@ -123,5 +136,7 @@ Nothing is wrong with the code. The Account Holder accepts the new agreement at 
 **After it's live**
 - [ ] `links.app_store` correct
 - [ ] `latest_build` set
-- [ ] `min_supported_version` raised only if forcing an update
-- [ ] `APP_*` constants for this version set to `true`, panel deployed
+- [ ] `min_supported_version` raised only if forcing an update (1.4.0: leave it)
+- [ ] `APP_*` constants for this version set to `true`, panel deployed (1.4.0: `APP_SHOWS_CONTRIBUTION`,
+      `APP_SHOWS_FUND_TRANSLATIONS`, `APP_SHOWS_NEWS`)
+- [ ] 1.4.0: Supabase "Confirm email" on, then one sign-up and one password reset checked on the store build

@@ -132,7 +132,7 @@ Optional "call this number to contribute" card on the event page, after "About t
 the event title; only "Tap to call" is translated. **When this version is on the App Store:** set
 `APP_SHOWS_CONTRIBUTION = true` in pape-admin `src/lib/event-contribution.ts`.
 
-## Email codes and password reset (1.4.1)
+## Email codes and password reset (1.4.0)
 
 Supabase sends auth email through Resend SMTP (`noreply@papemosque.ca`). The member types a 6-digit code (`{{ .Token }}`)
 into the app, so nothing depends on a link opening the app. Code: `lib/core/email_auth.dart` (`EmailAuth.instance`,
@@ -142,7 +142,7 @@ replaceable in tests), `confirm_email_screen.dart`, `reset_password_screen.dart`
 - Sign-up with no session opens "E-postanızı onaylayın" (`verifyOTP` signup signs in). A sign-in refused with
   `email_not_confirmed` sends a new code and opens the same screen. "Kodu tekrar gönder" waits 60 s, Supabase's interval.
 - With "Confirm email" on, Supabase answers a sign-up for a registered address like a success, with no identities and no
-  email. The app says the address has an account and offers sign-in and "Şifremi unuttum". Before 1.4.1 the app already
+  email. The app says the address has an account and offers sign-in and "Şifremi unuttum". Before 1.4.0 the app already
   said "email taken", so this reveals nothing new.
 - "Şifremi unuttum": email, then code (`verifyOTP` recovery signs in), then new password (`updateUser`). The code step
   reads the same for any address; only a rate limit or a network failure shows (`resetRequestError`).

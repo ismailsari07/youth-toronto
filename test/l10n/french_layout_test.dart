@@ -353,7 +353,7 @@ void main() {
     testWidgets('$key fits', (tester) => check(tester, key, value));
   }
 
-  // The email code screens, in every language at iPhone size (1.4.1).
+  // The email code screens, in every language at iPhone size (1.4.0).
   for (final lang in const ['tr', 'en']) {
     for (final name in const [
       'sign_in',

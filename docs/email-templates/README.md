@@ -1,4 +1,7 @@
-# Supabase auth email templates (app 1.4.1)
+# Supabase auth email templates (app 1.4.0)
+
+Final. Configured in Supabase on 2026-11-06 (templates, subjects, Redirect URL, codes); "Confirm email" stays **off**
+until 1.4.0 is on the App Store (`docs/RELEASE.md` §8).
 
 Paste each file into Supabase → Authentication → Emails → Templates. TR/EN/FR are stacked in one email; the 6-digit
 code (`{{ .Token }}`) is the main content and is typed into the app. The link is only a small fallback. There are no
@@ -35,7 +38,7 @@ Authentication → Sign In / Providers → Email:
 - **Email OTP Expiration: 3600** seconds. The emails say "1 hour".
 - **Minimum password length:** at most 6, because the app checks for 6.
 - **Secure email change:** leave on. The app has no email change.
-- **Confirm email: turn on LAST**, once 1.4.1 is on the App Store and the fallback page is live (see the order below).
+- **Confirm email: turn on LAST**, once 1.4.0 is on the App Store and the fallback page is live (see the order below).
 
 Authentication → Rate Limits:
 - **Minimum interval between emails per user: 60 seconds.** The app's "Kodu tekrar gönder" waits 60 s (`kResendCooldown`).
@@ -58,7 +61,7 @@ requires SPF to pass for the domain, which the Resend domain setup provides.
 
 1. ~~Publish the website page.~~ Done (2026-11-06, with `/email/logo.png`).
 2. Add the Redirect URL. Set the OTP length and expiry, the 60 s interval and the three templates. All of this is safe
-   with "Confirm email" still off: only "Şifremi unuttum" uses it, and that is new in 1.4.1.
-3. Ship 1.4.1. On TestFlight, check "Şifremi unuttum" on a test account (it works without "Confirm email").
-4. Turn on "Confirm email". On the 1.4.1 build, check a sign-up with a new address and a sign-in on an unconfirmed
+   with "Confirm email" still off: only "Şifremi unuttum" uses it, and that is new in 1.4.0.
+3. Ship 1.4.0. On TestFlight, check "Şifremi unuttum" on a test account (it works without "Confirm email").
+4. Turn on "Confirm email". On the 1.4.0 build, check a sign-up with a new address and a sign-in on an unconfirmed
    account. Before that, an older app closes the sign-up screen with no message.

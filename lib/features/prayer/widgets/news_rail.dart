@@ -12,14 +12,18 @@ import '../../../ui/components/app_card.dart';
 import '../../../ui/components/motion.dart';
 import '../../community/widgets/news_card.dart';
 
-/// "Camimizden Haberler" on the home screen: featured first, then a horizontal
-/// scroll. Carries its own top gap and hides when there's nothing to show. The
-/// cards are narrow on purpose, to keep the day's times from moving far down.
+/// "Camimizden Haberler" on the home screen: featured first. One item fills
+/// the width like the Community cards; several swipe sideways, each 88% of
+/// the width so the next one peeks in. Carries its own top gap and hides when
+/// there's nothing to show.
 class NewsRail extends ConsumerWidget {
   const NewsRail({super.key});
 
-  static const cardWidth = 188.0;
   static const maxItems = 8;
+
+  /// A card's share of the content width when there are several.
+  static const peekFraction = 0.88;
+  static const gap = 12.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -61,41 +65,80 @@ class NewsRail extends ConsumerWidget {
   }
 }
 
-/// Wider than the page's gutters, so the cards scroll to the screen's edges.
-class _Rail extends StatelessWidget {
+void _open(BuildContext context, MosqueNews item) =>
+    context.push('/community/news', extra: item);
+
+/// One card: the content width. Several: a [PageView] as wide as the screen
+/// from the left gutter on, pages of a card plus the gap, so each swipe stops
+/// with a card at the gutter and the next one peeking in on the right.
+class _Rail extends StatefulWidget {
   const _Rail({required this.items});
 
   final List<MosqueNews> items;
 
   @override
+  State<_Rail> createState() => _RailState();
+}
+
+class _RailState extends State<_Rail> {
+  PageController? _controller;
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  PageController _controllerFor(double fraction) {
+    final current = _controller;
+    if (current != null && current.viewportFraction == fraction) return current;
+    final page = current != null && current.hasClients ? current.page?.round() ?? 0 : 0;
+    current?.dispose();
+    return _controller = PageController(viewportFraction: fraction, initialPage: page);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return OverflowBox(
-      fit: OverflowBoxFit.deferToChild,
-      minWidth: 0,
-      maxWidth: MediaQuery.sizeOf(context).width,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        clipBehavior: Clip.none,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpace.pageGutter),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final (i, item) in items.indexed) ...[
-                if (i > 0) const SizedBox(width: 10),
-                SizedBox(
-                  width: NewsRail.cardWidth,
-                  child: NewsCard(
-                    item: item,
-                    compact: true,
-                    onTap: () => context.push('/community/news', extra: item),
-                  ),
+    final items = widget.items;
+    if (items.length == 1) {
+      return HomeNewsCard(
+        key: ValueKey('home-news-${items.first.id}'),
+        item: items.first,
+        onTap: () => _open(context, items.first),
+      );
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final content = constraints.maxWidth;
+        final screen = MediaQuery.sizeOf(context).width;
+        final viewport = screen - AppSpace.pageGutter;
+        final card = content * NewsRail.peekFraction;
+        final controller = _controllerFor((card + NewsRail.gap) / viewport);
+        return OverflowBox(
+          alignment: AlignmentDirectional.centerStart,
+          fit: OverflowBoxFit.deferToChild,
+          minWidth: 0,
+          maxWidth: viewport,
+          child: SizedBox(
+            width: viewport,
+            height: HomeNewsCard.heightFor(context, card),
+            child: PageView.builder(
+              controller: controller,
+              padEnds: false,
+              clipBehavior: Clip.none,
+              itemCount: items.length,
+              itemBuilder: (context, i) => Padding(
+                padding: const EdgeInsetsDirectional.only(end: NewsRail.gap),
+                child: HomeNewsCard(
+                  key: ValueKey('home-news-${items[i].id}'),
+                  item: items[i],
+                  onTap: () => _open(context, items[i]),
                 ),
-              ],
-            ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

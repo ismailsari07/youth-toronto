@@ -9,13 +9,22 @@ import 'announcement_photo.dart';
 
 /// A news photo in its 4:5 frame. A crop fills it; "Sığdır" shows the whole
 /// photo over the same blurred, darkened fill as announcement cards. A photo
-/// that fails keeps the frame, so a gallery never jumps.
+/// that fails keeps the frame, so a gallery never jumps. The home card asks
+/// for a 16:9 frame that always crops ([alwaysCover]), centred on the photo.
 class NewsPhotoFrame extends StatelessWidget {
-  const NewsPhotoFrame({super.key, required this.photo, this.fallbackLabel});
+  const NewsPhotoFrame({
+    super.key,
+    required this.photo,
+    this.fallbackLabel,
+    this.aspectRatio = defaultAspectRatio,
+    this.alwaysCover = false,
+  });
 
-  static const aspectRatio = 4 / 5;
+  static const defaultAspectRatio = 4 / 5;
 
   final NewsPhoto photo;
+  final double aspectRatio;
+  final bool alwaysCover;
 
   /// Read by screen readers when the photo has no text of its own.
   final String? fallbackLabel;
@@ -24,6 +33,7 @@ class NewsPhotoFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final image = NetworkImage(photo.url);
     final label = photo.altText ?? fallbackLabel;
+    final contain = photo.contain && !alwaysCover;
     return AspectRatio(
       aspectRatio: aspectRatio,
       child: Semantics(
@@ -35,10 +45,10 @@ class NewsPhotoFrame extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                if (photo.contain) PosterBackdrop(image: image),
+                if (contain) PosterBackdrop(image: image),
                 Image(
                   image: image,
-                  fit: photo.contain ? BoxFit.contain : BoxFit.cover,
+                  fit: contain ? BoxFit.contain : BoxFit.cover,
                   excludeFromSemantics: true,
                   errorBuilder: (_, _, _) => const SizedBox.shrink(),
                 ),

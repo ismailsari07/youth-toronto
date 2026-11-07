@@ -33,6 +33,8 @@ import 'package:myt_flutter/features/marriage/screens/marriage_upload_screen.dar
 import 'package:myt_flutter/features/marriage/widgets/withdraw_sheet.dart';
 import 'package:myt_flutter/features/prayer/screens/monthly_times_screen.dart';
 import 'package:myt_flutter/features/prayer/screens/prayer_home_screen.dart';
+import 'package:myt_flutter/features/prayer/widgets/news_rail.dart';
+import 'package:myt_flutter/theme/app_tokens.dart';
 import 'package:myt_flutter/features/prayer/widgets/reminders_sheet.dart';
 import 'package:myt_flutter/features/profile/screens/burial_services_screen.dart';
 import 'package:myt_flutter/features/profile/screens/confirm_email_screen.dart';
@@ -60,6 +62,9 @@ import 'package:myt_flutter/shared/providers/push_provider.dart';
 import 'package:myt_flutter/shared/providers/registration_provider.dart';
 import 'package:myt_flutter/shared/providers/reminders_provider.dart';
 import 'package:myt_flutter/theme/app_icon.dart';
+import 'package:myt_flutter/core/news/mosque_news.dart';
+import 'package:myt_flutter/shared/providers/mosque_news_provider.dart';
+import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:myt_flutter/theme/app_theme.dart';
 import 'package:myt_flutter/ui/components/island_tab_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show User;
@@ -173,9 +178,12 @@ void main() {
     Future<void> Function(WidgetTester)? after,
     Locale locale = const Locale('fr'),
     ThemeData? theme,
+    List<MosqueNews> news = const [],
+    bool tabBar = false,
+    double width = 390,
   }) async {
     SharedPreferences.setMockInitialValues({});
-    tester.view.physicalSize = Size(390 * 2, height * 2);
+    tester.view.physicalSize = Size(width * 2, height * 2);
     tester.view.devicePixelRatio = 2;
     addTearDown(tester.view.reset);
 
@@ -192,7 +200,25 @@ void main() {
 
     final router = GoRouter(
       routes: [
-        GoRoute(path: '/', builder: (context, _) => Material(child: home(context))),
+        GoRoute(
+          path: '/',
+          builder: (context, _) => tabBar
+              // As AppShell: the island floats over the content.
+              ? Scaffold(
+                  extendBody: true,
+                  body: home(context),
+                  bottomNavigationBar: IslandTabBar(
+                    tabs: [
+                      IslandTab(icon: AppIcons.mosque, label: context.l10n.tabPrayer),
+                      IslandTab(icon: AppIcons.calendar, label: context.l10n.tabCommunity),
+                      IslandTab(icon: AppIcons.person, label: context.l10n.tabProfile),
+                    ],
+                    index: 0,
+                    onSelect: (_) {},
+                  ),
+                )
+              : Material(child: home(context)),
+        ),
         GoRoute(path: '/prayer/monthly', builder: (_, _) => const MonthlyTimesScreen()),
       ],
     );
@@ -243,6 +269,7 @@ void main() {
               ],
             ),
             newsProvider.overrideWith((ref) async => [announcement]),
+            mosqueNewsProvider.overrideWith((ref) async => news),
             initialDonationFundsProvider.overrideWithValue(const []),
             athanBundledProvider.overrideWith((ref) async => true),
             reminderSettingsProvider.overrideWith(_Settings.new),
@@ -427,6 +454,101 @@ void main() {
                 tester.element(tile),
               ));
           await tester.pump();
+        },
+      );
+    });
+  }
+
+  // "Camimizden Haberler" on Prayer (1.4.0 redesign): one full-width card,
+  // or several swiping with the next one peeking in, the whole card above the
+  // tab bar once scrolled to. SHOT_NEWS_DIR holds real photos (cover.jpg,
+  // event.jpg) for rendered shots; without it the frames stay empty.
+  const coverUrl =
+      'https://onczqxxdvmmmdcuhmyio.supabase.co/storage/v1/object/public/news-images/e52b7590-a13e-46a3-bbd2-460e6e0e1023/6bd623ea-17f7-4a78-b1db-0f11c30afcc9.jpg';
+  const eventUrl =
+      'https://onczqxxdvmmmdcuhmyio.supabase.co/storage/v1/object/public/event-images/d947b1ac-4704-4cb0-bbf7-b3b8330e06d8/a2a16d8d-643a-4f4b-8ecf-3103acd24631.jpg';
+  MosqueNews newsItem(String id, String title, DateTime date, String url, {bool featured = false}) =>
+      MosqueNews(
+        id: id,
+        title: title,
+        body: '',
+        date: date,
+        cover: NewsPhoto(url: url),
+        featured: featured,
+      );
+  final realNews = newsItem(
+    'n1',
+    'Diyanet İşleri Başkanımız Pape Camiini Ziyaret Etti',
+    DateTime(2026, 11, 6),
+    coverUrl,
+    featured: true,
+  );
+  final threeNews = [
+    realNews,
+    newsItem('n2', 'Gençlik Buluşması yeni dönemine başladı', DateTime(2026, 11, 2), eventUrl),
+    newsItem('n3', 'Cuma namazı sonrası cemaatimizle çay ve sohbet buluşması', DateTime(2026, 10, 30), coverUrl),
+  ];
+
+  Future<void> preloadPhotos(WidgetTester tester) async {
+    final dir = Platform.environment['SHOT_NEWS_DIR'];
+    if (dir == null) return;
+    for (final (url, file) in [(coverUrl, 'cover.jpg'), (eventUrl, 'event.jpg')]) {
+      final info = await tester.runAsync(() async {
+        final codec = await ui.instantiateImageCodec(File('$dir/$file').readAsBytesSync());
+        return ImageInfo(image: (await codec.getNextFrame()).image);
+      });
+      PaintingBinding.instance.imageCache.putIfAbsent(
+        NetworkImage(url),
+        () => OneFrameImageStreamCompleter(SynchronousFuture(info!)),
+      );
+    }
+  }
+
+  for (final (count, mode, theme, lang, width, height) in [
+    (1, 'light', appLightTheme, 'tr', 390.0, 852.0),
+    (1, 'dark', appDarkTheme, 'tr', 390.0, 852.0),
+    (3, 'light', appLightTheme, 'tr', 390.0, 852.0),
+    (3, 'dark', appDarkTheme, 'tr', 390.0, 852.0),
+    (3, 'light', appLightTheme, 'fr', 390.0, 852.0),
+    (1, 'light', appLightTheme, 'en', 390.0, 852.0),
+    (3, 'light', appLightTheme, 'tr', 375.0, 667.0), // iPhone SE
+    (1, 'dark', appDarkTheme, 'fr', 375.0, 667.0),
+    (3, 'light', appLightTheme, 'en', 430.0, 932.0), // Pro Max
+  ]) {
+    testWidgets('home news, $count item(s) ($lang, $mode, ${width.round()} pt)', (tester) async {
+      await preloadPhotos(tester);
+      final items = count == 1 ? [realNews] : threeNews;
+      await check(
+        tester,
+        'home_news_${count}_${lang}_${mode}_${width.round()}',
+        (_) => const PrayerHomeScreen(),
+        locale: Locale(lang),
+        theme: theme,
+        width: width,
+        height: height,
+        news: items,
+        tabBar: true,
+        after: (tester) async {
+          final first = find.byKey(const ValueKey('home-news-n1'));
+          await tester.scrollUntilVisible(first, 300, scrollable: find.byType(Scrollable).first);
+          await tester.runAsync(
+            () => Scrollable.ensureVisible(tester.element(first), alignment: 0.45),
+          );
+          await tester.pump(const Duration(milliseconds: 400));
+          final card = tester.getRect(first);
+          final island = tester.getRect(find.byType(IslandTabBar));
+          // Fully visible: title included, above the floating tab bar.
+          expect(card.bottom, lessThan(island.top + 8), reason: 'card under the tab bar');
+          final content = width - 2 * AppSpace.pageGutter;
+          if (count == 1) {
+            expect(card.width, closeTo(content, 0.5));
+          } else {
+            expect(card.width, closeTo(content * NewsRail.peekFraction, 0.5));
+            // The next card peeks in from the right.
+            final next = tester.getRect(find.byKey(const ValueKey('home-news-n2')));
+            expect(next.left, lessThan(width));
+          }
+          expect(card.width / (card.height), greaterThan(1.1), reason: 'landscape card');
         },
       );
     });

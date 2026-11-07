@@ -324,7 +324,7 @@ afterwards). It builds `screenshots/main.dart` for the simulator (no signing) an
 per raw shot on an iPhone 16 Pro Max with a 9:41 status bar. The entry point runs the real app through `startApp()`
 (`lib/main.dart`) on live data, signed out, and never writes to the database (no `register_device`, no
 `record_event_view`). Raw PNGs are build artifacts; a missing screen (no "Gençlik Buluşması" event, no published mosque
-news with photos, no donation funds) fails the run instead of showing something else.
+news with at least 2 photos, no donation funds) fails the run instead of showing something else.
 
 `screenshots/compose.py` turns the raw shots into the ten App Store slides (1.4.0 order: Diyanet, athan notifications,
 widgets, iqamah/Jumu'ah, monthly, news, community + event, donate, marriage/funeral, languages + dark). The design is the

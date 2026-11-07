@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:myt_flutter/core/news/mosque_news.dart';
 import 'package:myt_flutter/core/push/device_identity.dart';
 import 'package:myt_flutter/core/push/push_api.dart';
 import 'package:myt_flutter/core/reminder_sync.dart';
@@ -144,15 +145,20 @@ Future<void> _open(String shot, String lang) async {
       await loaded(container.read(prayerProvider.future));
       router.push('/prayer/monthly');
     case 'news':
-      // Real news only: a missing item fails the run, nothing stands in.
+      // The news DETAIL (photos and title), not the home section: the Prayer
+      // home screen appears only once. Real news only, with at least two
+      // photos (the cover counts), so the gallery's dots show; a missing item
+      // fails the run, nothing stands in. Featured first, then the newest.
       final news = await container
           .read(mosqueNewsProvider.future)
           .timeout(const Duration(seconds: 30), onTimeout: () => const []);
-      final pick = news.where((n) => n.photos.length > 1).firstOrNull ??
-          news.where((n) => n.photos.isNotEmpty).firstOrNull;
+      final pick = newsRailOrder(news)
+          .where((n) => n.slides.length >= 2)
+          .firstOrNull;
       if (pick == null) {
         return _ready(
-          'failed: no published mosque news with photos (${news.length} published)',
+          'failed: no published mosque news with at least 2 photos '
+          '(${news.length} published)',
         );
       }
       router.go('/community');

@@ -63,7 +63,7 @@ CAPTIONS = {
     },
     'fr': {
         1: (['Horaires de prière', 'de la Diyanet'], ['Les horaires de la Présidence', 'des affaires religieuses de Türkiye']),
-        2: (['Une notification', 'à l’heure de l’adhan'], ['Choisissez les prières', 'pour lesquelles être notifié']),
+        2: (['Une notification', 'à l’heure de l’adhan'], ['Choisissez vos prières']),
         3: (['Les horaires sur', 'votre écran d’accueil'], ['Widgets pour l’écran d’accueil', 'et l’écran verrouillé']),
         4: (['Heures de l’iqama', 'et de la Joumou’a'], ['Sachez exactement quand', 'la communauté prie']),
         5: (['Horaires', 'du mois'], ['Adhan et iqama', 'des prochains jours']),

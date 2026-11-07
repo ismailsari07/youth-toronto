@@ -129,12 +129,41 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(find.text('Camimizden Haberler'), findsOneWidget);
-        final cards = tester.widgetList<NewsCard>(find.byType(NewsCard)).toList();
+        final cards =
+            tester.widgetList<HomeNewsCard>(find.byType(HomeNewsCard)).toList();
         expect(cards.first.item.id, 'b');
-        expect(tester.getSize(find.byType(NewsCard).first).width, 188);
+        // Several: 88% of the content width, the next one peeking in.
+        final first = tester.getRect(find.byType(HomeNewsCard).first);
+        expect(first.width, closeTo(350 * NewsRail.peekFraction, 0.5));
+        expect(first.width / first.height, greaterThan(1.1));
+        expect(tester.getRect(find.byType(HomeNewsCard).at(1)).left, lessThan(390));
         expect(tester.takeException(), isNull);
       });
     }
+
+    testWidgets('one item fills the content width', (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            mosqueNewsProvider.overrideWith((ref) async => [_news('a')]),
+          ],
+          child: _app(
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(children: [NewsRail()]),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final card = tester.getRect(find.byType(HomeNewsCard));
+      expect(card.width, 350);
+      expect(find.byType(PageView), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
 
     testWidgets('the rail takes no room without news', (tester) async {
       await tester.pumpWidget(
@@ -144,7 +173,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byType(NewsCard), findsNothing);
+      expect(find.byType(HomeNewsCard), findsNothing);
       expect(tester.getSize(find.byType(NewsRail)).height, 0);
     });
 

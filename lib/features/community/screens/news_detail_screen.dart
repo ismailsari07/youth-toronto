@@ -62,7 +62,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
           Stack(
             children: [
               AspectRatio(
-                aspectRatio: NewsPhotoFrame.aspectRatio,
+                aspectRatio: NewsPhotoFrame.defaultAspectRatio,
                 child: PageView.builder(
                   controller: _pages,
                   itemCount: slides.length,

@@ -1,0 +1,20 @@
+# Who must approve changes (GitHub CODEOWNERS). Takes effect once the repo is
+# in the mosque's GitHub organization and branch protection on main requires
+# code-owner review (pape-admin docs/github-protection.md).
+#
+# PLACEHOLDERS: replace MOSQUE-ORG with the organization's name; teams:
+#   MOSQUE-ORG/board     – board members (organization owners)
+#   MOSQUE-ORG/reviewers – the independent technical reviewer(s), NOT the developer
+
+*                                   @MOSQUE-ORG/board @MOSQUE-ORG/reviewers
+
+# Marriage service: form format, encryption, upload, and what ships in the build.
+/lib/features/marriage/             @MOSQUE-ORG/reviewers
+/lib/core/forms_v2/                 @MOSQUE-ORG/reviewers
+/lib/core/crypto/                   @MOSQUE-ORG/reviewers
+/test/fixtures/                     @MOSQUE-ORG/reviewers
+/pubspec.yaml                       @MOSQUE-ORG/reviewers
+/pubspec.lock                       @MOSQUE-ORG/reviewers
+/ios/Runner/Info.plist              @MOSQUE-ORG/reviewers
+/codemagic.yaml                     @MOSQUE-ORG/board @MOSQUE-ORG/reviewers
+/.github/                           @MOSQUE-ORG/board

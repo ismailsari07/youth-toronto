@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../../shared/providers/content_provider.dart';
 import '../../../shared/formatters.dart';
 import '../../../theme/app_icon.dart';
 import '../../../theme/app_theme.dart';
@@ -41,7 +42,9 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
     _leaving = true;
     ref.invalidate(myApplicationProvider);
     final messenger = ScaffoldMessenger.of(context);
-    context.pushReplacement(MarriageRoutes.upload);
+    context.pushReplacement(MarriageRoutes.startFor(
+      formV2: ref.read(contentProvider).features.marriageFormV2,
+    ));
     messenger.showSnackBar(
       SnackBar(content: Text(l.withdrawn)),
     );
@@ -56,7 +59,9 @@ class _MarriageStatusScreenState extends ConsumerState<MarriageStatusScreen> {
       if (!_leaving && next is AsyncData<MarriageApplication?> &&
           next.value == null) {
         _leaving = true;
-        context.pushReplacement(MarriageRoutes.upload);
+        context.pushReplacement(MarriageRoutes.startFor(
+          formV2: ref.read(contentProvider).features.marriageFormV2,
+        ));
       }
     });
 

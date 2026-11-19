@@ -171,13 +171,40 @@ SecureKey? openDataKey(Sodium s, Uint8List sealedKey, KeyPair service) {
     final id = r['key_id'];
     if (id is! int || r['retired_at'] != null) continue;
     final pin = pinned[id];
-    final db = r['public_key'];
-    if (pin == null || db is! String || db.replaceAll(RegExp(r'\s'), '') != pin) continue;
-    if (best == null || id > best.keyId) {
-      best = (keyId: id, publicKey: Uint8List.fromList(base64.decode(pin)));
-    }
+    final db = _keyBytes(r['public_key']);
+    if (pin == null || db == null) continue;
+    final pinBytes = Uint8List.fromList(base64.decode(pin));
+    if (!_same(db, pinBytes)) continue;
+    if (best == null || id > best.keyId) best = (keyId: id, publicKey: pinBytes);
   }
   return best;
+}
+
+/// `bytea` as PostgREST sends it (`\\x` + hex), or base64.
+Uint8List? _keyBytes(Object? v) {
+  if (v is! String) return null;
+  try {
+    if (v.startsWith(r'\x')) {
+      final hex = v.substring(2);
+      if (hex.length != 64) return null;
+      return Uint8List.fromList([
+        for (var i = 0; i < hex.length; i += 2) int.parse(hex.substring(i, i + 2), radix: 16),
+      ]);
+    }
+    final b = base64.decode(v.replaceAll(RegExp(r'\s'), ''));
+    return b.length == 32 ? Uint8List.fromList(b) : null;
+  } on FormatException {
+    return null;
+  }
+}
+
+bool _same(Uint8List a, Uint8List b) {
+  if (a.length != b.length) return false;
+  var d = 0;
+  for (var i = 0; i < a.length; i++) {
+    d |= a[i] ^ b[i];
+  }
+  return d == 0;
 }
 
 /// The decrypted answers payload (pape-admin marriage-envelope.ts

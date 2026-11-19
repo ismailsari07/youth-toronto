@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/providers/auth_provider.dart';
 import 'data/marriage_application.dart';
 import 'data/marriage_service.dart';
+import 'data/marriage_v2_service.dart';
 
 /// The signed-in member's own application, or null when signed out or not
 /// applied. Errors surface as AsyncError; the Profile row then shows its
@@ -12,6 +13,26 @@ final myApplicationProvider =
   final user = ref.watch(currentUserProvider);
   if (user == null) return null;
   return MarriageService.fetchOwn();
+});
+
+/// The member's encrypted application (form v2), or null. Read whatever the
+/// flag says, so an application sent while the form was on still shows
+/// (and can be withdrawn) after the form is switched off.
+final mySubmissionProvider = FutureProvider<MarriageSubmission?>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return null;
+  return MarriageV2Service.fetchOwn();
+});
+
+/// The published form and whether a key is ready, fetched together when the
+/// form opens. `key == false` = the service isn't open yet.
+final marriageFormProvider =
+    FutureProvider.autoDispose<({PublishedMarriageForm? form, bool keyReady})>((ref) async {
+  final results = await Future.wait([
+    MarriageV2Service.fetchForm(),
+    MarriageV2Service.fetchServiceKey(),
+  ]);
+  return (form: results[0] as PublishedMarriageForm?, keyReady: results[1] != null);
 });
 
 enum MarriageEligibility { needsDateOfBirth, underAge, eligible }

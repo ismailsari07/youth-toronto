@@ -11,7 +11,6 @@ import '../../../ui/components/app_buttons.dart';
 import '../../../ui/components/app_card.dart';
 import '../../../ui/components/app_row.dart';
 import '../../../ui/components/app_scaffolding.dart';
-import '../marriage_provider.dart';
 import '../marriage_routes.dart';
 
 /// Spec §8a screen 1: what the service is and how it stays private, for a
@@ -43,13 +42,9 @@ class _MarriageGateScreenState extends ConsumerState<MarriageGateScreen> {
     if (!mounted || _continuing) return;
     if (ref.read(currentUserProvider) == null) return;
     setState(() => _continuing = true);
-    final application = await ref
-        .read(myApplicationProvider.future)
-        .then<Object?>((a) => a, onError: (_) => null);
+    final route = await MarriageRoutes.resolve(ref);
     if (!mounted) return;
-    context.pushReplacement(
-      application == null ? MarriageRoutes.upload : MarriageRoutes.status,
-    );
+    context.pushReplacement(route);
   }
 
   @override

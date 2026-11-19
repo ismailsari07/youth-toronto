@@ -1584,4 +1584,128 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get passwordChanged => 'Şifreniz değiştirildi.';
+
+  @override
+  String get mfTitle => 'Başvuru formu';
+
+  @override
+  String get mfSubtitle => 'Telefonunuzda şifrelenir';
+
+  @override
+  String get mfPrivacy =>
+      'Cevaplarınız ve fotoğraflarınız gönderilmeden önce bu telefonda şifrelenir. Onları yalnızca caminin yetkili anahtar sahipleri açabilir; uygulamanın geliştiricileri ve sunucu açamaz.';
+
+  @override
+  String get mfSend => 'Başvuruyu gönder';
+
+  @override
+  String get mfSending => 'Güvenle gönderiliyor…';
+
+  @override
+  String get mfFixErrors =>
+      'Bazı cevapların düzeltilmesi gerekiyor. Kırmızıyla işaretlendi.';
+
+  @override
+  String get mfClosedTitle => 'Henüz açık değil';
+
+  @override
+  String get mfClosedBody =>
+      'Başvuru formu henüz açık değil. Lütfen daha sonra tekrar bakın.';
+
+  @override
+  String get mfUpdateBody =>
+      'Bu form için uygulamanın yeni sürümü gerekiyor. Lütfen App Store\'dan güncelleyin.';
+
+  @override
+  String get mfLoadFailed => 'Form yüklenemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get mfLeaveTitle => 'Formdan çıkılsın mı?';
+
+  @override
+  String get mfLeaveBody =>
+      'Cevaplarınız hiçbir yere kaydedilmez. Şimdi çıkarsanız kaybolur.';
+
+  @override
+  String get mfLeave => 'Çık ve sil';
+
+  @override
+  String get mfStay => 'Doldurmaya devam et';
+
+  @override
+  String get mfFromProfile => 'Profilinizden';
+
+  @override
+  String get mfAddPhoto => 'Fotoğraf ekle';
+
+  @override
+  String get mfRemovePhoto => 'Fotoğrafı kaldır';
+
+  @override
+  String get mfPreparingPhoto => 'Fotoğraf hazırlanıyor…';
+
+  @override
+  String get mfPhotoUnreadable =>
+      'Bu fotoğraf okunamadı. Başka bir fotoğraf seçin.';
+
+  @override
+  String get mfPhotoTooLarge =>
+      'Bu fotoğraf çok büyük. Başka bir fotoğraf seçin.';
+
+  @override
+  String get mfErrTooYoung => 'Başvurular 18 yaş ve üzeri üyelere açıktır.';
+
+  @override
+  String get mfErrEmail => 'Geçerli bir e-posta adresi girin.';
+
+  @override
+  String get mfErrPhotos => 'İstenen sayıda fotoğraf ekleyin.';
+
+  @override
+  String get mfErrConsent => 'Başvurunuzu göndermek için lütfen onaylayın.';
+
+  @override
+  String get mfErrAlready => 'Zaten bir başvurunuz var.';
+
+  @override
+  String get mfErrFormChanged =>
+      'Form az önce güncellendi. Lütfen cevaplarınızı kontrol edip tekrar gönderin.';
+
+  @override
+  String get mfErrSend =>
+      'Başvurunuz gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.';
+
+  @override
+  String get mfSentTitle => 'Başvurunuz gönderildi';
+
+  @override
+  String get mfSentBody =>
+      'Başvurunuz şifrelenip gönderildi. İmam onu özel olarak okur ve uygun biri olursa sizinle doğrudan iletişime geçer.';
+
+  @override
+  String get mfNoViewNote =>
+      'Gizliliğiniz için uygulama cevaplarınızı tekrar gösteremez. Bir şeyi değiştirmek için başvurunuzu geri çekip yeniden başvurun.';
+
+  @override
+  String get mfWithdrawCaption =>
+      'Cevaplarınızı ve fotoğraflarınızı caminin kayıtlarından siler';
+
+  @override
+  String get mfWithdrawSheetBody =>
+      'Cevaplarınız ve fotoğraflarınız kalıcı olarak silinir ve imam artık göremez. İstediğiniz zaman yeniden başvurabilirsiniz.';
+
+  @override
+  String mfAge(int age) {
+    return '$age yaşında';
+  }
+
+  @override
+  String mfSentOn(String date) {
+    return 'Gönderildi: $date';
+  }
+
+  @override
+  String mfPhotosHint(int max) {
+    return 'En fazla $max fotoğraf. Konum ve diğer gizli bilgiler gönderilmeden önce silinir.';
+  }
 }

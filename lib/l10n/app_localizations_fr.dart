@@ -1618,4 +1618,141 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get passwordChanged => 'Votre mot de passe a été modifié.';
+
+  @override
+  String get mfTitle => 'Formulaire de demande';
+
+  @override
+  String get mfSubtitle => 'Chiffré sur votre téléphone';
+
+  @override
+  String get mfPrivacy =>
+      'Vos réponses et vos photos sont chiffrées sur ce téléphone avant l\'envoi. Seules les personnes autorisées de la mosquée détiennent la clé pour les ouvrir : ni les développeurs de l\'application, ni le serveur.';
+
+  @override
+  String get mfSend => 'Envoyer la demande';
+
+  @override
+  String get mfSending => 'Envoi sécurisé…';
+
+  @override
+  String get mfFixErrors =>
+      'Certaines réponses sont à corriger. Elles sont indiquées en rouge.';
+
+  @override
+  String get mfClosedTitle => 'Pas encore ouvert';
+
+  @override
+  String get mfClosedBody =>
+      'Le formulaire n\'est pas encore ouvert. Revenez plus tard.';
+
+  @override
+  String get mfUpdateBody =>
+      'Ce formulaire nécessite une version plus récente de l\'application. Mettez-la à jour depuis l\'App Store.';
+
+  @override
+  String get mfLoadFailed => 'Impossible de charger le formulaire. Réessayez.';
+
+  @override
+  String get mfLeaveTitle => 'Quitter le formulaire?';
+
+  @override
+  String get mfLeaveBody =>
+      'Vos réponses ne sont enregistrées nulle part. Si vous quittez maintenant, elles seront perdues.';
+
+  @override
+  String get mfLeave => 'Quitter sans enregistrer';
+
+  @override
+  String get mfStay => 'Continuer';
+
+  @override
+  String get mfFromProfile => 'Depuis votre profil';
+
+  @override
+  String get mfAddPhoto => 'Ajouter une photo';
+
+  @override
+  String get mfRemovePhoto => 'Retirer la photo';
+
+  @override
+  String get mfPreparingPhoto => 'Préparation de la photo…';
+
+  @override
+  String get mfPhotoUnreadable =>
+      'Cette photo n\'a pas pu être lue. Choisissez-en une autre.';
+
+  @override
+  String get mfPhotoTooLarge =>
+      'Cette photo est trop volumineuse. Choisissez-en une autre.';
+
+  @override
+  String get mfErrTooYoung =>
+      'Les demandes sont réservées aux membres de 18 ans et plus.';
+
+  @override
+  String get mfErrEmail => 'Saisissez une adresse e-mail valide.';
+
+  @override
+  String get mfErrPhotos => 'Ajoutez le nombre de photos demandé.';
+
+  @override
+  String get mfErrConsent => 'Veuillez confirmer pour envoyer votre demande.';
+
+  @override
+  String get mfErrAlready => 'Vous avez déjà une demande en cours.';
+
+  @override
+  String get mfErrFormChanged =>
+      'Le formulaire vient d\'être mis à jour. Vérifiez vos réponses, puis renvoyez-le.';
+
+  @override
+  String get mfErrSend =>
+      'Votre demande n\'a pas pu être envoyée. Vérifiez votre connexion, puis réessayez.';
+
+  @override
+  String get mfSentTitle => 'Demande envoyée';
+
+  @override
+  String get mfSentBody =>
+      'Votre demande a été chiffrée et envoyée. L\'imam la lit en privé et vous contacte directement s\'il y a une personne qui vous convient.';
+
+  @override
+  String get mfNoViewNote =>
+      'Pour votre confidentialité, l\'application ne peut pas réafficher vos réponses. Pour modifier quelque chose, retirez votre demande et refaites-en une.';
+
+  @override
+  String get mfWithdrawCaption =>
+      'Supprime vos réponses et vos photos des registres de la mosquée';
+
+  @override
+  String get mfWithdrawSheetBody =>
+      'Vos réponses et vos photos seront définitivement supprimées et l\'imam n\'y aura plus accès. Vous pourrez refaire une demande à tout moment.';
+
+  @override
+  String mfAge(int age) {
+    String _temp0 = intl.Intl.pluralLogic(
+      age,
+      locale: localeName,
+      other: '$age ans',
+      one: '1 an',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mfSentOn(String date) {
+    return 'Envoyée le $date';
+  }
+
+  @override
+  String mfPhotosHint(int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      max,
+      locale: localeName,
+      other: 'Jusqu\'à $max photos',
+      one: 'Une photo',
+    );
+    return '$_temp0. La position et les autres informations cachées sont supprimées avant l\'envoi.';
+  }
 }

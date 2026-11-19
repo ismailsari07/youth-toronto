@@ -8,9 +8,11 @@ import '../features/community/screens/community_screen.dart';
 import '../features/community/screens/event_detail_screen.dart';
 import '../features/community/screens/news_detail_screen.dart';
 import '../features/marriage/data/marriage_application.dart';
+import '../features/marriage/screens/marriage_form_screen.dart';
 import '../features/marriage/screens/marriage_gate_screen.dart';
 import '../features/marriage/screens/marriage_received_screen.dart';
 import '../features/marriage/screens/marriage_status_screen.dart';
+import '../features/marriage/screens/marriage_submitted_screen.dart';
 import '../features/marriage/screens/marriage_upload_screen.dart';
 import '../features/marriage/screens/marriage_viewer_screen.dart';
 import '../features/prayer/screens/monthly_times_screen.dart';
@@ -222,6 +224,17 @@ final router = GoRouter(
                   path: 'marriage/status',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const MarriageStatusScreen(),
+                ),
+                GoRoute(
+                  path: 'marriage/form',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const MarriageFormScreen(),
+                ),
+                GoRoute(
+                  path: 'marriage/submitted',
+                  parentNavigatorKey: _rootKey,
+                  // extra: true right after sending.
+                  builder: (context, state) => MarriageSubmittedScreen(justSent: state.extra == true),
                 ),
                 GoRoute(
                   path: 'marriage/view',

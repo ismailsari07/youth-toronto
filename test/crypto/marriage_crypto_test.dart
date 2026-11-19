@@ -147,6 +147,9 @@ void main() {
       ];
       expect(pickServiceKey(rows, const {}), isNull, reason: 'nothing pinned');
       expect(pickServiceKey(rows, {1: pk})?.keyId, 1);
+      final hex = '\\x${base64.decode(pk).map((b) => b.toRadixString(16).padLeft(2, '0')).join()}';
+      expect(pickServiceKey([{'key_id': 1, 'public_key': hex, 'retired_at': null}], {1: pk})?.publicKey,
+          base64.decode(pk), reason: 'bytea as PostgREST sends it');
       expect(pickServiceKey(rows, {2: pk}), isNull, reason: 'pinned under another id');
       expect(pickServiceKey([{...rows[0], 'retired_at': '2026-11-19T00:00:00Z'}], {1: pk}), isNull);
       final swapped = base64.encode(s.crypto.box.keyPair().publicKey);

@@ -1,0 +1,669 @@
+{
+ "note": "Published form v1 (the seed, pape-admin 20261104120100), for widget tests.",
+ "version": 1,
+ "schema": {
+  "sections": [
+   {
+    "id": "s_D67NWSRW",
+    "title": {
+     "en": "Identity",
+     "fr": "Identité",
+     "tr": "Kimlik"
+    },
+    "fields": [
+     {
+      "id": "q_6MNWUCPS",
+      "type": "short_text",
+      "label": {
+       "en": "Full name",
+       "fr": "Nom complet",
+       "tr": "Ad soyad"
+      },
+      "required": true,
+      "max_length": 120
+     },
+     {
+      "id": "q_AC9NYP69",
+      "type": "single_choice",
+      "label": {
+       "en": "Gender",
+       "fr": "Sexe",
+       "tr": "Cinsiyet"
+      },
+      "options": [
+       {
+        "id": "o_RYDA8Z",
+        "label": {
+         "en": "Male",
+         "fr": "Homme",
+         "tr": "Erkek"
+        }
+       },
+       {
+        "id": "o_VJ8FM8",
+        "label": {
+         "en": "Female",
+         "fr": "Femme",
+         "tr": "Kadın"
+        }
+       }
+      ],
+      "required": true
+     },
+     {
+      "id": "q_VRN8RTR6",
+      "role": "birth_date",
+      "type": "date",
+      "label": {
+       "en": "Date of birth",
+       "fr": "Date de naissance",
+       "tr": "Doğum tarihi"
+      },
+      "required": true
+     },
+     {
+      "id": "q_CKNYBMR7",
+      "type": "single_choice",
+      "label": {
+       "en": "Marital status",
+       "fr": "État civil",
+       "tr": "Medeni durum"
+      },
+      "options": [
+       {
+        "id": "o_G3F8NY",
+        "label": {
+         "en": "Never married",
+         "fr": "Jamais marié(e)",
+         "tr": "Hiç evlenmedim"
+        }
+       },
+       {
+        "id": "o_ZLE3CB",
+        "label": {
+         "en": "Divorced",
+         "fr": "Divorcé(e)",
+         "tr": "Boşandım"
+        }
+       },
+       {
+        "id": "o_2D3US8",
+        "label": {
+         "en": "Widowed",
+         "fr": "Veuf / veuve",
+         "tr": "Eşimi kaybettim"
+        }
+       }
+      ],
+      "required": true
+     }
+    ]
+   },
+   {
+    "id": "s_37GXKMKC",
+    "title": {
+     "en": "Background",
+     "fr": "Origines",
+     "tr": "Geçmiş"
+    },
+    "fields": [
+     {
+      "id": "q_U8NJG9Q3",
+      "type": "short_text",
+      "label": {
+       "en": "Hometown",
+       "fr": "Ville d'origine",
+       "tr": "Memleket"
+      },
+      "required": true,
+      "max_length": 120
+     },
+     {
+      "id": "q_3PKVYVXH",
+      "type": "single_choice",
+      "label": {
+       "en": "Residency status in Canada",
+       "fr": "Statut au Canada",
+       "tr": "Kanada'daki oturum durumu"
+      },
+      "options": [
+       {
+        "id": "o_W6YTVP",
+        "label": {
+         "en": "Citizen",
+         "fr": "Citoyen(ne)",
+         "tr": "Vatandaş"
+        }
+       },
+       {
+        "id": "o_6UNJZX",
+        "label": {
+         "en": "Permanent resident",
+         "fr": "Résident(e) permanent(e)",
+         "tr": "Daimi oturum (PR)"
+        }
+       },
+       {
+        "id": "o_9DA7V7",
+        "label": {
+         "en": "Work permit",
+         "fr": "Permis de travail",
+         "tr": "Çalışma izni"
+        }
+       },
+       {
+        "id": "o_K8AM5C",
+        "label": {
+         "en": "Student",
+         "fr": "Étudiant(e)",
+         "tr": "Öğrenci"
+        }
+       },
+       {
+        "id": "o_NLYS6M",
+        "label": {
+         "en": "Other",
+         "fr": "Autre",
+         "tr": "Diğer"
+        }
+       }
+      ],
+      "required": false
+     },
+     {
+      "id": "q_ATD4MAR3",
+      "type": "single_choice",
+      "label": {
+       "en": "Do your parents live in Canada?",
+       "fr": "Vos parents vivent-ils au Canada ?",
+       "tr": "Anne babanız Kanada'da mı?"
+      },
+      "options": [
+       {
+        "id": "o_B2F4KL",
+        "label": {
+         "en": "Yes, both",
+         "fr": "Oui, les deux",
+         "tr": "Evet, ikisi de"
+        }
+       },
+       {
+        "id": "o_PCERJV",
+        "label": {
+         "en": "One of them",
+         "fr": "L'un d'eux",
+         "tr": "Biri"
+        }
+       },
+       {
+        "id": "o_P7K5NK",
+        "label": {
+         "en": "No",
+         "fr": "Non",
+         "tr": "Hayır"
+        }
+       }
+      ],
+      "required": true
+     },
+     {
+      "id": "q_9WT63WUQ",
+      "type": "short_text",
+      "label": {
+       "en": "Name of one parent",
+       "fr": "Nom de l'un de vos parents",
+       "tr": "Anne veya babanızın adı"
+      },
+      "show_if": {
+       "field": "q_ATD4MAR3",
+       "any_of": [
+        "o_B2F4KL",
+        "o_PCERJV"
+       ]
+      },
+      "required": false,
+      "max_length": 120
+     },
+     {
+      "id": "q_CB9F4A47",
+      "type": "phone",
+      "label": {
+       "en": "That parent's phone number",
+       "fr": "Téléphone de ce parent",
+       "tr": "Anne veya babanızın telefonu"
+      },
+      "show_if": {
+       "field": "q_ATD4MAR3",
+       "any_of": [
+        "o_B2F4KL",
+        "o_PCERJV"
+       ]
+      },
+      "required": false
+     }
+    ]
+   },
+   {
+    "id": "s_9M4EAGY8",
+    "title": {
+     "en": "Work",
+     "fr": "Travail",
+     "tr": "İş"
+    },
+    "fields": [
+     {
+      "id": "q_9WLVXQQN",
+      "type": "short_text",
+      "label": {
+       "en": "Sector",
+       "fr": "Secteur d'activité",
+       "tr": "Sektör"
+      },
+      "required": true,
+      "max_length": 120
+     },
+     {
+      "id": "q_D9DX93NA",
+      "type": "short_text",
+      "label": {
+       "en": "Position",
+       "fr": "Poste",
+       "tr": "Pozisyon"
+      },
+      "required": true,
+      "max_length": 120
+     },
+     {
+      "id": "q_9XK69UZP",
+      "type": "single_choice",
+      "label": {
+       "en": "Average monthly income",
+       "fr": "Revenu mensuel moyen",
+       "tr": "Ortalama aylık gelir"
+      },
+      "options": [
+       {
+        "id": "o_4ZZJRN",
+        "label": {
+         "en": "Under $3,000",
+         "fr": "Moins de 3 000 $",
+         "tr": "3.000 $'dan az"
+        }
+       },
+       {
+        "id": "o_KVR8JK",
+        "label": {
+         "en": "$3,000–4,999",
+         "fr": "3 000 à 4 999 $",
+         "tr": "3.000–4.999 $"
+        }
+       },
+       {
+        "id": "o_74KJZJ",
+        "label": {
+         "en": "$5,000–7,499",
+         "fr": "5 000 à 7 499 $",
+         "tr": "5.000–7.499 $"
+        }
+       },
+       {
+        "id": "o_RURLJK",
+        "label": {
+         "en": "$7,500–9,999",
+         "fr": "7 500 à 9 999 $",
+         "tr": "7.500–9.999 $"
+        }
+       },
+       {
+        "id": "o_2G4HWS",
+        "label": {
+         "en": "$10,000 and above",
+         "fr": "10 000 $ et plus",
+         "tr": "10.000 $ ve üzeri"
+        }
+       }
+      ],
+      "required": false
+     }
+    ]
+   },
+   {
+    "id": "s_9W5AGS6X",
+    "title": {
+     "en": "Physical details",
+     "fr": "Caractéristiques physiques",
+     "tr": "Fiziksel bilgiler"
+    },
+    "fields": [
+     {
+      "id": "q_7GJ8ZYVB",
+      "max": 250,
+      "min": 100,
+      "type": "number",
+      "unit": "cm",
+      "label": {
+       "en": "Height",
+       "fr": "Taille",
+       "tr": "Boy"
+      },
+      "integer": true,
+      "required": false
+     },
+     {
+      "id": "q_KL59EDXK",
+      "max": 250,
+      "min": 30,
+      "type": "number",
+      "unit": "kg",
+      "label": {
+       "en": "Weight",
+       "fr": "Poids",
+       "tr": "Kilo"
+      },
+      "integer": true,
+      "required": false
+     }
+    ]
+   },
+   {
+    "id": "s_PJT7ATEB",
+    "title": {
+     "en": "Religious life",
+     "fr": "Pratique religieuse",
+     "tr": "Dini yaşantı"
+    },
+    "fields": [
+     {
+      "id": "q_JWZRNEUQ",
+      "type": "single_choice",
+      "label": {
+       "en": "Madhhab",
+       "fr": "École juridique (madhhab)",
+       "tr": "Mezhep"
+      },
+      "options": [
+       {
+        "id": "o_UVPK7A",
+        "label": {
+         "en": "Hanafi",
+         "fr": "Hanafite",
+         "tr": "Hanefi"
+        }
+       },
+       {
+        "id": "o_TGHGZ6",
+        "label": {
+         "en": "Shafi'i",
+         "fr": "Chaféite",
+         "tr": "Şafii"
+        }
+       },
+       {
+        "id": "o_YMEYT7",
+        "label": {
+         "en": "Maliki",
+         "fr": "Malikite",
+         "tr": "Maliki"
+        }
+       },
+       {
+        "id": "o_P4X6AA",
+        "label": {
+         "en": "Hanbali",
+         "fr": "Hanbalite",
+         "tr": "Hanbeli"
+        }
+       },
+       {
+        "id": "o_WZ26LS",
+        "label": {
+         "en": "Other",
+         "fr": "Autre",
+         "tr": "Diğer"
+        }
+       }
+      ],
+      "required": false
+     },
+     {
+      "id": "q_JBRTVSZE",
+      "type": "single_choice",
+      "label": {
+       "en": "Prayer",
+       "fr": "Prière",
+       "tr": "Namaz"
+      },
+      "options": [
+       {
+        "id": "o_6UQZND",
+        "label": {
+         "en": "I pray five times a day",
+         "fr": "Je prie cinq fois par jour",
+         "tr": "Beş vakit kılıyorum"
+        }
+       },
+       {
+        "id": "o_YBLPCD",
+        "label": {
+         "en": "I pray sometimes",
+         "fr": "Je prie de temps en temps",
+         "tr": "Ara sıra kılıyorum"
+        }
+       },
+       {
+        "id": "o_YZKUN2",
+        "label": {
+         "en": "I don't pray yet",
+         "fr": "Je ne prie pas encore",
+         "tr": "Henüz kılmıyorum"
+        }
+       }
+      ],
+      "required": true
+     },
+     {
+      "id": "q_WLC54CHY",
+      "type": "single_choice",
+      "label": {
+       "en": "Smoking",
+       "fr": "Tabac",
+       "tr": "Sigara"
+      },
+      "options": [
+       {
+        "id": "o_WQU5HU",
+        "label": {
+         "en": "Yes",
+         "fr": "Oui",
+         "tr": "Evet"
+        }
+       },
+       {
+        "id": "o_KLBH46",
+        "label": {
+         "en": "No",
+         "fr": "Non",
+         "tr": "Hayır"
+        }
+       },
+       {
+        "id": "o_ADEBAN",
+        "label": {
+         "en": "Occasionally",
+         "fr": "Occasionnellement",
+         "tr": "Ara sıra"
+        }
+       }
+      ],
+      "required": true
+     },
+     {
+      "id": "q_8MUN4WD3",
+      "type": "single_choice",
+      "label": {
+       "en": "Alcohol",
+       "fr": "Alcool",
+       "tr": "Alkol"
+      },
+      "options": [
+       {
+        "id": "o_Z2QAAE",
+        "label": {
+         "en": "Yes",
+         "fr": "Oui",
+         "tr": "Evet"
+        }
+       },
+       {
+        "id": "o_Y5W5Y7",
+        "label": {
+         "en": "No",
+         "fr": "Non",
+         "tr": "Hayır"
+        }
+       }
+      ],
+      "required": true
+     }
+    ]
+   },
+   {
+    "id": "s_79ZNMUMA",
+    "title": {
+     "en": "About you",
+     "fr": "À propos de vous",
+     "tr": "Hakkınızda"
+    },
+    "fields": [
+     {
+      "id": "q_YTDVN95J",
+      "help": {
+       "en": "Your hobbies, habits, likes and dislikes, and anything else you'd like us to know.",
+       "fr": "Vos loisirs, vos habitudes, ce que vous aimez et n'aimez pas, et tout ce que vous souhaitez préciser.",
+       "tr": "Hobileriniz, alışkanlıklarınız, sevdikleriniz ve sevmedikleriniz; belirtmek istediğiniz her şey."
+      },
+      "type": "long_text",
+      "label": {
+       "en": "Tell us about yourself",
+       "fr": "Parlez-nous de vous",
+       "tr": "Kendinizden bahsedin"
+      },
+      "required": true,
+      "max_length": 2000
+     },
+     {
+      "id": "q_L466YF2L",
+      "type": "long_text",
+      "label": {
+       "en": "What are you looking for in a spouse?",
+       "fr": "Que recherchez-vous chez un(e) conjoint(e) ?",
+       "tr": "Nasıl birini arıyorsunuz?"
+      },
+      "required": true,
+      "max_length": 2000
+     }
+    ]
+   },
+   {
+    "id": "s_SJCPGRCU",
+    "title": {
+     "en": "Contact",
+     "fr": "Coordonnées",
+     "tr": "İletişim"
+    },
+    "fields": [
+     {
+      "id": "q_QC64L9RR",
+      "type": "phone",
+      "label": {
+       "en": "Phone",
+       "fr": "Téléphone",
+       "tr": "Telefon"
+      },
+      "prefill": "profile",
+      "required": true
+     },
+     {
+      "id": "q_B5T8EW63",
+      "type": "email",
+      "label": {
+       "en": "Email",
+       "fr": "Courriel",
+       "tr": "E-posta"
+      },
+      "prefill": "account",
+      "required": false
+     },
+     {
+      "id": "q_475WJD4E",
+      "type": "short_text",
+      "label": {
+       "en": "Reference's name",
+       "fr": "Nom d'une personne de référence",
+       "tr": "Referans kişinin adı"
+      },
+      "required": false,
+      "max_length": 120
+     },
+     {
+      "id": "q_68WZ46X5",
+      "type": "phone",
+      "label": {
+       "en": "Reference's phone number",
+       "fr": "Téléphone de la personne de référence",
+       "tr": "Referans kişinin telefonu"
+      },
+      "required": false
+     }
+    ]
+   },
+   {
+    "id": "s_F88ZGFNN",
+    "title": {
+     "en": "Photos",
+     "fr": "Photos",
+     "tr": "Fotoğraflar"
+    },
+    "fields": [
+     {
+      "id": "q_X3ZG8GU3",
+      "max": 3,
+      "min": 1,
+      "help": {
+       "en": "Recent photos where your face is clearly visible.",
+       "fr": "Des photos récentes où votre visage est bien visible.",
+       "tr": "Yüzünüzün net göründüğü güncel fotoğraflar."
+      },
+      "type": "photos",
+      "label": {
+       "en": "Your photos",
+       "fr": "Vos photos",
+       "tr": "Fotoğraflarınız"
+      },
+      "required": true
+     }
+    ]
+   },
+   {
+    "id": "s_SXDQ7J3K",
+    "title": {
+     "en": "Consent",
+     "fr": "Consentement",
+     "tr": "Onay"
+    },
+    "fields": [
+     {
+      "id": "q_U3DRC4Q2",
+      "type": "consent",
+      "label": {
+       "en": "I agree that my information and photos will be shared only with the imam and authorized board members.",
+       "fr": "J'accepte que mes informations et mes photos soient partagées uniquement avec l'imam et les membres autorisés du conseil d'administration.",
+       "tr": "Bilgilerimin ve fotoğraflarımın yalnızca cami imamı ve yetkili yönetim kurulu üyeleriyle paylaşılacağını kabul ediyorum."
+      },
+      "required": true
+     }
+    ]
+   }
+  ]
+ }
+}

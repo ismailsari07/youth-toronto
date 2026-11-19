@@ -237,6 +237,7 @@ class AppFeatures {
     this.events = true,
     this.announcements = true,
     this.news = true,
+    this.marriageFormV2 = false,
   });
 
   final bool marriageService;
@@ -246,6 +247,10 @@ class AppFeatures {
 
   /// Camimizden Haberler; a missing flag means on.
   final bool news;
+
+  /// The encrypted marriage application form (1.5.0+). A missing flag means
+  /// OFF: until the panel switches it on, the old document upload stays.
+  final bool marriageFormV2;
 
   factory AppFeatures.parse(Object? raw, AppFeatures fallback) {
     if (raw is! Map) return fallback;
@@ -260,6 +265,9 @@ class AppFeatures {
       events: flag('events', fallback.events),
       announcements: flag('announcements', fallback.announcements),
       news: flag('news', fallback.news),
+      // Missing or not a boolean = off, never the fallback's value. The
+      // server checks the same switch on every submission anyway.
+      marriageFormV2: raw['marriage_form_v2'] == true,
     );
   }
 }

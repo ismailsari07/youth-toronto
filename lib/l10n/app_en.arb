@@ -978,20 +978,49 @@
   "newsOpenPhoto": "Photo {index} of {total}, open full screen",
   "newsViewerHint": "Pinch to zoom, swipe for more",
   "newsViewerHintOne": "Pinch to zoom",
-  "@newsPhotoCount": {"placeholders": {"count": {"type": "int"}}},
-  "@newsOpenPhoto": {"placeholders": {"index": {"type": "String"}, "total": {"type": "String"}}},
+  "@newsPhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@newsOpenPhoto": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
   "forgotPassword": "Forgot password?",
   "confirmEmailTitle": "Confirm your email",
   "confirmEmailSubtitle": "We sent a 6-digit code to {email}.",
-  "@confirmEmailSubtitle": {"placeholders": {"email": {"type": "String"}}},
+  "@confirmEmailSubtitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "emailCodeLabel": "6-digit code",
-  "@emailCodeLabel": {"description": "Label above the code field."},
+  "@emailCodeLabel": {
+    "description": "Label above the code field."
+  },
   "enterEmailCode": "Enter the 6-digit code from the email.",
   "confirmEmailButton": "Confirm",
   "confirmingEmail": "Confirming…",
   "resendCode": "Send the code again",
   "resendCodeIn": "{seconds, plural, one{Send the code again (1 s)} other{Send the code again ({seconds} s)}}",
-  "@resendCodeIn": {"placeholders": {"seconds": {"type": "int"}}},
+  "@resendCodeIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "codeSentAgain": "A new code is on its way.",
   "confirmLaterNote": "Can't find the email? Check your junk folder. Your account is saved: you can also confirm later, the next time you sign in.",
   "errorInvalidCode": "That code is wrong or has expired. Check it, or ask for a new one.",
@@ -1002,12 +1031,173 @@
   "sendCode": "Send code",
   "sendingCode": "Sending…",
   "resetCodeSubtitle": "If {email} has an account, we've sent it a 6-digit code.",
-  "@resetCodeSubtitle": {"placeholders": {"email": {"type": "String"}}},
+  "@resetCodeSubtitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "continueButton": "Continue",
   "checkingCode": "Checking…",
   "resetCodeNote": "No email after a few minutes? Check your junk folder and the address. Accounts made with Apple have no password: use Sign in with Apple.",
   "newPasswordSubtitle": "Choose a new password. You'll stay signed in on this phone.",
   "newPassword": "New password",
   "savePassword": "Save password",
-  "passwordChanged": "Your password has been changed."
+  "passwordChanged": "Your password has been changed.",
+  "mfTitle": "Application form",
+  "@mfTitle": {
+    "description": "Marriage form v2: nav bar title."
+  },
+  "mfSubtitle": "Encrypted on your phone",
+  "@mfSubtitle": {
+    "description": "Marriage form v2: nav bar subtitle."
+  },
+  "mfPrivacy": "Your answers and photos are encrypted on this phone before they are sent. Only the mosque's authorised key holders can open them: not the app's developers, and not the server.",
+  "@mfPrivacy": {
+    "description": "Marriage form v2: privacy strip above the form."
+  },
+  "mfSend": "Send application",
+  "@mfSend": {
+    "description": "Marriage form v2: submit button."
+  },
+  "mfSending": "Sending securely…",
+  "@mfSending": {
+    "description": "Marriage form v2: submit button while sending."
+  },
+  "mfFixErrors": "Some answers need attention. They are marked in red.",
+  "@mfFixErrors": {
+    "description": "Marriage form v2: shown when local checks fail."
+  },
+  "mfClosedTitle": "Not open yet",
+  "@mfClosedTitle": {
+    "description": "Marriage form v2: the service has no active key or is switched off."
+  },
+  "mfClosedBody": "The application form isn't open yet. Please check back later.",
+  "@mfClosedBody": {
+    "description": "Marriage form v2: body when closed."
+  },
+  "mfUpdateBody": "This form needs a newer version of the app. Please update from the App Store.",
+  "@mfUpdateBody": {
+    "description": "Marriage form v2: the published form isn't understood by this build."
+  },
+  "mfLoadFailed": "Couldn't load the form. Please try again.",
+  "@mfLoadFailed": {
+    "description": "Marriage form v2: network or server error while loading."
+  },
+  "mfLeaveTitle": "Leave the form?",
+  "@mfLeaveTitle": {
+    "description": "Marriage form v2: leave warning title."
+  },
+  "mfLeaveBody": "Your answers aren't saved anywhere. If you leave now, they are lost.",
+  "@mfLeaveBody": {
+    "description": "Marriage form v2: leave warning body (drafts are memory only)."
+  },
+  "mfLeave": "Leave and discard",
+  "@mfLeave": {
+    "description": "Marriage form v2: leave warning, destructive action."
+  },
+  "mfStay": "Keep filling in",
+  "@mfStay": {
+    "description": "Marriage form v2: leave warning, stay."
+  },
+  "mfFromProfile": "From your profile",
+  "@mfFromProfile": {
+    "description": "Marriage form v2: caption under a value taken from the profile."
+  },
+  "mfAddPhoto": "Add photo",
+  "@mfAddPhoto": {
+    "description": "Marriage form v2: photo picker button."
+  },
+  "mfRemovePhoto": "Remove photo",
+  "@mfRemovePhoto": {
+    "description": "Marriage form v2: VoiceOver label of the remove button on a photo."
+  },
+  "mfPreparingPhoto": "Preparing photo…",
+  "@mfPreparingPhoto": {
+    "description": "Marriage form v2: while a picked photo is resized and cleaned."
+  },
+  "mfPhotoUnreadable": "This photo couldn't be read. Choose another one.",
+  "@mfPhotoUnreadable": {
+    "description": "Marriage form v2: picked file isn't an image."
+  },
+  "mfPhotoTooLarge": "This photo is too large. Choose another one.",
+  "@mfPhotoTooLarge": {
+    "description": "Marriage form v2: picked photo too large."
+  },
+  "mfErrTooYoung": "Applications are open to members aged 18 and over.",
+  "@mfErrTooYoung": {
+    "description": "Field error: too_young (birth date)."
+  },
+  "mfErrEmail": "Enter a valid email address.",
+  "@mfErrEmail": {
+    "description": "Field error: invalid_email."
+  },
+  "mfErrPhotos": "Add the number of photos asked for.",
+  "@mfErrPhotos": {
+    "description": "Field error: wrong_count (photos)."
+  },
+  "mfErrConsent": "Please confirm to send your application.",
+  "@mfErrConsent": {
+    "description": "Field error: consent not ticked."
+  },
+  "mfErrAlready": "You already have an application.",
+  "@mfErrAlready": {
+    "description": "Submit failure: already_applied."
+  },
+  "mfErrFormChanged": "The form was just updated. Please check your answers and send again.",
+  "@mfErrFormChanged": {
+    "description": "Submit failure: form_changed (answers kept where possible)."
+  },
+  "mfErrSend": "Couldn't send your application. Check your connection and try again.",
+  "@mfErrSend": {
+    "description": "Submit failure: network or other."
+  },
+  "mfSentTitle": "Application sent",
+  "@mfSentTitle": {
+    "description": "Marriage v2 status: heading right after sending."
+  },
+  "mfSentBody": "Your application was encrypted and sent. The Imam reads it in private and contacts you directly if there is a suitable match.",
+  "@mfSentBody": {
+    "description": "Marriage v2 status: body."
+  },
+  "mfNoViewNote": "For your privacy, the app can't show your answers again. To change something, withdraw your application and apply again.",
+  "@mfNoViewNote": {
+    "description": "Marriage v2 status: why there is no view or edit."
+  },
+  "mfWithdrawCaption": "Deletes your answers and photos from the mosque's records",
+  "@mfWithdrawCaption": {
+    "description": "Marriage v2 status: caption under Withdraw."
+  },
+  "mfWithdrawSheetBody": "Your answers and photos will be permanently deleted and the Imam will no longer see them. You can apply again at any time.",
+  "@mfWithdrawSheetBody": {
+    "description": "Marriage v2: withdraw sheet body."
+  },
+  "mfAge": "{age, plural, =1{1 year old} other{{age} years old}}",
+  "@mfAge": {
+    "description": "Marriage form v2: age next to the birth date.",
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "mfSentOn": "Sent {date}",
+  "@mfSentOn": {
+    "description": "Marriage v2 status: date line.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "mfPhotosHint": "{max, plural, =1{One photo} other{Up to {max} photos}}. Location and other hidden details are removed before sending.",
+  "@mfPhotosHint": {
+    "description": "Marriage form v2: photos field hint.",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  }
 }

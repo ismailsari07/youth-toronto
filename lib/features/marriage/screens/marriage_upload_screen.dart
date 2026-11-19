@@ -43,12 +43,12 @@ class MarriageUploadScreen extends ConsumerWidget {
       AsyncData(value: final row?) =>
         switch (eligibilityFor(row['date_of_birth'] as String?)) {
           MarriageEligibility.needsDateOfBirth => const MarriageDobView(),
-          MarriageEligibility.underAge => const _NotEligibleView(),
+          MarriageEligibility.underAge => const MarriageNotEligibleView(),
           MarriageEligibility.eligible => _UploadFlow(replacing: replacing),
         },
       // No profile row, or it failed to load (userProfileProvider maps
       // errors to null). Never guess "no date of birth" from that.
-      AsyncData() || AsyncError() => _ProfileUnavailableView(
+      AsyncData() || AsyncError() => MarriageProfileUnavailableView(
           onRetry: () => ref.invalidate(userProfileProvider),
         ),
       _ => _Frame(title: l.uploadTitle, body: []),
@@ -550,8 +550,9 @@ class _RejectedCard extends StatelessWidget {
 
 // ── Gates in front of the flow ──────────────────────────────────────────────
 
-class _NotEligibleView extends StatelessWidget {
-  const _NotEligibleView();
+/// Under 18 (also used by the v2 form).
+class MarriageNotEligibleView extends StatelessWidget {
+  const MarriageNotEligibleView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -596,8 +597,9 @@ class _NotEligibleView extends StatelessWidget {
   }
 }
 
-class _ProfileUnavailableView extends StatelessWidget {
-  const _ProfileUnavailableView({required this.onRetry});
+/// The profile couldn't be loaded (also used by the v2 form).
+class MarriageProfileUnavailableView extends StatelessWidget {
+  const MarriageProfileUnavailableView({super.key, required this.onRetry});
 
   final VoidCallback onRetry;
 

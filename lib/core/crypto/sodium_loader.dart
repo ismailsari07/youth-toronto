@@ -9,7 +9,7 @@ import 'package:sodium/sodium.dart';
 /// Linux `apt install libsodium23`, macOS `brew install libsodium`.
 Future<Sodium> loadSystemSodium() => SodiumInit.init(() {
       final candidates = [
-        if (Platform.environment['LIBSODIUM_PATH'] case final p?) p,
+        ?Platform.environment['LIBSODIUM_PATH'],
         if (Platform.isMacOS) ...[
           '/opt/homebrew/lib/libsodium.dylib',
           '/usr/local/lib/libsodium.dylib',

@@ -11,16 +11,26 @@ import '../data/marriage_service.dart';
 /// Spec §8a screen 7. Shows the sheet and, if the member confirms, withdraws
 /// (files first, then the row). Resolves true once everything is deleted;
 /// false if they kept their application.
-Future<bool> showWithdrawSheet(BuildContext context) async {
+///
+/// [action] and [body] replace the document withdrawal and its text (the
+/// encrypted application deletes its photos and row instead).
+Future<bool> showWithdrawSheet(
+  BuildContext context, {
+  Future<void> Function()? action,
+  String? body,
+}) async {
   final withdrawn = await showAppSheet<bool>(
     context: context,
-    builder: (_) => const _WithdrawSheet(),
+    builder: (_) => _WithdrawSheet(action: action, body: body),
   );
   return withdrawn ?? false;
 }
 
 class _WithdrawSheet extends StatefulWidget {
-  const _WithdrawSheet();
+  const _WithdrawSheet({this.action, this.body});
+
+  final Future<void> Function()? action;
+  final String? body;
 
   @override
   State<_WithdrawSheet> createState() => _WithdrawSheetState();
@@ -28,7 +38,7 @@ class _WithdrawSheet extends StatefulWidget {
 
 class _WithdrawSheetState extends State<_WithdrawSheet> {
   bool _busy = false;
-  MarriageFailure? _error;
+  String? _error;
 
   Future<void> _withdraw() async {
     setState(() {
@@ -36,13 +46,14 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
       _error = null;
     });
     try {
-      await MarriageService.withdraw();
+      await (widget.action ?? MarriageService.withdraw)();
       if (mounted) Navigator.of(context).pop(true);
-    } on MarriageException catch (e) {
+    } catch (e) {
       if (mounted) {
+        final l = context.l10n;
         setState(() {
           _busy = false;
-          _error = e.failure;
+          _error = e is MarriageException ? e.message(l) : l.withdrawFailed;
         });
       }
     }
@@ -98,7 +109,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
               ),
               const SizedBox(height: 8),
               Text(
-                l.withdrawSheetBody,
+                widget.body ?? l.withdrawSheetBody,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14.5, height: 1.45)
                     .c(context.colors.ink2),
@@ -106,7 +117,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
               if (error != null) ...[
                 const SizedBox(height: 12),
                 Text(
-                  error.message(l),
+                  error,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 13.5).c(context.colors.danger),
                 ),

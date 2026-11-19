@@ -59,6 +59,9 @@ class Question {
     this.min,
     this.max,
     this.integer = false,
+    this.maxLength,
+    this.unit,
+    this.help,
   });
 
   final String id;
@@ -74,6 +77,12 @@ class Question {
   /// number only. A missing key means decimals, as the server reads it
   /// (D1; pape-admin §10).
   final bool integer;
+
+  /// Marriage form v2 extras (registration forms never set them): a text
+  /// field's own limit, a number's unit ("cm") and a help line {tr, en?, fr?}.
+  final int? maxLength;
+  final String? unit;
+  final Map<String, dynamic>? help;
 
   /// Above this many options a single choice opens a sheet instead of radios.
   static const radioLimit = 6;

@@ -22,7 +22,6 @@ import '../../../ui/components/motion.dart';
 import '../../../ui/components/refreshable.dart';
 import '../../../ui/components/stagger.dart';
 import '../../donations/donate_sheet.dart';
-import '../../marriage/data/marriage_application.dart';
 import '../../marriage/marriage_provider.dart';
 import '../../marriage/marriage_routes.dart';
 import '../../marriage/widgets/marriage_widgets.dart';
@@ -52,6 +51,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       onRefresh: () async {
         ref.invalidate(userProfileProvider);
         ref.invalidate(myApplicationProvider);
+        ref.invalidate(mySubmissionProvider);
         await ref.read(userProfileProvider.future);
       },
       padding: EdgeInsets.fromLTRB(
@@ -207,7 +207,10 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     return switch (service.kind) {
       ServiceKind.marriage => _marriageRow(
           l,
-          signedIn ? ref.watch(myApplicationProvider).valueOrNull : null,
+          signedIn
+              ? ref.watch(myApplicationProvider).valueOrNull?.createdAt ??
+                  ref.watch(mySubmissionProvider).valueOrNull?.createdAt
+              : null,
           title: title,
           summary: summary,
           icon: icon,
@@ -238,7 +241,7 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
   /// it still resolves the right screen.
   Widget _marriageRow(
     AppLocalizations l,
-    MarriageApplication? application, {
+    DateTime? submittedAt, {
     required String title,
     required String summary,
     required String icon,
@@ -248,19 +251,19 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
     return FadeSwitch(
       child: _marriageListRow(
         l,
-        application,
+        submittedAt,
         title: title,
         summary: summary,
         icon: icon,
         divided: divided,
-        key: ValueKey(application == null),
+        key: ValueKey(submittedAt == null),
       ),
     );
   }
 
   Widget _marriageListRow(
     AppLocalizations l,
-    MarriageApplication? application, {
+    DateTime? submittedAt, {
     required String title,
     required String summary,
     required String icon,
@@ -272,10 +275,10 @@ class _ProfileRootScreenState extends ConsumerState<ProfileRootScreen> {
       divided: divided,
       icon: icon,
       title: title,
-      subtitle: application != null
-          ? l.submittedOn(dayMonth(l, application.createdAt))
+      subtitle: submittedAt != null
+          ? l.submittedOn(dayMonth(l, submittedAt))
           : (summary.isEmpty ? null : summary),
-      trailing: application == null
+      trailing: submittedAt == null
           ? const RowChevron()
           : const Row(
               mainAxisSize: MainAxisSize.min,

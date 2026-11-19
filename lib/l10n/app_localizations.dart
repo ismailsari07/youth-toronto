@@ -2721,6 +2721,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your password has been changed.'**
   String get passwordChanged;
+
+  /// Marriage form v2: nav bar title.
+  ///
+  /// In en, this message translates to:
+  /// **'Application form'**
+  String get mfTitle;
+
+  /// Marriage form v2: nav bar subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted on your phone'**
+  String get mfSubtitle;
+
+  /// Marriage form v2: privacy strip above the form.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers and photos are encrypted on this phone before they are sent. Only the mosque\'s authorised key holders can open them: not the app\'s developers, and not the server.'**
+  String get mfPrivacy;
+
+  /// Marriage form v2: submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Send application'**
+  String get mfSend;
+
+  /// Marriage form v2: submit button while sending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending securely…'**
+  String get mfSending;
+
+  /// Marriage form v2: shown when local checks fail.
+  ///
+  /// In en, this message translates to:
+  /// **'Some answers need attention. They are marked in red.'**
+  String get mfFixErrors;
+
+  /// Marriage form v2: the service has no active key or is switched off.
+  ///
+  /// In en, this message translates to:
+  /// **'Not open yet'**
+  String get mfClosedTitle;
+
+  /// Marriage form v2: body when closed.
+  ///
+  /// In en, this message translates to:
+  /// **'The application form isn\'t open yet. Please check back later.'**
+  String get mfClosedBody;
+
+  /// Marriage form v2: the published form isn't understood by this build.
+  ///
+  /// In en, this message translates to:
+  /// **'This form needs a newer version of the app. Please update from the App Store.'**
+  String get mfUpdateBody;
+
+  /// Marriage form v2: network or server error while loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the form. Please try again.'**
+  String get mfLoadFailed;
+
+  /// Marriage form v2: leave warning title.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the form?'**
+  String get mfLeaveTitle;
+
+  /// Marriage form v2: leave warning body (drafts are memory only).
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers aren\'t saved anywhere. If you leave now, they are lost.'**
+  String get mfLeaveBody;
+
+  /// Marriage form v2: leave warning, destructive action.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave and discard'**
+  String get mfLeave;
+
+  /// Marriage form v2: leave warning, stay.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep filling in'**
+  String get mfStay;
+
+  /// Marriage form v2: caption under a value taken from the profile.
+  ///
+  /// In en, this message translates to:
+  /// **'From your profile'**
+  String get mfFromProfile;
+
+  /// Marriage form v2: photo picker button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get mfAddPhoto;
+
+  /// Marriage form v2: VoiceOver label of the remove button on a photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get mfRemovePhoto;
+
+  /// Marriage form v2: while a picked photo is resized and cleaned.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing photo…'**
+  String get mfPreparingPhoto;
+
+  /// Marriage form v2: picked file isn't an image.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo couldn\'t be read. Choose another one.'**
+  String get mfPhotoUnreadable;
+
+  /// Marriage form v2: picked photo too large.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is too large. Choose another one.'**
+  String get mfPhotoTooLarge;
+
+  /// Field error: too_young (birth date).
+  ///
+  /// In en, this message translates to:
+  /// **'Applications are open to members aged 18 and over.'**
+  String get mfErrTooYoung;
+
+  /// Field error: invalid_email.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get mfErrEmail;
+
+  /// Field error: wrong_count (photos).
+  ///
+  /// In en, this message translates to:
+  /// **'Add the number of photos asked for.'**
+  String get mfErrPhotos;
+
+  /// Field error: consent not ticked.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm to send your application.'**
+  String get mfErrConsent;
+
+  /// Submit failure: already_applied.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have an application.'**
+  String get mfErrAlready;
+
+  /// Submit failure: form_changed (answers kept where possible).
+  ///
+  /// In en, this message translates to:
+  /// **'The form was just updated. Please check your answers and send again.'**
+  String get mfErrFormChanged;
+
+  /// Submit failure: network or other.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send your application. Check your connection and try again.'**
+  String get mfErrSend;
+
+  /// Marriage v2 status: heading right after sending.
+  ///
+  /// In en, this message translates to:
+  /// **'Application sent'**
+  String get mfSentTitle;
+
+  /// Marriage v2 status: body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your application was encrypted and sent. The Imam reads it in private and contacts you directly if there is a suitable match.'**
+  String get mfSentBody;
+
+  /// Marriage v2 status: why there is no view or edit.
+  ///
+  /// In en, this message translates to:
+  /// **'For your privacy, the app can\'t show your answers again. To change something, withdraw your application and apply again.'**
+  String get mfNoViewNote;
+
+  /// Marriage v2 status: caption under Withdraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Deletes your answers and photos from the mosque\'s records'**
+  String get mfWithdrawCaption;
+
+  /// Marriage v2: withdraw sheet body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers and photos will be permanently deleted and the Imam will no longer see them. You can apply again at any time.'**
+  String get mfWithdrawSheetBody;
+
+  /// Marriage form v2: age next to the birth date.
+  ///
+  /// In en, this message translates to:
+  /// **'{age, plural, =1{1 year old} other{{age} years old}}'**
+  String mfAge(int age);
+
+  /// Marriage v2 status: date line.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent {date}'**
+  String mfSentOn(String date);
+
+  /// Marriage form v2: photos field hint.
+  ///
+  /// In en, this message translates to:
+  /// **'{max, plural, =1{One photo} other{Up to {max} photos}}. Location and other hidden details are removed before sending.'**
+  String mfPhotosHint(int max);
 }
 
 class _AppLocalizationsDelegate

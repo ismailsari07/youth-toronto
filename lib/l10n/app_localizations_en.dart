@@ -1598,4 +1598,140 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordChanged => 'Your password has been changed.';
+
+  @override
+  String get mfTitle => 'Application form';
+
+  @override
+  String get mfSubtitle => 'Encrypted on your phone';
+
+  @override
+  String get mfPrivacy =>
+      'Your answers and photos are encrypted on this phone before they are sent. Only the mosque\'s authorised key holders can open them: not the app\'s developers, and not the server.';
+
+  @override
+  String get mfSend => 'Send application';
+
+  @override
+  String get mfSending => 'Sending securely…';
+
+  @override
+  String get mfFixErrors =>
+      'Some answers need attention. They are marked in red.';
+
+  @override
+  String get mfClosedTitle => 'Not open yet';
+
+  @override
+  String get mfClosedBody =>
+      'The application form isn\'t open yet. Please check back later.';
+
+  @override
+  String get mfUpdateBody =>
+      'This form needs a newer version of the app. Please update from the App Store.';
+
+  @override
+  String get mfLoadFailed => 'Couldn\'t load the form. Please try again.';
+
+  @override
+  String get mfLeaveTitle => 'Leave the form?';
+
+  @override
+  String get mfLeaveBody =>
+      'Your answers aren\'t saved anywhere. If you leave now, they are lost.';
+
+  @override
+  String get mfLeave => 'Leave and discard';
+
+  @override
+  String get mfStay => 'Keep filling in';
+
+  @override
+  String get mfFromProfile => 'From your profile';
+
+  @override
+  String get mfAddPhoto => 'Add photo';
+
+  @override
+  String get mfRemovePhoto => 'Remove photo';
+
+  @override
+  String get mfPreparingPhoto => 'Preparing photo…';
+
+  @override
+  String get mfPhotoUnreadable =>
+      'This photo couldn\'t be read. Choose another one.';
+
+  @override
+  String get mfPhotoTooLarge => 'This photo is too large. Choose another one.';
+
+  @override
+  String get mfErrTooYoung =>
+      'Applications are open to members aged 18 and over.';
+
+  @override
+  String get mfErrEmail => 'Enter a valid email address.';
+
+  @override
+  String get mfErrPhotos => 'Add the number of photos asked for.';
+
+  @override
+  String get mfErrConsent => 'Please confirm to send your application.';
+
+  @override
+  String get mfErrAlready => 'You already have an application.';
+
+  @override
+  String get mfErrFormChanged =>
+      'The form was just updated. Please check your answers and send again.';
+
+  @override
+  String get mfErrSend =>
+      'Couldn\'t send your application. Check your connection and try again.';
+
+  @override
+  String get mfSentTitle => 'Application sent';
+
+  @override
+  String get mfSentBody =>
+      'Your application was encrypted and sent. The Imam reads it in private and contacts you directly if there is a suitable match.';
+
+  @override
+  String get mfNoViewNote =>
+      'For your privacy, the app can\'t show your answers again. To change something, withdraw your application and apply again.';
+
+  @override
+  String get mfWithdrawCaption =>
+      'Deletes your answers and photos from the mosque\'s records';
+
+  @override
+  String get mfWithdrawSheetBody =>
+      'Your answers and photos will be permanently deleted and the Imam will no longer see them. You can apply again at any time.';
+
+  @override
+  String mfAge(int age) {
+    String _temp0 = intl.Intl.pluralLogic(
+      age,
+      locale: localeName,
+      other: '$age years old',
+      one: '1 year old',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mfSentOn(String date) {
+    return 'Sent $date';
+  }
+
+  @override
+  String mfPhotosHint(int max) {
+    String _temp0 = intl.Intl.pluralLogic(
+      max,
+      locale: localeName,
+      other: 'Up to $max photos',
+      one: 'One photo',
+    );
+    return '$_temp0. Location and other hidden details are removed before sending.';
+  }
 }

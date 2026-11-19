@@ -216,6 +216,10 @@ class QuestionField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FieldLabel(pickLabel(question.label, lang), required: question.required),
+          if (question.help case final help? when pickLabel(help, lang).isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(pickLabel(help, lang), style: AppText.caption.c(context.colors.ink2)),
+          ],
           if (hint != null) ...[
             const SizedBox(height: 3),
             Text(hint, style: AppText.caption.c(context.colors.ink3)),
@@ -234,6 +238,7 @@ class QuestionField extends StatelessWidget {
       case QuestionType.number:
         final min = q.min, max = q.max;
         final parts = [
+          ?q.unit,
           if (min != null && max != null)
             l.regRange(_n(min), _n(max))
           else if (min != null)
@@ -262,14 +267,14 @@ class QuestionField extends StatelessWidget {
         return BoxInput(
           controller: controller,
           last: last,
-          maxLength: Question.shortMax,
+          maxLength: q.maxLength ?? Question.shortMax,
           error: hasError,
           onChanged: onChanged,
         );
       case QuestionType.longText:
         return BoxInput(
           controller: controller,
-          maxLength: Question.longMax,
+          maxLength: q.maxLength ?? Question.longMax,
           minLines: 4,
           maxLines: 8,
           counter: true,
@@ -455,7 +460,7 @@ class _ChoiceList extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                     children: [
-                      _Mark(on: picked.contains(id), round: !multi),
+                      ChoiceMark(on: picked.contains(id), round: !multi),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -476,8 +481,8 @@ class _ChoiceList extends StatelessWidget {
 }
 
 /// A radio dot or a checkbox tick.
-class _Mark extends StatelessWidget {
-  const _Mark({required this.on, required this.round});
+class ChoiceMark extends StatelessWidget {
+  const ChoiceMark({super.key, required this.on, required this.round});
 
   final bool on;
   final bool round;

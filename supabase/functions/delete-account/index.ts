@@ -55,6 +55,26 @@ Deno.serve((req) =>
     // This runs for every user, so neither the log nor the timing shows who
     // used the service, and nothing about the file is ever logged.
     async clearMarriage(userId) {
+      // Encrypted applications (app 1.5.0+): photos under
+      // marriage-sealed/{user}/{submission}/{n}.bin, then the row.
+      const sealed = admin.storage.from("marriage-sealed");
+      for (let round = 0; ; round++) {
+        if (round === 10) return false;
+        const { data: folders, error: listErr } = await sealed.list(userId, { limit: 100 });
+        if (listErr) return false;
+        if (!folders || folders.length === 0) break;
+        for (const folder of folders) {
+          const { data: files, error: filesErr } = await sealed.list(`${userId}/${folder.name}`, { limit: 100 });
+          if (filesErr) return false;
+          const paths = (files ?? []).map((f) => `${userId}/${folder.name}/${f.name}`);
+          if (paths.length === 0) continue;
+          const { error: rmErr } = await sealed.remove(paths);
+          if (rmErr) return false;
+        }
+      }
+      const { error: subErr } = await admin.from("marriage_submissions").delete().eq("user_id", userId);
+      if (subErr) return false;
+
       const bucket = admin.storage.from("marriage-documents");
       for (let round = 0; round < 10; round++) {
         const { data: objects, error: listErr } = await bucket.list(userId, {

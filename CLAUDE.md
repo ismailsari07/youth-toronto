@@ -342,8 +342,9 @@ whatever the switch says, so it can be withdrawn. The server refuses a second ap
   `submit_marriage_application`; any failure removes the uploaded parts. Withdraw: photos first, then
   `withdraw_marriage_application`. The member sees only the status, never their answers.
 - `delete-account` also removes `marriage-sealed/{uid}/…` and the `marriage_submissions` row (deployed 2026-11-19, version 12; safe for older apps).
-- Export compliance: `ITSAppUsesNonExemptEncryption` is now `true`; answers in `docs/export-compliance.md`. France is
-  removed from the territories (owner, 2026-11-19), so there is no French declaration.
+- Export compliance: Info.plist has **no** `ITSAppUsesNonExemptEncryption` and no compliance code (`true` without an approved
+  code failed upload with ITMS-90592, build 30), so App Store Connect asks per build; answers in `docs/export-compliance.md`.
+  France is removed from the territories (owner, 2026-11-19), so there is no French declaration.
 
 ## Release checklist
 

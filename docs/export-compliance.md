@@ -8,33 +8,53 @@ marriage applications end to end before upload: X25519 sealed boxes
 (`crypto_box_seal`) and XChaCha20-Poly1305, all standard, published
 algorithms (code: `lib/core/crypto/marriage_crypto.dart`). That is encryption
 for data confidentiality with a library that is **not** Apple's operating
-system, so the app no longer counts as exempt:
-`ITSAppUsesNonExemptEncryption` is now `true` in `ios/Runner/Info.plist`
-(checked by `test/ios/export_compliance_test.dart`).
+system, so the app no longer counts as exempt.
 
-## What happens on upload
+## Info.plist: neither key (decided 2026-11-19)
 
-Each uploaded build shows **"Missing Compliance"** in TestFlight until the
-questions are answered in App Store Connect (TestFlight → the build →
-"Manage" next to the compliance warning). The answers for this app:
+`ios/Runner/Info.plist` has **no** `ITSAppUsesNonExemptEncryption` and **no**
+`ITSEncryptionExportComplianceCode` (checked by
+`test/ios/export_compliance_test.dart`, which also checks the widget's plist).
 
-1. Does your app use encryption? **Yes.**
-2. Algorithm type: **"Standard encryption algorithms instead of, or in
-   addition to, using or accessing the encryption within Apple's operating
-   system."** Not proprietary: libsodium implements published IETF/standard
-   constructions, so no US CCATS is needed.
-3. **France:** Apple asks whether the app is available on the App Store in
-   France. Apple's table ("Export compliance documentation for encryption")
-   says an app using an industry-standard algorithm not provided by the OS
-   needs the **French encryption declaration** only if it is distributed in
-   France. **Decided by the owner on 2026-11-19: France is removed from the
-   app's territories** (App Store Connect → Pricing and Availability) before
-   1.5.0 is submitted, so no French declaration is filed. Answer **No**.
-   If France is ever added back, the declaration (ANSSI) comes first.
+- `false` would be untrue while libsodium is bundled.
+- `true` tells App Store Connect the app has **approved** export compliance
+  documentation, whose code must be in `ITSEncryptionExportComplianceCode`.
+  We have none, so 1.5.0 build 30 was refused at upload with **ITMS-90592**
+  ("Invalid Export Compliance Code … key value [] … doesn't match … the
+  app's export compliance documentation"; `[]` = no code in the plist).
+- With no key, the upload goes through and App Store Connect asks the
+  questions for each build.
 
-Once the answers are accepted for one build, App Store Connect offers to
-reuse them; if Apple issues an export compliance code, it can be added as
-`ITSEncryptionExportComplianceCode` in `Info.plist` so later builds don't ask.
+Put `true` back only together with an Apple-issued code
+(`ITSEncryptionExportComplianceCode`), i.e. after Apple approves documentation
+uploaded in App Store Connect (App Information → App Encryption Documentation).
+This app doesn't need that: standard algorithms, not distributed in France.
+
+## What to answer for each build
+
+The build shows **"Missing Compliance"** in TestFlight until answered:
+TestFlight → the build → "Manage" next to the warning (or the prompt when the
+build is added to a submission). The wording of Apple's dialog changes from time
+to time; the substance of the answers:
+
+1. "What type of encryption algorithms does your app implement?" (or "Does your
+   app use encryption?" → **Yes**): choose **"Standard encryption algorithms
+   instead of, or in addition to, using or accessing the encryption within
+   Apple's operating system."** Not "None of the algorithms mentioned above"
+   (that is only for apps that use nothing but HTTPS/Apple crypto), and not
+   "Proprietary or non-standard" (libsodium implements published
+   constructions, so no US CCATS is needed).
+2. "Is your app going to be available on the App Store in France?" → **No.**
+   Decided by the owner on 2026-11-19: France is removed from the app's
+   territories (App Store Connect → Pricing and Availability) before 1.5.0 is
+   submitted, so no French declaration is filed. If France is ever added back,
+   the declaration (ANSSI) comes first.
+3. If Apple then asks to upload documentation: it shouldn't for this
+   combination. If it does, stop and check Apple's current help before
+   uploading anything; don't invent a code for the plist.
+
+Every new build asks again (the key stays absent). That is the cost of having
+no approved compliance code.
 
 This note records the reasoning, not legal advice. If in doubt (e.g. new
 territories), check Apple's current App Store Connect help on export

@@ -15,6 +15,8 @@ workflows:
     scripts:
       - name: Get packages
         script: flutter pub get
+      - name: libsodium for the crypto tests (the app bundles its own)
+        script: brew list libsodium >/dev/null 2>&1 || brew install libsodium
       - name: Flutter tests
         script: flutter test
       - name: Build for the simulator (no signing)

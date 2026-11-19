@@ -316,6 +316,35 @@ English "4:55 PM", Turkish "16:55" (morning "05:43"), French "16 h 55" (no-break
 Flutter. Display only: instants and scheduling never read it (`test/l10n/clock_format_test.dart`, DST days included).
 `french_layout_test.dart` fails on a 12-hour or colon time on any French screen. Free text from the panel isn't converted.
 
+## Encrypted marriage application (1.5.0, behind `features.marriage_form_v2`)
+
+Phase 3 of the marriage E2EE plan (pape-admin CLAUDE.md §3 `marriage_forms`, `marriage_submissions`, vault). Switch
+`app_config.features.marriage_form_v2`: **missing or anything but `true` = off** (never the cached/bundled value). Off: the
+old document upload, unchanged. On: `/profile/marriage/form` for members without an application. An existing application
+always wins (`MarriageRoutes.entryFor`): a document → its status screen, an encrypted one → `/profile/marriage/submitted`,
+whatever the switch says, so it can be withdrawn. The server refuses a second application of either kind.
+
+- Form: the published `marriage_forms` row, format v2 (`lib/core/forms_v2/marriage_form.dart`, refused if
+  `marriageFormValid` fails → "update the app"). `MarriageFormBody` renders sections, `show_if` live, the eight shared types
+  through the registration widgets (`Question` got optional `maxLength`, `unit`, `help`), and its own email, photos,
+  consent and read-only birth date (from the profile; the DOB gate of the document flow runs first). Prefill: phone from
+  the profile, email from the account (not an Apple relay address). `validateAnswers` runs before sending, as in the key
+  holder's browser. Drafts are memory only; leaving a started form asks first (`PopScope`).
+- Photos (`photo_prep.dart`): decoded in an isolate, orientation baked in, long side ≤ 1600, EXIF/ICC/text removed,
+  JPEG re-encoded; the picker's temp copy is deleted after reading. Only the result is encrypted.
+- Crypto (`lib/core/crypto/`): `sodium` 3.4.6 + `sodium_libs` 3.4.6+4 (pinned). `marriage_crypto.dart` seals only (same
+  format as the panel). Keys: `service_keys.dart` pins the service public keys (**empty until the key ceremony**: then
+  the form says "not open yet"); a key is used only if it is active in `marriage_service_keys` **and** pinned.
+  Tests open the panel's vector (`test/fixtures/marriage-crypto.json`); `dart run tool/marriage_crypto_vector.dart`
+  writes the app's (`marriage-crypto-app.json`), which pape-admin opens. Tests need a system libsodium
+  (`apt install libsodium23` / `brew install libsodium`; `LIBSODIUM_PATH` overrides).
+- Sending (`marriage_v2_service.dart`): new id → seal → upload `marriage-sealed/{uid}/{id}/{n}.bin` → RPC
+  `submit_marriage_application`; any failure removes the uploaded parts. Withdraw: photos first, then
+  `withdraw_marriage_application`. The member sees only the status, never their answers.
+- `delete-account` also removes `marriage-sealed/{uid}/…` and the `marriage_submissions` row (deploy it before 1.5.0 ships).
+- Export compliance: `ITSAppUsesNonExemptEncryption` is now `true`; answers and the France rule in
+  `docs/export-compliance.md`.
+
 ## Release checklist
 
 Full guide: `docs/RELEASE.md`.

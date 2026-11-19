@@ -61,9 +61,12 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<!-- Only standard HTTPS/TLS: no export-compliance questionnaire on upload. -->
+	<!-- Since 1.5.0 the app bundles libsodium (standard algorithms, not Apple's
+	     OS crypto) to encrypt marriage applications end to end, so it is not
+	     exempt: App Store Connect asks the export-compliance questions for each
+	     build. Answers and the France rule: docs/export-compliance.md. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

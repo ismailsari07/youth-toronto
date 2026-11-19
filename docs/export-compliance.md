@@ -26,13 +26,11 @@ questions are answered in App Store Connect (TestFlight → the build →
 3. **France:** Apple asks whether the app is available on the App Store in
    France. Apple's table ("Export compliance documentation for encryption")
    says an app using an industry-standard algorithm not provided by the OS
-   needs the **French encryption declaration** uploaded in App Store Connect
-   **only if it is distributed in France**.
-   - If France is in the app's territories (App Store Connect → Pricing and
-     Availability): either file the French declaration (ANSSI) and upload the
-     approval, or remove France from the territories before 1.5.0 is
-     submitted. This is the mosque's decision; the app is aimed at Toronto.
-   - If France isn't listed: answer **No**, and nothing is uploaded.
+   needs the **French encryption declaration** only if it is distributed in
+   France. **Decided by the owner on 2026-11-19: France is removed from the
+   app's territories** (App Store Connect → Pricing and Availability) before
+   1.5.0 is submitted, so no French declaration is filed. Answer **No**.
+   If France is ever added back, the declaration (ANSSI) comes first.
 
 Once the answers are accepted for one build, App Store Connect offers to
 reuse them; if Apple issues an export compliance code, it can be added as

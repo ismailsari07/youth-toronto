@@ -341,9 +341,9 @@ whatever the switch says, so it can be withdrawn. The server refuses a second ap
 - Sending (`marriage_v2_service.dart`): new id → seal → upload `marriage-sealed/{uid}/{id}/{n}.bin` → RPC
   `submit_marriage_application`; any failure removes the uploaded parts. Withdraw: photos first, then
   `withdraw_marriage_application`. The member sees only the status, never their answers.
-- `delete-account` also removes `marriage-sealed/{uid}/…` and the `marriage_submissions` row (deploy it before 1.5.0 ships).
-- Export compliance: `ITSAppUsesNonExemptEncryption` is now `true`; answers and the France rule in
-  `docs/export-compliance.md`.
+- `delete-account` also removes `marriage-sealed/{uid}/…` and the `marriage_submissions` row (deployed 2026-11-19, version 12; safe for older apps).
+- Export compliance: `ITSAppUsesNonExemptEncryption` is now `true`; answers in `docs/export-compliance.md`. France is
+  removed from the territories (owner, 2026-11-19), so there is no French declaration.
 
 ## Release checklist
 
